@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8" />
+      <meta name="format-detection" content="telephone=no" />
+      <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+      <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.3.2.min.css"/>
+      <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+      <link rel="stylesheet" type="text/css" href="css/index.css" />
+      <title>Corporate Management System</title>
+   </head>
+   <body>
+      <!-- Home -->
+      <div data-role="page" id="father">
+         <header id="xpdHeader" data-theme="b" data-role="header" data-position="fixed">
+            <h2>XpandIT Coporate management System</h2>
+            <nav data-role="navbar" data-iconpos="top">
+               <ul>
+                  <li><a href="#page1" data-transition="fade" data-theme="" data-icon="bars">Knowledge Graph</a></li>
+                  <li><a href="#page1" data-transition="fade" data-theme="" data-icon="star">Projects</a></li>
+                  <li><a href="#page1" data-transition="fade" data-theme="" data-icon="edit">Reports</a>
+                  </li>
+               </ul>
+            </nav>
+         </header>
+         <aside hidden>Hidden for later use of side menu</aside>
+         <section data-role="content">
+            <figure style=" text-align:center" id="xpdLogo">
+               <img id="xpdLogo" src="img/logo.gif">
+            </figure>
+            <ul>
+               <li><a href="welcome.html" data-transition="fade">Other Design</a></li>
+               <li><a href="" data-transition="fade">Task management</a></li>
+               <li><a href="" data-transition="fade">Task asigment</a></li>
+               <li><a href="" data-transition="fade">Task Report</a></li>
+            </ul>
+            <article id="deviceready" class="container">
+               <header><h3>Device Details</h3><time><time></header>
+               <main id="mainContent"></main>
+            </article>
+         </section>
+         <footer id="xpdFooter" data-theme="b" data-role="footer" data-position="fixed">
+            <h3>Footer</h3>
+         </footer>
+      </div>
+      <script type="text/javascript" src="js/libs/jquery/jquery-1.9.1.min.js"></script>
+      <script type="text/javascript" src="js/libs/jquery/jquery.mobile-1.3.2.min.js"></script>
+      <script type="text/javascript" src="js/libs/bootstrap/bootstrap.min.js"></script>
+      <script type="text/javascript" src="js/libs/angular/angular.min.js"></script>
+      <script type="text/javascript" src="js/biliotheca/lib.muneris.js"></script>
+      <script type="text/javascript" src="js/biliotheca/lib.consuetudinem.js"></script>
+      <script type="text/javascript">
+         if(window.PASCO){load_async("cordova.js",false,'end',false)}
+         if(window.PASCO){load_async("js/index.js",false,'end',false)}
+         else {load_async("js/welcome.js",false,'end',false)}
+      </script>
+   </body>
+</html>
+
