@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" ng-app='KingOFkings'>
+   <head>
+      <meta charset="utf-8" /><meta name="format-detection" content="telephone=no" /><meta name="apple-mobile-web-app-capable" content="yes" /><meta name="mobile-web-app-capable" content="yes"><meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+      <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" /><link rel="stylesheet" type="text/css" href="css/index.css" /><link rel="shortcut icon" href="img/fav.png" />
+      <link rel="apple-touch-icon" href="res/icon/android/icon-36-ldpi.png"/><link rel="apple-touch-startup-image" href="res/screen/android/screen-mdpi-portrait.png">
+      <link rel="shortcut icon" sizes="196x196" href="res/screen/android/screen-mdpi-landscape.png"><link rel="shortcut icon" sizes="128x128" href="res/icon/android/icon-36-ldpi.png">
+      <title>Corporate Management System</title>
+   </head>
+   <body hm-swipe-left="showPanel=showPanel=='left'?false:'right'" hm-swipe-right="showPanel=showPanel=='right'?false:'left'"  ng-click="showPanel=false;">
+      <div id="Creator">
+         <section id="initSet" ng-if="!PASCO">
+            <header id="topHeader" class="navbar navbar-default navbar-fixed-top">
+               <section id="logo">&nbsp;</section>
+               <section id="header">
+                  <h2><a href="#genesis">{{site.company}}</a>
+                     <small>{{site.title}}
+                        <span class="dropdown pull-right">
+                           <span class="glyphicon glyphicon-th dropdown-toggle icon-cursor" data-toggle="dropdown"></span>
+                           <ul class="dropdown-menu pull-right" id="theMenu" role="menu"><li ng-repeat="menu in menus" role="presentation" ng-class="(menu.header||menu.divider||'')" ><a ng-show="menu.link" role="menuitem" tabindex="-1" ng-href="{{menu.href}}"><span ng-show="menu.icon" ng-class="'custIcon glyphicon '+(menu.icon||'')"></span>{{menu.text}}</a></li></ul>
+                        </span>
+                     </small>
+                  </h2>
+               </section>
+            </header>
+         </section>
+         <section id="father" class="container-fluid slide-animate-container">
+            <article id="deviceready" class="slide-animate" ng-view></article>
+            <form class="form-inline well well-sm bottom-search" role="form">
+               <div class="input-group col-xs-12 footNote"><span class="glyphicon glyphicon-search input-group-addon white"></span><input type="text" class="form-control" id="inputSearch" placeholder="Search..."></div>
+            </form>
+            <aside class="leftPanel" ng-show="showPanel=='left'" ><ul class="nothing list-group"><li class="list-first-item"></li><li ng-repeat="panel in panelLeft" ng-class="'list-group-item '+{true:panel.cls}[panel.header]"><a ng-href="{{panel.href}}"><span ng-show="panel.icon" ng-class="'glyphicon ' + panel.icon"></span>  {{panel.name}}</a></li></ul></aside>
+            <aside class="rightPanel" ng-show="showPanel=='right'"><ul class="nothing list-group"><li class="list-first-item"></li><li ng-repeat="panel in panelRight" ng-class="'list-group-item '+{true:panel.cls}[panel.header]"><a href="">{{panel.name}}</a></li></ul></aside>
+         </section>
+         <footer id="footer" class="navbar navbar-fixed-bottom navbar-inverse navbar-static"><h4>&copy; 2013 XpandIT</h4><div id='notification'><span>...</span></div></footer>
+      </div>
+      <script type="text/javascript" src="js/libs/jquery/jquery-1.9.1.min.js"></script>
+      <script type="text/javascript" src="js/libs/angular/angular.min.js"></script>
+      <script type="text/javascript" src="js/biliotheca/lib.muneris.js"></script>
+      <script type="text/javascript" src="js/libs/angular/angular-route.min.js"></script>
+      <script type="text/javascript" src="js/libs/angular/angular-animate.min.js"></script>
+      <script type="text/javascript" src="js/libs/angular/angular-sanitize.min.js"></script>
+      <script type="text/javascript" src="js/libs/angular/angular-resource.min.js"></script>
+      <script type="text/javascript" src="js/libs/angular/angular-gestures.min.js"></script>
+      <script type="text/javascript" src="js/libs/angular/app.filters.js"></script>
+      <script type="text/javascript" src="js/libs/angular/app.js" defer ></script>
+      <script type="text/javascript" src="js/libs/angular/app.controllers.js" defer ></script>
+      <script type="text/javascript" src="js/libs/angular/app.service.js"></script>
+      <script type="text/javascript" src="js/biliotheca/lib.consuetudinem.js"></script>
+      <script type="text/javascript">if (window.PASCO) {load_async("cordova.js", false, 'end', false);load_async("js/PushNotification.js", false, 'end', false);load_async("js/index.js", false, 'end', false); }else{load_async("js/welcome.js", false, 'end', false);}</script>
+   </body>
+</html>
+

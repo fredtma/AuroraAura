@@ -1,0 +1,14 @@
+<article  ng-controller="deuteronomy">
+   <header class="menuHeader"><ol class="breadcrumb">
+      <li><a href="#genesis">Home</a></li>
+      <li><a ng-href="{{menu.list[0].url}}">{{menu.list[0].name}}</a></li>
+      <li ng-if="menu.list[1]"><a ng-href="{{menu.list[1].url}}">{{menu.list[1].name}}</a></li>
+      <li class="active" ng-if="menu.list[2]">{{menu.list[2].name}}</li></ol>
+   </header>
+   <ul class="list-group smaller-list">
+      <li class="list-group-item list-header list-group-item-success">Server Log System</li>
+      <li ng-repeat="list in data" ng-class="'list-group-item list-group-item-'+list.statusClass">
+         <span ng-show="list.icon" ng-class="'glyphicon glyphicon-' + list.icon" ></span>{{list.name}}<small> <br/>[{{list.modified}}] {{list.reason}}</small>
+      </li>
+   </ul>
+</article>

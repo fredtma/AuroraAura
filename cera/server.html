@@ -1,0 +1,41 @@
+<article  ng-controller="leviticus">
+   <header class="menuHeader"><ol class="breadcrumb"><li><a href="#genesis">Home</a></li><li><a href="#deutoronomy">Servers</a></li><li class="active">{{$scope.address||"New"}} Server</li></ol><a href="javascript:void(0)" ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></header>
+   <section class="">
+      <form id="srvForm" ng-submit="submit()">
+      <input type="hidden" class="form-control" ng-model="server.jesua" />
+      <input type="hidden" class="form-control" ng-model="server.mailbox" />
+      <div id='srvModified1' class="input-group">
+         <span class="input-group-addon glyphicon glyphicon-calendar"></span>
+         <output class="form-control" ng-model="modified"  >{{server.modified}}</output>
+      </div>
+      <div id='srvModified' class="input-group">
+         <span class="input-group-addon glyphicon glyphicon-book"></span>
+         <input type="text" class="form-control" required placeholder="Server's name" name="name" ng-model="server.name" />
+      </div>
+      <div id='srvModified' class="input-group">
+         <span class="input-group-addon glyphicon glyphicon-cloud"></span>
+         <input type="text" class="form-control" required placeholder="Server address/IP" name="address" ng-model="server.address" />
+      </div>
+      <div id='srvModified' class="input-group">
+         <span class="input-group-addon glyphicon glyphicon-envelope"></span>
+         <input type="text" class="form-control" required placeholder="Mailbox Name / Email address" name="mailbox" ng-model="server.email"  />
+      </div>
+      <div id='srvModified' class="input-group" ng-if="!server.jesua">
+         <span class="input-group-addon glyphicon glyphicon-lock"></span>
+         <input type="password" class="form-control" placeholder="Enter server Password" name="password" ng-model="server.password" />
+      </div>
+      <div ng-if="server.reference">
+         <h4 class="refSection">Link Clients</h4>
+         <div id='srvModified' class="input-group btn-group" data-toggle="buttons" >
+            <span class="input-group-addon glyphicon glyphicon-book"></span>
+            <lable ng-repeat="client in server.reference" ng-init="temp=client.server_name" ng-class="'btn btn-primary '+{true:'active'}[temp!=null]" ng-click="client.server_name=(client.server_name)?null:server.name;temp=(client.server_name)?null:server.server_name;">
+               <input type="checkbox" name="title" ng-model="client.client_name" ng-value="true"/>{{client.client_name}}</lable>
+         </div>
+      </div>
+      <div id='srvModified' class="input-group">
+         <button type="submit" class="form-control btn btn-primary" name="submit" >{{server.submit}}</button>
+      </div>
+      </form>
+      <span>{{server|json}}</span>
+   </section>
+</article>
