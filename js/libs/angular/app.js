@@ -1,6 +1,8 @@
 'use strict'
 angular.module('KingOFkings',['ngRoute','angular-gestures','ngSanitize','ngAnimate','KingsControllers','KingsServices','KingsFilters'])
-.config(['$routeProvider',function($routeProvider){
+.config(['$routeProvider','$compileProvider',function($routeProvider,$compileProvider){
+   $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel|mail|chrome-extension):/);
+//   $compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel|chrome-extension):/);
    $routeProvider
       .when('/genesis/:view?',{templateUrl:'cera/home.html'})
       .when('/exodus/:login?',{templateUrl:'cera/login.html'})
@@ -11,7 +13,8 @@ angular.module('KingOFkings',['ngRoute','angular-gestures','ngSanitize','ngAnima
       .otherwise({redirectTo:'/genesis'});
 }]).run(['notitia','$location','$rootScope',function(notitia,$location,$rootScope){
    notitia.notitia();/*innitiate the DB*/
-   if(!impetroUser().operarius&&$location.$$url!='/exodus') $location.path("/exodus");/*less intensive redirect when not login*/
+   if(!impetroUser().operarius&&$location.$$url!='/exodus') {
+   $location.path("/exodus");}/*less intensive redirect when not login*/
    //$rootScope.$on("$routeChangeStart",function(event,next,current){if(!impetroUser().singularis && next.loadedTemplateUrl!="cera/login.html"){$location.path("/exodus");}});//redirect when not login by watching event
    var href=(impetroUser())?"#joshua/administrator/"+impetroUser().operarius+"/details":"#joshua/administrator/none/details";
    $rootScope.site={"title":sessionStorage.SITE_NAME,"company":"XpandIT"};
@@ -19,9 +22,20 @@ angular.module('KingOFkings',['ngRoute','angular-gestures','ngSanitize','ngAnima
    $rootScope.panelLeft=[{"name":"Functions","id":"panelFunctions","header":true,"cls":"list-header"},{"name":"User Profile","id":"panelProfile","header":false,"icon":"glyphicon-user","href":href},{"name":"Profile List","id":"panelProfileList","header":false,"icon":"glyphicon-list","href":"#joshua/administrator/view/all"},{"name":"Clients","id":"panelClients","header":false,"icon":"glyphicon-briefcase","href":"#numbers/clients/view/all"},{"name":"Servers","id":"panelServers","header":false,"icon":"glyphicon-hdd","href":"#leviticus/servers/view/all"},{"name":"System","id":"panelCommunicate","header":true,"cls":"list-header"},{"name":"Share","id":"panelShare","header":false,"icon":"glyphicon-retweet"},{"name":"Feed Back","id":"panelFeed","header":false,"icon":"glyphicon-comment"},{"name":"Configuration","id":"panelConfig","header":false,"icon":"glyphicon-cog"},{"name":"Help","id":"panelHelp","header":false,"icon":"glyphicon-question-sign"},{"name":"Log Off","id":"panelLogOff","header":false,"icon":"glyphicon-off danger","href":"#exodus/logoff"}];
    $rootScope.panelRight=[{"name":"Knowledge Graph","id":"panelKnowledge","header":true,"cls":"list-header"},{"name":"Email","id":"panelEmail","header":false},{"name":"Network","id":"panelNetword","header":false},{"name":"Setup","id":"panelSetup","header":false},{"name":"Server","id":"panelServer","header":false},{"name":"Software","id":"panelSoftware","header":false}];
    $rootScope.PASCO=PASCO;
+   $rootScope.debug=PASCO?false:false;
+   $rootScope.showPanel=false;
+   $rootScope.exit=function(){if('app' in navigator && 'exitApp' in navigator.app && confirm("Are you sure you want to exit the application?"))navigator.app.exitApp(); else close();}
+   $rootScope.panelMenu=function(swipe){
+      iyona.deb("SWIPE",swipe,$rootScope.showPanel);
+      if(swipe==='left')$rootScope.showPanel=$rootScope.showPanel=='left'?false:'right';
+      else if(swipe==='right')$rootScope.showPanel=$rootScope.showPanel=='right'?false:'left';
+      else $rootScope.showPanel=false;
+   }
+   $rootScope.isViewLoading = false;
 }]);
 //============================================================================//
-
+if (window.PASCO) {load_async("cordova.js", false, 'end', false);load_async("js/PushNotification.js", false, 'end', false);load_async("js/index.js", false, 'end', false); }else{load_async("js/welcome.js", false, 'end', false);}
+//============================================================================//
 configuration.prototype.eternal=function(){
    var date = new Date().format("isoDateTime");
    var scope = {
@@ -45,4 +59,5 @@ configuration.prototype.eternal=function(){
    dynamis.set("loremIpsum",loremIpsum);
    return this;
 };
-(function(){var settings= new configuration(); settings.eternal();  iyona.deb(settings,'settings'); })();
+(function(){var settings= new configuration(); settings.eternal(); })();
+//============================================================================//
