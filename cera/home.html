@@ -1,32 +1,34 @@
 <article  ng-controller="bethel">
    <header class="menuHeader"><ol class="breadcrumb"><li><a href="#genesis">Home</a></li><li class="active">Device Details</li></ol><a title="View operating server" href="#genesis/live" class="glyphicon glyphicon-thumbs-up white"></a><a  href="#genesis/down" title="View down server" class="glyphicon glyphicon-thumbs-down white"></a><a title="View all server" href="#genesis/all" class="glyphicon glyphicon-hand-up white"></a></header>
-   <section class="dashboard">
-      <div class="dashRow">
-         <div class="panel panel-primary dashCell cell ">
-            <div class="panel-body whiteShadow"  ng-click="moveTo('leviticus/servers/view/all',true)">
-               <span class="glyphicon glyphicon-hdd panelIcon"></span>
-               <p>Currently {{total}} operational server<br/>
-                  The last system check ran on {{last}}
-               </p>
+   <section class="dashboard listContainer" >
+      <ul>
+         <li class="dashRow">
+            <div class="panel panel-primary dashCell cell ">
+               <div class="panel-body whiteShadow"  ng-click="moveTo('leviticus/servers/view/all',true)">
+                  <span class="glyphicon glyphicon-hdd panelIcon"></span>
+                  <p>Currently {{total}} monitored server<br/>
+                     The last system check ran on {{last}}
+                  </p>
+               </div>
+               <h3 class="panel-footer">Exchange Mail Server</h3>
             </div>
-            <h3 class="panel-footer">Exchange Mail Server</h3>
-         </div>
-         <div ng-class="'panel '+{true:'panel-danger dashCell cell backRed',false:'panel-primary dashCell cell backBlue'}[down]">
-            <div class="panel-body whiteShadow">
-               <span ng-class="'glyphicon glyphicon-'+{true:'thumbs-down danger',false:'thumbs-up'}[down]+' panelIcon'"></span>
-               <p ng-class="">{{msgStatus}}</p>
+            <div ng-class="'panel '+{true:'panel-danger dashCell cell backRed',false:'panel-primary dashCell cell backBlue'}[down]">
+               <div class="panel-body whiteShadow">
+                  <span ng-class="'glyphicon glyphicon-'+{true:'thumbs-down danger',false:'thumbs-up'}[down]+' panelIcon'"></span>
+                  <p ng-class="">{{msgStatus}}</p>
+               </div>
+               <h3 ng-class="'panel-footer '+{true:'danger',false:'passed'}[down]">Inactive Mail Server</h3>
             </div>
-            <h3 ng-class="'panel-footer '+{true:'danger',false:'passed'}[down]">Inactive Mail Server</h3>
-         </div>
-      </div>
-      <div class="dashRow" ng-repeat="(LineKey,line) in serverLine">
-         <div ng-repeat="server in line" ng-class="'panel dashCell '+{true:' panel-danger backRed',false:' panel-primary backBlue'}[server.status=='down']+{true:' cellBlock',false:' cell'}[serverLine[LineKey].length==1]">
-            <div class="panel-body whiteShadow" ng-init="cnt=cnt+1;" ng-click="moveTo(server.name)">
-               <span ng-class="'panelIcon glyphicon glyphicon-'+{true:'thumbs-down danger',false:'thumbs-up'}[server.status=='down']"></span>
-               <p ng-class=""><strong>{{server.name}}</strong> {{server.status=='down'?"down since":"checked"}} {{server.modified|lastTime}} ago</p>
+         </li>
+         <li class="dashRow" ng-repeat="(LineKey,line) in serverLine | filter:inputSearch">
+            <div ng-repeat="server in line" ng-class="'panel dashCell '+{true:' panel-danger backRed',false:' panel-primary backBlue'}[server.status=='down']+{true:' cellBlock',false:' cell'}[serverLine[LineKey].length==1]">
+               <div class="panel-body whiteShadow" ng-init="cnt=cnt+1;" ng-click="moveTo(server.name)">
+                  <span ng-class="'panelIcon glyphicon glyphicon-'+{true:'thumbs-down danger',false:'thumbs-up'}[server.status=='down']"></span>
+                  <p ng-class=""><strong>{{server.name}}</strong> {{server.status=='down'?"down since":"checked"}} {{server.modified|lastTime}} ago</p>
+               </div>
+               <h3 ng-class="'panel-footer '+{true:'danger',false:'passed'}[server.status=='down']">{{server.address}}</h3>
             </div>
-            <h3 ng-class="'panel-footer '+{true:'danger',false:'passed'}[server.status=='down']">{{server.address}}</h3>
-         </div>
-      </div>
+         </li>
+      </ul>
    </section>
 </article>

@@ -1,49 +1,54 @@
 <article ng-controller="leviticus">
    <section id="listView" ng-if="view=='all'">
       <header class="menuHeader"><ol class="breadcrumb"><li><a href="#genesis">Home</a></li><li class="active">{{menu.list[0].name}}</li></ol><a ng-if="licentia.Alpha" ng-href="{{menu.list[0].url}}" class="glyphicon glyphicon-plus success"></a></header>
-      <section id="mainContent" class="div-striped-">
-         <div class="row numbers-items" ng-repeat="row in data">
-            <div class="col-xs-1">
-               <span ng-if="row.icon" ng-class="'item-icon glyphicon '+row.icon+' '+row.clss "></span>
-            </div>
-            <div class="col-xs-11">
-               <a href="#leviticus/servers/{{row.name}}/details">
-                  <h4>
-                     <span ng-if="row.count" ng-class="'pull-right badge badge-success'">{{row.count}}</span>
-                     <span ng-if="row.tags" ng-repeat="tag in row.tags" ng-class="'pull-right label label-'+(tag.cls||'default')">{{tag.name}}</span>
-                     {{row.name}}
-                  </h4>
-                  <small><span ng-if='row.address'>{{row.address}}.</span> <span ng-if='row.email'>{{row.modified}}</span></small>
-               </a>
-            </div>
+      <section id="mainContent" class='listContainer'>
+         <div id='scroller'>
+            <ul>
+               <li class="row numbers-items" ng-repeat="row in data | filter:inputSearch">
+                  <div class="col-xs-1">
+                     <span ng-if="row.icon" ng-class="'item-icon glyphicon '+row.icon+' '+row.clss "></span>
+                  </div>
+                  <div class="col-xs-11">
+                     <a href="#leviticus/servers/{{row.name}}/details">
+                        <h4>
+                           <span ng-if="row.count" ng-class="'pull-right badge badge-success'">{{row.count}}</span>
+                           <span ng-if="row.tags" ng-repeat="tag in row.tags" ng-class="'pull-right label label-'+(tag.cls||'default')">{{tag.name}}</span>
+                           {{row.name}}
+                        </h4>
+                        <small><span ng-if='row.address'>{{row.address}}.</span> <span ng-if='row.email'>{{row.modified}}</span></small>
+                     </a>
+                  </div>
+               </li>
+            </ul>
          </div>
       </section>
    </section>
    <section id="detailView"  ng-if="view=='details'">
-      <header class="menuHeader"><ol class="breadcrumb"><li><a href="#genesis">Home</a></li><li><a ng-href="{{menu.details[0].url}}">{{menu.details[0].name}}</a></li><li class="active">{{data.name||"New"}} {{menu.details[1].name}}</li></ol><a ng-if="licentia.Alpha" ng-href="{{menu.list[0].url}}" class="glyphicon glyphicon-plus success"></a><a ng-if="licentia.omegA" href="javascript:void(0)" ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></header>
-      <section class="">
-         <form id="srvForm" ng-submit="submit()">
+      <header class="menuHeader"><ol class="breadcrumb"><li><a href="#genesis">Home</a></li><li><a ng-href="{{menu.details[0].url}}">{{menu.details[0].name}}</a></li><li class="active">{{data.name||"New"}} {{menu.details[1].name}}</li></ol><a ng-if="licentia.Alpha" ng-href="{{menu.list[0].url}}" class="glyphicon glyphicon-plus success"></a><a ng-if="licentia.omegA" ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></header>
+      <section  class='listContainer'>
+         <span id="messager" ng-class="'help-block '+{true:'text-danger',false:'text-info'}[err]" ng-show="msg">{{msg}}</span>
+         <form id="srvForm" name="dataForm" ng-submit="submit(dataForm)">
          <input type="hidden" class="form-control" ng-model="data.jesua" />
          <input type="hidden" class="form-control" ng-model="data.mailbox" />
-         <div id='srvModified1' class="input-group">
+         <div id='srvModified1'  class="input-group">
             <span class="input-group-addon glyphicon glyphicon-calendar"></span>
             <output class="form-control" ng-model="modified"  >{{data.modified}}</output>
          </div>
-         <div id='srvModified' class="input-group">
+         <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.name]">
             <span class="input-group-addon glyphicon glyphicon-book"></span>
             <input type="text" class="form-control" required placeholder="Server's name" autofocus name="name" ng-model="data.name" title="Server's name" />
          </div>
-         <div id='srvModified' class="input-group">
+         <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.address]">
             <span class="input-group-addon glyphicon glyphicon-cloud"></span>
             <input type="text" class="form-control" required placeholder="Server address/IP" name="address" ng-model="data.address" title="Server address/IP" />
          </div>
-         <div id='srvModified' class="input-group">
+         <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.mailbox]">
             <span class="input-group-addon glyphicon glyphicon-envelope"></span>
-            <input type="email" class="form-control" ng-required="!data.email" placeholder="Mailbox Name / Email address" name="mailbox" ng-model="data.email"title="Server's name" title="Mailbox Name / Email address" />
+            <input type="email" class="form-control" required placeholder="Mailbox Name / Email address" name="mailbox" ng-model="data.email" title="Mailbox Name / Email address" />
          </div>
-         <div id='srvModified' class="input-group" ng-if="!data.jesua">
+         <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.password]" ng-if="!data.jesua">
             <span class="input-group-addon glyphicon glyphicon-lock"></span>
-            <input type="password" class="form-control" placeholder="Enter server Password" name="password" ng-model="data.password" title="Enter server Password" />
+            <input type="password" required class="form-control" placeholder="Enter server Password" name="password" ng-model="data.password" title="Enter server Password" />
          </div>
          <div ng-if="opt.reference" ng-repeat="(key,links) in opt.reference" >
             <h4 class="refSection">{{opt.foreign[key].title}}</h4>
@@ -53,14 +58,14 @@
                   <input type="{{type||'checkbox'}}" name="title" ng-model="link[col2]" ng-value="true" />{{link[col2]}}</lable>
             </div>
          </div>
-         <div id='srvModified' class="input-group" ng-if="data.jesua">
+         <div id='srvModified'  class="input-group" ng-if="data.jesua">
             <span class="input-group-addon glyphicon glyphicon-link"></span>
             <a ng-href="{{'#deuteronomy/log-servers/'+data.name+'/'+data.address}}">Click here to view server's log <small>(This will take you to a different page)</small></a>
          </div>
-         <div ng-if="licentia.deLta" id='srvModified' class="input-group">
-            <button type="submit" ng-class="btnClass" name="submit" >{{btn}}</button>
+         <div ng-if="licentia.deLta" id='srvModified'  class="input-group">
+            <button type="submit"  ng-class="btnClass" name="submit" >{{btn}}</button>
          </div>
          </form>
-      </section><small>{{licentia|json}}<hr/>{{data|json}}<br/>{{opt.reference|json}}</small>
+      </section><small  ng-if="debug">{{licentia|json}}<hr/>{{data|json}}<br/>{{opt.reference|json}}</small>
    </section>
 </article>

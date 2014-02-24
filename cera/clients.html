@@ -1,8 +1,8 @@
 <article  ng-controller="numbers">
    <section id="listView" ng-if="view=='all'">
       <header class="menuHeader"><ol class="breadcrumb"><li><a href="#genesis">Home</a></li><li class="active">{{menu.list[0].name}}</li></ol><a ng-if="licentia.Alpha" ng-href="{{menu.list[0].url}}" class="glyphicon glyphicon-plus success"></a></header>
-      <section id="mainContent" class="div-striped-">
-         <div class="row numbers-items" ng-repeat="row in data">
+      <section id="mainContent" class='listContainer'>
+         <div class="row numbers-items" ng-repeat="row in data | filter:inputSearch">
             <div class="col-xs-1">
                <span ng-class="'item-icon glyphicon glyphicon-briefcase success'"></span>
             </div>
@@ -18,39 +18,39 @@
       </section>
    </section>
    <section id="detailView"  ng-if="view=='details'">
-      <header class="menuHeader"><ol class="breadcrumb"><li><a href="#genesis">Home</a></li><li><a ng-href="{{menu.details[0].url}}">{{menu.details[0].name}}</a></li><li class="active">{{data.name||"New"}} {{menu.details[1].name}}</li></ol><a ng-if="licentia.Alpha" ng-href="{{menu.list[0].url}}" class="glyphicon glyphicon-plus success"></a><a ng-if="licentia.omegA" href="javascript:void(0)" ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></header>
-      <section class="">
-         <form id="clientForm" ng-submit="submit()">
+      <header class="menuHeader"><ol class="breadcrumb"><li><a href="#genesis">Home</a></li><li><a ng-href="{{menu.details[0].url}}">{{menu.details[0].name}}</a></li><li class="active">{{data.name||"New"}} {{menu.details[1].name}}</li></ol><a ng-if="licentia.Alpha" ng-href="{{menu.list[0].url}}" class="glyphicon glyphicon-plus success"></a><a ng-if="licentia.omegA" ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></header>
+      <section  class='listContainer'><span id="messager" ng-class="'help-block '+{true:'text-danger',false:'text-info'}[err]" ng-show="msg">{{msg}}</span>
+         <form id="clientForm" name="dataForm" ng-submit="submit(dataForm)">
             <input type="hidden" class="form-control" ng-model="data.jesua" />
          <div id='srvModified1' class="input-group">
             <span class="input-group-addon glyphicon glyphicon-calendar"></span>
             <output class="form-control" ng-model="data.modified"  >{{data.modified}}</output>
          </div>
-         <div id='srvModified' class="input-group">
+         <div  ng-class="'input-group '+{true:'has-error'}[errMsg.name]">
             <span class="input-group-addon glyphicon glyphicon-qrcode"></span>
             <input type="text" class="form-control" required placeholder="Client's name" title="Client's name" autofocus name="name" ng-model="data.name" />
          </div>
-         <div id='srvModified' class="input-group">
+         <div  ng-class="'input-group '+{true:'has-error'}[errMsg.code]">
             <span class="input-group-addon glyphicon glyphicon-barcode"></span>
             <input type="text" class="form-control" required placeholder="Unique company code" title="Unique company code" name="code" ng-model="data.code" />
          </div>
-         <div id='srvModified' class="input-group">
+         <div  class="input-group">
             <span class="input-group-addon glyphicon glyphicon-align-left"></span>
             <input type="text" class="form-control" placeholder="Company desscription" title="Company desscription" name="desc" ng-model="data.desc" />
          </div>
          <div ng-if="opt.reference" ng-repeat="(key,links) in opt.reference" >
             <h4 class="refSection">{{opt.foreign[key].title}}</h4>
-            <div id='srvModified' class="input-group btn-group" data-toggle="buttons" ng-init="col1=opt.foreign[key].col1;col2=opt.foreign[key].col2;parent=data[opt.foreign[key].parent];type=opt.foreign[key].type;">
+            <div  class="input-group btn-group" data-toggle="buttons" ng-init="col1=opt.foreign[key].col1;col2=opt.foreign[key].col2;parent=data[opt.foreign[key].parent];type=opt.foreign[key].type;">
                <span class="input-group-addon glyphicon glyphicon-book"></span>
                <lable ng-repeat="(k,link) in links.rows" ng-init="temp=link[col1]" ng-class="'btn btn-primary '+{true:'active'}[temp!=null]" ng-click="DBenum(links,parent,col1,k,type); ">
                   <input type="{{type||'checkbox'}}" name="title" ng-model="link[col2]" ng-value="true" />{{link[col2]}}</lable>
             </div>
          </div>
-         <div id='srvModified' class="input-group">
+         <div  class="input-group">
             <button ng-if="licentia.deLta" type="submit" ng-class="btnClass" name="submit" >{{btn}}</button>
          </div>
          </form>
       </section>
    </section>
-   <small ng-show="!PASCO">{{data|json}} <hr/>{{opt.reference|json}}</small>
+   <small ng-if="debug">{{data|json}} <hr/>{{opt.reference|json}}</small>
 </article>
