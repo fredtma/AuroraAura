@@ -1,15 +1,16 @@
 
-<section id="detailView"  ng-controller="exodus">
+<section id="detailView" ng-controller="exodus">
    <header class="menuHeader"><ol class="breadcrumb"><li>User Login</li></ol></header>
-   <section class="">
-      <form id="userForm" ng-submit="login()" >
-         <div id='srvModified' class="input-group">
+   <section class='listContainer'>
+      <span id="messager" ng-class="'help-block '+{true:'text-danger',false:'text-info'}[err]" ng-show="msg">{{msg}}</span>
+      <form id="userForm" name="dataForm" ng-submit="login()" >
+         <div id='srvModified' ng-class="'input-group '+{true:'has-error'}[errMsg.username]">
             <span class="input-group-addon glyphicon glyphicon-user"></span>
             <input type="text" class="form-control" required placeholder="Username or Email" autofocus name="username" ng-model="data.username" />
          </div>
-         <div id='srvModified' class="input-group">
+         <div id='srvModified' ng-class="'input-group '+{true:'has-error'}[errMsg.password]">
             <span class="input-group-addon glyphicon glyphicon-lock"></span>
-            <input type="password" class="form-control" placeholder="Enter server Password" name="password" ng-model="data.password" />
+            <input type="password" class="form-control" required placeholder="Enter server Password" name="password" ng-model="data.password" />
          </div>
          <div id='srvModified' class="input-group">
             <button type="submit" class="form-control btn btn-primary width50" name="login" >Login</button>
