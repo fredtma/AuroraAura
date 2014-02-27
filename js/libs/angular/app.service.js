@@ -1,7 +1,7 @@
 'use strict'
 var cor=angular.module('KingsServices',[,'ngResource']);
 
-cor.factory('online',['$resource',online]).service('notitia',['$resource',notitia]).service('fetch',['$http',fetch]).service('crud',['notitia','$routeParams',crud]);
+cor.factory('online',['$resource',online]).service('notitia',['$resource','$rootScope',notitia]).service('fetch',['$http','$rootScope',fetch]).service('crud',['notitia','$routeParams',crud]);
 //############################################################################//
 //ONLINE                                                                      //
 //############################################################################//
@@ -27,7 +27,7 @@ function online($resource){
 //############################################################################//
 //NOTITIA                                                                     //
 //############################################################################//
-function notitia($resource){
+function notitia($resource,$rootScope){
    var that=this,eternal=eternalCall();
    if(dynamis.get("CONFIG").openDatabase===false&&dynamis.get("CONFIG").indexedDB===false&&dynamis.get("CONFIG").Online===false)return false;
    if(eternal){that.name=eternal.form.field.name;that.frmName='frm_'+that.name;that.frmID='#frm_'+that.name;}
@@ -563,19 +563,17 @@ function notitia($resource){
    }//end firstKing
    //=========================================================================//ONLINE
    this.secondKings=function(callback){
-      if(dynamis.get("CONFIG").Online){
+      if(dynamis.get("CONFIG").Online){$rootScope.isViewLoading = {"width":"100%"};
          that.basilia=that.basilia||dynamis.get("quaerere",true);//,"headers":{"Content-Type":"application/x-www-form-urlencoded"}
          var service=$resource(dynamis.get("SITE_MILITIA"),{},{"militia":{"method":"POST" ,isArray:false,"cache":false,"responseType":"json","withCredentials":true}});
-         if(!PASCO&&dynamis.get("CONFIG").isOnline){service.militia(that.basilia,function(j){
-               iyona.deb(typeof j.notitia.idem,'j.notitia.idem');
-               iyona.deb(j.notitia.idem,'j.notitia.idem',j.notitia.idem!=0,j.notitia.idem!='0');
+         if(!PASCO&&dynamis.get("CONFIG").isOnline){service.militia(that.basilia,function(j){$rootScope.isViewLoading = false;
                if(j.notitia)iyona.log(j.notitia.sql);
                if(j.notitia&&j.notitia.idem!='0'){var u=dynamis.get("USER_NAME",true);u.cons=j.notitia.idem;dynamis.set("USER_NAME",u,true)}//pour maitre un autre biscuit
                iyona.log(j,'Online');if(typeof callback=="function")callback(j);});}
-         else if(!dynamis.get("CONFIG").isOnline){iyona.msg("You are currently offline",true,"danger bold");}
+         else if(!dynamis.get("CONFIG").isOnline){iyona.msg("You are currently offline",true,"danger bold");$rootScope.isViewLoading = false;}
          else if(PASCO){var Connection=checkConnection();
             if(Connection==Connection.NONE){iyona.msg("You are currently offline",true,"danger bold");}//@doto: connection
-            else{service.militia(that.basilia,function(j){
+            else{service.militia(that.basilia,function(j){$rootScope.isViewLoading = false;
                if(j.notitia)iyona.log(j.notitia.sql);
                if(j.notitia&&j.notitia.idem!=0){var u=dynamis.get("USER_NAME",true);u.cons=j.notitia.idem;dynamis.set("USER_NAME",u)}//pour maitre un autre biscuit
                iyona.log(j,'Online');if(typeof callback=="function")callback(j);});}
@@ -587,13 +585,14 @@ function notitia($resource){
 //############################################################################//
 //FETCH                                                                       //
 //############################################################################//
-function fetch($http){
+function fetch($http,$rootScope){
    this.responseType=this.responseType||"json";
    if(!dynamis.get("CONFIG").isOnline){iyona.msg("Your device is currently Offline.",true,"danger bold"); return false;}//@todo
-   this.post=function(url,params,callback){
-      $http.post(url,$.param(params),{"responseType":this.responseType,"cache":true,"headers":{"Content-Type":"application/x-www-form-urlencoded"},"withCredentials":true}).success(callback)
+   this.post=function(url,params,callback){$rootScope.isViewLoading = {"width":"100%"};
+      $http.post(url,$.param(params),{"responseType":this.responseType,"cache":true,"headers":{"Content-Type":"application/x-www-form-urlencoded"},"withCredentials":true})
+      .success(function(server){$rootScope.isViewLoading = false;callback(server);})
 //      $http({"url":url,"params":params,"method":"POST","responseType":this.responseType,"cache":true,"headers":{"Content-Type":"application/x-www-form-urlencoded"},"withCredentials":true}).success(callback)
-      .error(function(data,status,headers,config){
+      .error(function(data,status,headers,config){$rootScope.isViewLoading = false;
          if(status==404&&PASCO&&navigator.connection.type=="none") iyona.msg("Please check your internet connection::"+navigator.connection.type,true,'danger bold');
          if(status==404&&PASCO) iyona.msg("Please check your internet connection::"+navigator.connection.type,true,'danger bold');
          iyona.log("There was an error in handling the transaction.");
@@ -613,6 +612,7 @@ function crud(notitia,$routeParams){
       that.scope.data={};
       if(details!=='new'&&details!=='view'){notitia.firstKings(mensa,scope.details,3,this.details,conseutudinem)}
       else if(view=='all'){notitia.firstKings(mensa,scope.list,3,this.list);}
+      else {$scope.data.created=new Date().format("isoDateTime");$scope.data.modified=new Date().format("isoDateTime");}//new record
       return view;
    };
    this.details=function(server){
@@ -622,17 +622,22 @@ function crud(notitia,$routeParams){
       }else{var msg=("notitia" in server)?server.notitia.err:null; iyona.msg(msg||"There was an error fetching the selected record",true,"danger");}
    };
    this.list=function(server){
-      if("notitia" in server&&"err" in server.notitia){iyona.msg(server.notitia.err,true,'danger',true);
-      }else if("notitia" in server){that.scope.data=server.notitia.iota;that.scope.$broadcast("readyList",server.notitia);iyona.msg(server.notitia.msg,true,"danger");iyona.deb(server.notitia.iota,"List");
+      if("notitia" in server&&"err" in server.notitia){iyona.msg(server.notitia.err,false,'success',true);
+      }else if("notitia" in server){
+         that.scope.data=server.notitia.iota;
+         that.scope.$broadcast("readyList",server.notitia);
+         /*set scroller*/setTimeout(SETiSCROLL,1000);
+         iyona.msg(server.notitia.msg,true,"danger");iyona.deb(server.notitia.iota,"List");
       }else{iyona.msg("There was an error fetching the selected record",true,"danger",true);}
    };
    this.submit=function($scope,mensa,conseutudinem){
-      var tau=$scope.data.jesua?"deLta":"Alpha";
+      var tau=$scope.data.jesua?"deLta":"Alpha";if(this.check($scope,'dataForm')===false)return false;
       if(tau=="deLta"){delete $scope.data.created;}//upon update do not change the creation date.
       try{
          notitia.firstKings(mensa,$scope.data,tau,function(server){if("notitia" in server===false){iyona.msg(server.notitia.err||"There was an error from the server",server);return false;}
             var notitia=server.notitia,consuetudinem=notitia.consuetudinem,err="err" in notitia?true:false,clss=err?"danger bold":"success";
             if(tau=="Alpha"&&err)$scope.data.jesua=null;//if there is an error when adding data reset the form jesua
+            else $scope.btn="Update "+that.keyName;
             if(consuetudinem.links){$scope.opt.reference=consuetudinem.links;} //do not overflow the update
 //            $scope.btnClass=err?"form-control btn btn-danger":"form-control btn btn-success";//somehow this is not working
             var tmp=$scope.btn;$scope.btn=notitia.msg;setTimeout(function(){$scope.btn=tmp;$scope.$apply();},2000);
@@ -641,12 +646,12 @@ function crud(notitia,$routeParams){
       }catch(e){iyona.msg("There was an internal error. return to the previous page and try again."); iyona.log("Internal error::"+e.message,e);if(tau=="Alpha");$scope.data.jesua=null;}
    }
    this.delete=function($scope,mensa){
-      var msg="Would you like to remove the current record?";
       if(!$scope.data.jesua){iyona.msg("You need to add a new record first.",false,"danger bold"); return false;}
-      if (PASCO){navigator.notification.confirm(msg,function(buttonIndex){
-            if(buttonIndex==1){this.remove($scope,mensa);}
-         },"Remove Server",["Yes","No"]);
-      }else if(confirm(msg)){this.remove($scope,mensa);};
+      $("#myModal").modal("show");
+      $(".modal-title").html("Remove Record");
+      $(".modal-body").html("Would you like to remove the current record?");
+      $("#btnYesModal").click(function(){that.remove($scope,mensa);$(this).unbind('click');$("#myModal").modal("hide");});
+      return;
    }
    this.remove=function($scope,mensa){
       var tau="omegA";
@@ -654,7 +659,7 @@ function crud(notitia,$routeParams){
          if(!server.notitia) {iyona.log("There was an error retrieving notitia"); return false};
          if("err" in server.notitia) {iyona.log(server.notitia.err,true,'danger',true); return false};
          var notitia=server.notitia,err="err" in notitia?true:false,clss=err?"danger bold":"success";
-         var scope=dynamis.get("scope")[$routeParams.page];$scope.data=scope;$scope.opt.reference=null;//empty scope
+         var scope=dynamis.get("scope")[$routeParams.page];$scope.data=scope;$scope.btn="Add a new "+that.keyName;$scope.opt.reference=null;//empty scope
          if(notitia.consuetudinem&&notitia.consuetudinem.servers&&notitia.consuetudinem.servers.length>0){}
          iyona.msg(notitia.msg,true,clss);
       });
@@ -676,7 +681,19 @@ function crud(notitia,$routeParams){
       else {field+=','+val;iyona.deb(field,"third");}
       return field;
    }
-   this.rem=function(){}
+   this.check=function($scope,name){ if (name in $scope===false){iyona.deb("The "+name+" cannot be found in the form",$scope); return false;}
+      var frm=$scope[name],invalid=frm.$invalid,x,l,row,title,msg=[],
+      message={"email":"is not a valid email","required":"is required"};
+      if(invalid){$scope.err=true;$scope.errMsg={};
+         for(var type in frm.$error){l=frm.$error[type].length;
+            for(x=0;x<l;x++){row=frm.$error[type][x];title=ucfirst(row.$name);
+               $scope.errMsg[row.$name]=true;//frm[row.$name].$error[type];
+               msg.push(" "+title+" "+message[type]);
+            }}
+         if(frm){}iyona.deb("SCOPE",frm,$scope);
+         $scope.msg=msg.join();return false;}
+      $scope.errMsg=null;$scope.err=false;$scope.msg=null;return true;
+   }
 }
 //############################################################################//
 //CRUD                                                                        //

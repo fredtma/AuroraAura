@@ -27,7 +27,7 @@ iyona={
          else console.log(arguments[x]);}},/*for workers or gap application display objects*/
    log:function(){if(iyona.enableLog){if(arguments[1]!==false)console.log('%c'+arguments[0],'background:#2d79aa;color:#d9edf7;width:100%;display:block;font-weight:bold;',arguments); else console.log('%c'+arguments[0],'background:#ff0000;color:#d9edf7;width:100%;display:block;font-weight:bold;',arguments);}},/*notification msg for the log and all set var*/
    msg:function(msg,permanent,clss,opt){if(iyona.view){console.log(arguments);clss=clss||'';_$("#notification span").html(msg).removeClass().addClass('blink_me '+clss);if(permanent!==true)setTimeout(function(){_$("#notification span").html("...").removeClass('blink_me');},5000); }},/*debug msg and all set var*/
-   deb:function(){if(iyona.view){if(!PASCO){arguments[arguments.length++]=this.pup();this.pop.apply(console,arguments);}else{this.obj(arguments);} }}/*break down all set var into arr, custom debug msg re-created*/
+   deb:function(){if(iyona.view){if(!PASCO||true){arguments[arguments.length++]=this.pup();this.pop.apply(console,arguments);}else{this.obj(arguments);} }}/*break down all set var into arr, custom debug msg re-created*/
 }
 //============================================================================//STORAGE
 dynamis={
@@ -40,8 +40,8 @@ dynamis={
    },
    get:function(_key,_local){
       var value;
-      if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.get(_key,function(obj){return obj[_key]});return sessionStorage.getItem(_key);}
-      else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.get(_key,function(obj){return obj[_key]});return sessionStorage.getItem(_key);}
+      if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.get(_key,function(obj){return obj[_key]});value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
+      else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.get(_key,function(obj){return obj[_key]});value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
       else if(_local==true){value=localStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
       else{value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}//endif
    },
@@ -88,7 +88,8 @@ configuration.prototype.config=function(){
       "PASCO":window.PASCO,
       "isOnline":navigator.onLine,
       "Online":true,
-      "projectID":"17238315752"
+      "projectID":"17238315752",
+      "app":(typeof chrome !== "undefined" && chrome.hasOwnProperty("identity"))
    });
    dynamis.set("EXEMPLAR",JSON.stringify({"username":["^[A-Za-z0-9_]{6,15}$","requires at least six alpha-numerique character"],
    "pass1":["((?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{6,20})","requires complex phrase with upperCase, lowerCase, number and a minimum of 6 chars"],
@@ -107,7 +108,7 @@ configuration.prototype.config=function(){
    var config = dynamis.get("CONFIG"); config.openDatabase=false;config.indexedDB=false;dynamis.set("CONFIG",config);
 return this;
 };
-(function(){var settings= new configuration(); iyona.deb(settings,'settings');settings.config(); })();
+(function(){var settings= new configuration(); settings.config(); })();
 //============================================================================//INNITIATOR
 _$=function(element){return angular.element(document.querySelectorAll(element));}
 //============================================================================//
@@ -345,6 +346,7 @@ ucwords = function (str)
         return $1.toUpperCase();
     });
 }//end function
+ucfirst=function(word){return word.charAt(0).toUpperCase() + word.substring(1);}
 //============================================================================//
 /**
  * change into alpha numerical, with no spacing
@@ -569,9 +571,9 @@ helpfullLink=function(_now,_curr){
       _now+=encore;//var collapse=$(".collapse").length;
       if(j.rows.length){
          var row=j[0];var content=row['content'];var title=row['title'];var next=row['option'];var pos=row['position'];
-         var link="<div class='pager small'><ul><li class='previous'><a href='javascript:void(0)' onclick='javascript:$(\""+_now+"\").popover(\"destroy\");' >Close</a></li>";
-         if(next!=='none'&&!def)link+="<li class='next'><a href='javascript:void(0)' onclick='helpfullLink(\""+next+"\",\""+_now+"\")' >Next »</a></li></ul></div>";
-         else if(def)link+="<li class='next'><a href='javascript:void(0)' onclick='helpfullLink(\""+def+"\",\""+_now+"\")' >Next »</a></li></ul></div>";
+         var link="<div class='pager small'><ul><li class='previous'><a href='#' onclick='javascript:$(\""+_now+"\").popover(\"destroy\");' >Close</a></li>";
+         if(next!=='none'&&!def)link+="<li class='next'><a href='#' onclick='helpfullLink(\""+next+"\",\""+_now+"\")' >Next »</a></li></ul></div>";
+         else if(def)link+="<li class='next'><a href='#' onclick='helpfullLink(\""+def+"\",\""+_now+"\")' >Next »</a></li></ul></div>";
          iyona.deb(_now,"_now",$(_now)[0]);
          content=content+link;var len=$(_now).length;if(len>1)_now=$(_now)[0];
          iyona.deb(_now,"_now",$(_now));
@@ -590,7 +592,7 @@ helpfullLink=function(_now,_curr){
  * @param object <var>_next</var> the next hint object
  */
 helpfullNext=function(_now,_next){
-   var next="<br/><a href='javascript:void(0)' class='helpNext' onclick='helpfullNext(\'\')' >Next >></a>";
+   var next="<br/><a href='#' class='helpNext' onclick='helpfullNext(\'\')' >Next >></a>";
    var content=$(_next).data('content')+next;
    $(_now).popover('destroy');
    $(_next).popover({"html":true,"trigger":"click","content":content});$(_next).popover('show');
@@ -775,7 +777,16 @@ function timeDifference(t) {
     if(dif>1)set+='s';
     return set;
 }
-//=============================================================================//
+//============================================================================//
+/**
+ * initiate the scrolling mechanism with iscroller library
+ * @author fredtma
+ * @version 0.5
+ * @category asthetic
+ */
+function SETiSCROLL (id) {id=id||"#mainContent"; iyona.deb("   EXECUTED CODE  ")
+	return new IScroll(id, {scrollbars: true,mouseWheel: true,interactiveScrollbars: true,shrinkScrollbars: 'scale',fadeScrollbars: true, tab:true, click:true});
+}
 //============================================================================//
 /**
  * check the users permission
@@ -787,4 +798,92 @@ function timeDifference(t) {
  */
 function getLicentia(perm) {
    return impetroUser().licencia;
+}
+//============================================================================//
+//GOOGLE API USER DETAILS                                                     //
+//============================================================================//
+function GPLUS_USER() {
+   // @corecode_begin getProtectedData
+   this.access_token, this.user_info,this.callFunction;//public
+   var callback,retry,that=this;//private
+   this.getToken = function(method, url, interactive, callBack) {
+      retry = false;
+      callback = callBack;
+      chrome.identity.getAuthToken({"interactive": interactive}, function(token) {
+         if (chrome.runtime.lastError) {
+            callback(chrome.runtime.lastError); return;
+         }
+         that.access_token = token;
+         that.requestStart(method, url);
+      });
+   }
+
+   this.requestStart = function(method, url) {
+      var xhr = new XMLHttpRequest();
+      xhr.open(method, url);
+      xhr.setRequestHeader('Authorization', 'Bearer ' + this.access_token);
+      xhr.onload = this.requestComplete;
+      xhr.send();
+   }
+
+   this.requestComplete = function() {
+      if (this.status == 401 && retry) {
+         retry = false;
+         chrome.identity.removeCachedAuthToken({token: this.access_token}, this.getToken);
+      } else {
+         callback(null, this.status, this.response);
+      }
+   }
+
+   this.getUserInfo = function(interactive,callFunction) {
+      this.callFunction=callFunction;
+      this.getToken('GET', 'https://www.googleapis.com/plus/v1/people/me', interactive, this.onUserInfoFetched);
+   }
+
+   this.onUserInfoFetched = function(error, status, response) {
+      if (!error && status == 200) {
+         that.user_info = JSON.parse(response);//displayName,image
+         that.callFunction(that.user_info,that.access_token);
+         iyona.deb(that.user_info,that.access_token);
+      } else {
+         that.user_info = {"id":0,"type":0,"emails":[{"value":0}]};
+         that.callFunction(that.user_info,error);
+         iyona.msg("could not retrive user data:"+error.message,false,"danger",error,response);
+      }
+   }
+
+   this.revokeToken = function() {
+      chrome.identity.getAuthToken({'interactive': false},
+      function(current_token) {
+         if (!chrome.runtime.lastError) {
+            chrome.identity.removeCachedAuthToken({token: current_token},
+            function() {
+            });
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://accounts.google.com/o/oauth2/revoke?token=' + current_token);
+            xhr.send();
+         }
+      });
+   }
+};
+//============================================================================//
+//FETCH IMAGE
+//============================================================================//
+var GET_IAMGE = function(url,ele) {
+   this.fetchImageBytes = function(url) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+      xhr.responseType = 'blob';
+      xhr.onload = this.onImageFetched;
+      xhr.send();
+   }
+   this.onImageFetched = function(e) {
+      if (this.status != 200) return;
+      var imgElem = document.createElement('img');
+      var objUrl = window.webkitURL.createObjectURL(this.response);
+      imgElem.src = objUrl;
+      var element=document.querySelector(ele);element.appendChild(imgElem);
+      imgElem.onload = function() {window.webkitURL.revokeObjectURL(objUrl);}
+   }
+   this.fetchImageBytes(url);
 }
