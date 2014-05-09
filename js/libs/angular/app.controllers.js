@@ -327,7 +327,8 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
                   strokeColor.push(field.strokeColor);
                   legend.push(field.title);
                }
-               if(field.title)$scope.table.title.push({"title":field.title,"key":key});
+               //used for table td,filter with display, servers the field key as well
+               if(field.title)$scope.table.title.push({"title":field.title,"key":key,"display":field.display||null});
             }
             options={"fillColor":fillColor,"strokeColor":strokeColor};//set the bar graph colors and options settings
             $scope.opt.legend=legend;//used in the presentation page to display the legends
@@ -351,7 +352,7 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
                   pointStrokeColor.push(field.pointStrokeColor);
                   legend.push(field.title);
                }
-               if(field.title)$scope.table.title.push({"title":field.title,"key":key});
+               if(field.title)$scope.table.title.push({"title":field.title,"key":key,"display":field.display||null});
             }
             options={"fillColor":fillColor,"strokeColor":strokeColor,"pointColor":pointColor,"pointStrokeColor":pointStrokeColor};
             $scope.opt.legend=legend;
