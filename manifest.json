@@ -1,7 +1,7 @@
 {
    "name":"Aurora Aura",
    "description":"Internal application, for exchange mail surveillance",
-   "version":"0.80.2",
+   "version":"0.80.21",
    "offline_enabled":false,
    "author":"fredtma mondeEntier",
    "minimum_chrome_version":"29",
