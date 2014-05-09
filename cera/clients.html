@@ -1,13 +1,19 @@
 <article  ng-controller="numbers">
-   <section id="listView" ng-if="view=='all'">
-      <header class="menuHeader"><ol class="breadcrumb"><li><a href="#genesis">Home</a></li><li class="active">{{menu.list[0].name}}</li></ol><a ng-if="licentia.Alpha" ng-href="{{menu.list[0].url}}" class="glyphicon glyphicon-plus success"></a></header>
+   <section id="listView" ng-if="view=='list'">
+      <header class="menuHeader">
+         <ol class="breadcrumb">
+            <li><a href="#genesis">Home</a></li>
+            <li class="active">{{menu[0].text}}</li>
+            <li class="menu-icon"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+         </ol>
+      </header>
       <section id="mainContent" class='listContainer'>
          <div class="row numbers-items" ng-repeat="row in data | filter:inputSearch">
             <div class="col-xs-1">
                <span ng-class="'item-icon glyphicon glyphicon-briefcase success'"></span>
             </div>
             <div class="col-xs-11">
-               <a href="#numbers/clients/{{row.name}}/details">
+               <a href="#numbers/clients/view/{{row.name}}">
                   <h4>
                      {{row.name}}
                   </h4>
@@ -17,18 +23,26 @@
          </div>
       </section>
    </section>
-   <section id="detailView"  ng-if="view=='details'">
-      <header class="menuHeader"><ol class="breadcrumb"><li><a href="#genesis">Home</a></li><li><a ng-href="{{menu.details[0].url}}">{{menu.details[0].name}}</a></li><li class="active">{{data.name||"New"}} {{menu.details[1].name}}</li></ol><a ng-if="licentia.Alpha" ng-href="{{menu.list[0].url}}" class="glyphicon glyphicon-plus success"></a><a ng-if="licentia.omegA" ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></header>
+   <section id="detailView"  ng-if="view=='view'||view=='new'">
+      <header class="menuHeader">
+         <ol class="breadcrumb">
+            <li><a href="#genesis">Home</a></li>
+            <li><a ng-href="{{menu[0].link}}">{{menu[0].text}}</a></li>
+            <li class="active">{{jesua|ucfirst}} {{menu[1].text}}</li>
+            <li class="menu-icon"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon"><a ng-if="licentia.omegA"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
+         </ol>
+      </header>
       <section  class='listContainer'><span id="messager" ng-class="'help-block '+{true:'text-danger',false:'text-info'}[err]" ng-show="msg">{{msg}}</span>
-         <form id="clientForm" name="dataForm" ng-submit="submit(dataForm)">
+         <form id="clientForm" name="dataForm" ng-submit="submit(dataForm)" >
             <input type="hidden" class="form-control" ng-model="data.jesua" />
          <div id='srvModified1' class="input-group">
             <span class="input-group-addon glyphicon glyphicon-calendar"></span>
-            <output class="form-control" ng-model="data.modified"  >{{data.modified}}</output>
+            <output class="readonly form-control" ng-model="data.modified"  >{{data.modified}}</output>
          </div>
          <div  ng-class="'input-group '+{true:'has-error'}[errMsg.name]">
             <span class="input-group-addon glyphicon glyphicon-qrcode"></span>
-            <input type="text" class="form-control" required placeholder="Client's name" title="Client's name" autofocus name="name" ng-model="data.name" />
+            <input type="text" class="form-control" required placeholder="Client's name" title="Client's name" autofocus name="name" ng-model="data.name.alpha" />
          </div>
          <div  ng-class="'input-group '+{true:'has-error'}[errMsg.code]">
             <span class="input-group-addon glyphicon glyphicon-barcode"></span>
@@ -36,21 +50,20 @@
          </div>
          <div  class="input-group">
             <span class="input-group-addon glyphicon glyphicon-align-left"></span>
-            <input type="text" class="form-control" placeholder="Company desscription" title="Company desscription" name="desc" ng-model="data.desc" />
+            <input type="text" class="form-control" placeholder="Company desscription" title="Company desscription" name="desc" ng-model="data.description" />
          </div>
-         <div ng-if="opt.reference" ng-repeat="(key,links) in opt.reference" >
-            <h4 class="refSection">{{opt.foreign[key].title}}</h4>
-            <div  class="input-group btn-group" data-toggle="buttons" ng-init="col1=opt.foreign[key].col1;col2=opt.foreign[key].col2;parent=data[opt.foreign[key].parent];type=opt.foreign[key].type;">
+         <div ng-if="opt.foreignVal" ng-repeat="(key,links) in opt.foreignVal" >
+            <h4 class="refSection">{{opt.foreignConf[key].title}}</h4>
+            <div id='srvModified' class="input-group btn-group" data-toggle="buttons" ng-init="col1=opt.foreignConf[key].col1;col2=opt.foreignConf[key].col2;parent=data[opt.foreignConf[key].parent].alpha;type=opt.foreignConf[key].type;">
                <span class="input-group-addon glyphicon glyphicon-book"></span>
-               <lable ng-repeat="(k,link) in links.rows" ng-init="temp=link[col1]" ng-class="'btn btn-primary '+{true:'active'}[temp!=null]" ng-click="DBenum(links,parent,col1,k,type); ">
-                  <input type="{{type||'checkbox'}}" name="title" ng-model="link[col2]" ng-value="true" />{{link[col2]}}</lable>
+               <button ng-if="type=='radio'" ng-repeat="(k,link) in links.rows" type="button" class="btn btn-primary" ng-model="link[col1]"  btn-radio="'{{parent}}'" ng-click="DBenum(links,parent,col1,k,'radio');">{{link[col2]}}</button>
+               <button ng-if="type=='checkbox'" ng-repeat="(k,link) in links.rows" type="button" class="btn btn-primary" ng-model="link[col1]" btn-checkbox btn-checkbox-false="null" btn-checkbox-true="'{{parent}}'" >{{link[col2]}}</button>
             </div>
          </div>
          <div  class="input-group">
             <button ng-if="licentia.deLta" type="submit" ng-class="btnClass" name="submit" >{{btn}}</button>
          </div>
-         </form>
+         </form><small ng-if="debug">{{data|json}} <hr/>{{opt|json}} - msg={{msg}}</small>
       </section>
    </section>
-   <small ng-if="debug">{{data|json}} <hr/>{{opt.reference|json}}</small>
 </article>

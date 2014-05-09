@@ -1,50 +1,48 @@
 <html>
    <head></head>
-   <body>
-   <mc type="body">
-      <br />
-      <p style="text-align: left;">
-         <font size="2">
-            <b>
-               <mc type="variable" source="from" attribute="cn">
-            </b>
-            <font size="1"> <br />
-               <mc type="variable" source="from" attribute="title">
-               <br />
-               <br />
-            </font>
-         </font>
-      </p>
-      <table>
+   <body><mc type="body">
+      <table width="60%" style="font-family: Calibri;font-size:11pt;color:#000" cellspacing="0" cellpadding="0">
          <tbody>
-            <tr> 
-               <td>
-                  <br /> Tel:
-                  <mc type="variable" source="from" attribute="telephoneNumber">
-                  <br /> Fax:
-                  <mc type="variable" source="from" attribute="facsimileTelephoneNumber">
-                  <br /> Email:
-                  <mc type="variable" source="from" attribute="mail">
-                  <br />
-                  <p></p>
-                  <font size="6"><font size="12"> </font></font>
-                  <table>
+            <tr>
+               <td colspan="3">
+                  <table style="font-family: Calibri;font-size:11pt;color:#000" cellspacing="0" cellpadding="0">
                      <tbody>
                         <tr>
-                           <td>
-                           <mc type="clickimage" code="imagebottom">
-                           </td>
+                           <td style="height:10px"><mc type="variable" source="from" attribute="cn"></td>
+                        </tr>
+                        <tr>
+                           <td style="height:10px"><mc type="variable" source="from" attribute="title"></td>
                         </tr>
                      </tbody>
                   </table>
-                  <br />
-                  <br />
-                  <strong>Disclaimer:</strong>
-                  <p></p>
-                  <p> This mail is private as between the sender and the intended recipient. The information contained in this message and any file that may be attached to it are confidential between those parties and may be privileged. Any other party who receives it in error is not permitted to read, use, copy, discuss or pass on the information contained in either the message or its attachments, nor are they entitled to take any action in reliance on the contents. Therefore, if you are not the intended recipient you are kindly requested to contact me immediately by telephone on the numbers given above.</p>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top" width="40%" style="left-padding:5px;font-family: Calibri;font-size:10pt;color:#000">
+                  <table cellspacing="0" cellpadding="0" style="font-family: Calibri;font-size:10pt;color:#000">
+                     <tbody>
+                     <tr><th align="left" style="height:30px" valign="top" colspan="2">ThunderMark</th></tr>
+                     <tr><th align="left" style="height:10px;" valign="top" width="40%">Tel</th><td><mc type="variable" source="from" attribute="telephoneNumber"></td></tr>
+                     <tr><th align="left" style="height:10px;" valign="top" width="40%">Cell</th><td><mc type="variable" source="from" attribute="mobile"></td></tr>
+                     <tr><th align="left" style="height:10px" valign="top" width="40%">Email</th><td><mc type="variable" source="from" attribute="mail"></td></tr>
+                     <tr><th align="left" style="height:10px" valign="top" width="40%">Fax(local)</th><td><mc type="variable" source="from" attribute="facsimileTelephoneNumber"></td></tr>
+                     <tr><th align="left" style="height:10px" valign="top" width="40%">Fax(international)&nbsp;&nbsp;</th><td><mc type="variable" source="from" attribute="Company"></td></tr>
+                     <tr><th align="left" style="height:10px" valign="top" width="40%">Skype</th><td><mc type="variable" source="from" attribute="Department"></td></tr>
+                     <tr><td colspan="2" style="height:30px" valign="top" width="40%"><a href="http://www.thundermark.co.za" target="_blank">www.thundermark.co.za</a></td></tr>
+                     </tbody>
+                  </table>
+               </td>
+               <td valign="top" width="60%">
+                  <mc type="clickimage" code="imagebottom">
                </td>
             </tr>
          </tbody>
       </table>
+      <p style="font-family: Calibri; font-size:9pt; color:#000;padding: 0 0 0 2px;margin: 6px 0;">
+         <strong>Disclaimer</strong><br/>
+      The information contained in this email is confidential and is intended solely for use by the person to whom it was originally addressed.
+      If you are not the intended recipient of this email, you are hereby notified that any disclosure, copying, distribution or taking action in relation to the contents of this email is strictly prohibited and may be unlawful. The content of this email including all attachments is protected by copyright and other intellectual property laws and all rights not expressly granted are reserved. By communicating with us through electronic means, you consent to receiving communications electronically and agree that such communication satisfies all legal requirements.
+      Unless otherwise agreed, we are only deemed to have received an email once we have confirmed receipt thereof.</p>
+
    </body>
 </html>

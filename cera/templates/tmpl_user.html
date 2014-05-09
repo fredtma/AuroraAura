@@ -1,0 +1,52 @@
+<section class='listContainer' ng-controller="joshua">
+   <form id="userForm" name="dataForm"  ng-submit="submit(dataForm)">
+      <input type="hidden" class="form-control" ng-model="data.jesua" />
+      <div id='srvModified1' class="input-group">
+         <span class="input-group-addon glyphicon glyphicon-calendar"></span>
+         <output class="form-control readonly" ng-model="data.modified"  >{{data.modified}}</output>
+      </div>
+      <div id='srvModified' class="input-group btn-group" data-toggle="buttons">
+         <span class="input-group-addon glyphicon glyphicon-book"></span>
+         <button ng-repeat="key in opt.extra.title.enum" required type="button" class="btn btn-primary" ng-model="data.title"  btn-radio="'{{key}}'" >{{key}}</button>
+      </div>
+      <div id='srvModified' ng-class="'input-group '+{true:'has-error'}[errMsg.firstname]">
+         <span class="input-group-addon glyphicon glyphicon-qrcode"></span>
+         <input type="text" class="form-control" required placeholder="Administrator's name" title="Administrator's name" autofocus name="firstname" ng-model="data.firstname" />
+      </div>
+      <div id='srvModified' ng-class="'input-group '+{true:'has-error'}[errMsg.lastname]">
+         <span class="input-group-addon glyphicon glyphicon-barcode"></span>
+         <input type="text" class="form-control" required placeholder="Administrator's Surname" title="Administrator's Surname" name="lastname" ng-model="data.lastname" />
+      </div>
+      <div id='srvModified' ng-class="'input-group '+{true:'has-error'}[errMsg.email]">
+         <span class="input-group-addon glyphicon glyphicon-envelope"></span>
+         <input type="email" class="form-control" required placeholder="Email address" title="Email address" name="email" ng-model="data.email"  />
+      </div>
+      <div id='srvModified' ng-class="'input-group '+{true:'has-error'}[errMsg.mobile]">
+         <span class="input-group-addon glyphicon glyphicon-phone"></span>
+         <input type="tel" class="form-control" required placeholder="Mobile number" pattern="{{pattern.phone[0]}}" title="{{pattern.phone[1]}}" name="mobile" ng-model="data.mobile"  />
+      </div>
+      <div id='srvModified' class="input-group btn-group" data-toggle="buttons" >
+         <span class="input-group-addon glyphicon glyphicon-book"></span>
+         <button ng-repeat="(key,value) in opt.extra.communication.enum" type="button" class="btn btn-primary" ng-model="data.communication"  btn-radio="'{{value}}'" >{{value}}</button>
+      </div>
+      <div id='srvModified' ng-class="'input-group '+{true:'has-error'}[errMsg.username]" ng-if="!data.jesua">
+         <span class="input-group-addon glyphicon glyphicon-user"></span>
+         <input type="text" class="form-control" required placeholder="Unique username" pattern="{{pattern.username[0]}}" title="{{pattern.username[1]}}" name="username" ng-model="data.username" />
+      </div>
+      <div id='srvModified' ng-class="'input-group '+{true:'has-error'}[errMsg.password]" ng-if="!data.jesua">
+         <span class="input-group-addon glyphicon glyphicon-lock"></span>
+         <input type="password" class="form-control" placeholder="Enter server Password" pattern="{{pattern.password[0]}}" title="{{pattern.password[1]}}" name="password" ng-model="data.password" />
+      </div>
+      <div ng-if="opt.foreignVal" ng-repeat="(key,links) in opt.foreignVal" >
+         <h4 class="refSection">{{opt.foreignConf[key].title}}</h4>
+         <div id='srvModified' class="input-group btn-group" data-toggle="buttons" ng-init="col1 = opt.foreignConf[key].col1; col2 = opt.foreignConf[key].col2; parent = data[opt.foreignConf[key].parent]; type = opt.foreignConf[key].type;">
+            <span class="input-group-addon glyphicon glyphicon-book"></span>
+            <button ng-if="type == 'radio'" ng-repeat="(k,link) in links.rows" type="button" class="btn btn-primary" ng-model="link[col1]"  btn-radio="'{{parent}}'" ng-click="DBenum(links, parent, col1, k, 'radio');">{{link[col2]}}</button>
+            <button ng-if="type == 'checkbox'" ng-repeat="(k,link) in links.rows" type="button" class="btn btn-primary" ng-model="link[col1]" btn-checkbox btn-checkbox-false="null" btn-checkbox-true="'{{parent}}'" >{{link[col2]}}</button>
+         </div>
+      </div>
+      <div ng-if="licentia.deLta || data.jesua == prima" id='srvModified' class="input-group">
+         <button ng-if="licentia.deLta" type="submit" ng-class="btnClass" name="submit" >{{btn}}</button>
+      </div>
+   </form>
+</section>

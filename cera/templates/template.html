@@ -1,0 +1,27 @@
+<article  ng-controller="psalm">
+   <section id="listView">
+      <header class="menuHeader"><ol class="breadcrumb"><li><a href="#genesis">Home</a></li></ol></header>
+      <section id="mainContent" class="listContainer">
+         <tabset>
+            <tab>
+               <tab-heading>
+                  <i class="glyphicon glyphicon-bell"></i> Alert!
+               </tab-heading>
+               This is the alert
+            </tab>
+            <tab disabled="templates[0].disabled">
+               <tab-heading>
+                  <i class="glyphicon glyphicon-cloud"></i> Cloud!
+               </tab-heading>
+               <ng-include src="templates[0].url"></ng-include>
+            </tab>
+            <tab disabled="templates[1].disabled">
+               <tab-heading>
+                  <i class="glyphicon glyphicon-flag"></i> Flag!
+               </tab-heading>
+               <ng-include src="templates[1].url"></ng-include>
+            </tab>
+         </tabset>
+      </section>
+   </section>
+</article>

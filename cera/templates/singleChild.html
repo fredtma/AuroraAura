@@ -1,0 +1,9 @@
+<ul ng-transclude>{{row}}
+   <li class="row numbers-items" ng-if="row.child">
+      <div class="col-xs-1 cnt">
+         <span ng-class="'glyphicon glyphicon-plus'"></span>
+      </div>
+      <div class="col-xs-11"><input type="text" value="{{row.child.name}}" class="bordeless" ng-keydown="executiveDirector($event, key, row)" view-autofocus="{{row.child.focus}}" /></div>
+      <!--<span ng-if="sub.child"><you-are-stronger></you-are-stronger></span>-->
+   </li>
+</ul>

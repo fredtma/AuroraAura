@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en" ng-csp ng-app='KingOFkings'>
    <head>
-      <meta charset="utf-8" /><meta name="format-detection" content="telephone=no" /><meta name="apple-mobile-web-app-capable" content="yes" /><meta name="mobile-web-app-capable" content="yes"><meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+      <meta charset="utf-8" /><meta name="format-detection" content="telephone=no" /><meta name="apple-mobile-web-app-capable" content="yes" /><meta name="mobile-web-app-capable" content="yes"><meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /><meta name="ROBOTS" content="NOINDEX">
       <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" /><link rel="stylesheet" type="text/css" href="css/index.css" /><link rel="shortcut icon" href="img/fav.png" />
       <link rel="apple-touch-icon" href="img/icon-128-xxhdpi.png"/><link rel="apple-touch-startup-image" href="res/screen/android/screen-mdpi-portrait.png"><link rel="apple-touch-icon-precomposed" sizes="128x128" href="img/icon-128-xxhdpi.png">
       <link rel="shortcut icon" sizes="196x196" href="img/icon-196-xhdpi.png"><link rel="shortcut icon" sizes="128x128" href="img/icon-128-xxhdpi.png">
       <title>Corporate Management System.</title>
    </head>
-   <body hm-swipe-left="panelMenu('left')" hm-swipe-right="panelMenu('right')"  hm-tap="panelMenu('none')">
+   <body hm-swipe-left="panelMenu('left',$event)" hm-swipe-right="panelMenu('right',$event)" hm-tap="panelMenu('none',$event)">
       <div id="Creator">
          <section id="initSet" ng-if="!PASCO">
             <header id="topHeader" class="navbar navbar-default navbar-fixed-top">
@@ -25,8 +25,8 @@
             </header>
          </section>
          <section id="father" class="container-fluid slide-animate-container">
-            <div ng-class="'progress progress-striped active '+{true:'none'}[isViewLoading==false] ">
-               <div class="progress-bar"  role="progressbar"  aria-valuemin="0" aria-valuemax="100" ng-style="isViewLoading"><span class="sr-only">100% Complete</span></div>
+            <div class="progress progress-striped active"  ng-style="isViewLoading">
+               <div class="progress-bar"  role="progressbar"  aria-valuemin="0" aria-valuemax="100"><span class="sr-only">100% Complete</span></div>
             </div>
             <article id="deviceready" class="slide-animate" ng-view></article>
             <form class="form-inline well well-sm bottom-search" role="form">
@@ -37,17 +37,8 @@
          </section>
          <footer id="footer" class="navbar navbar-fixed-bottom navbar-inverse navbar-static"><h4>&copy; 2013 XpandIT</h4><div id='notification'><span>...</span></div></footer>
       </div>
-      <div class="modal fade" id="myModal" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
-         <div class="modal-dialog">
-            <div class="modal-content">
-               <div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel">Modal title</h4></div>
-               <div class="modal-body"></div>
-               <div class="modal-footer"><button type="button" id="btnYesModal" class="btn btn-default">Yes</button><button type="button" class="btn btn-primary" data-dismiss="modal">No</button></div>
-            </div>
-         </div>
-      </div>
-      <script type="text/javascript" src="js/libs/jquery/jquery-1.9.1.min.js"></script>
       <script type="text/javascript" src="js/libs/angular/angular.min.js"></script>
+      <script type="text/javascript" src="js/libs/bootstrap/ui-bootstrap-0.9.0.min.js"></script>
       <script type="text/javascript" src="js/biliotheca/lib.muneris.js"></script>
       <script type="text/javascript" src="js/libs/iscroll/iscroll.js"></script>
       <script type="text/javascript" src="js/libs/angular/angular-route.min.js"></script>
@@ -59,6 +50,7 @@
       <script type="text/javascript" src="js/libs/angular/app.js" defer ></script>
       <script type="text/javascript" src="js/libs/angular/app.controllers.js" defer ></script>
       <script type="text/javascript" src="js/libs/angular/app.service.js"></script>
+      <script type="text/javascript" src="js/libs/angular/app.directive.js"></script>
       <script type="text/javascript" src="js/biliotheca/lib.consuetudinem.js"></script>
    </body>
 </html>

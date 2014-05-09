@@ -1,0 +1,87 @@
+<article ng-controller="rptServers">
+   <header class="menuHeader">
+      <ol class="breadcrumb">
+         <li><a href="#genesis">Home</a></li>
+         <li ng-repeat="item in menu"><a ng-class="item.class" ng-href="{{item.link}}">{{item.text}}</a></li>
+         <li class="menu-icon"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+      </ol>
+   </header>
+   <section id="listView" class="listContainer">
+      <div class="container-fluid fullPage">
+         <!--header row-->
+         <div class="row">
+            <div class='col-xs-12 bg-info repHeader'><h3>Server Details. <small>report links</small></h3></div>
+         </div>
+         <!--address row-->
+         <div class="row">
+            <div class='col-xs-4 bg-info repAddress'>
+               <address>
+                  <strong>XpandIT outsourcing</strong><br/>
+                  <abbr title="telphone">T</abbr>: 011 575 4313<br/>
+                  <abbr title="email address">E</abbr>: <a href="mail:info@xpandit.co.za">info@xpandit.co.za</a><br/>
+                  1st Floor, The Gabba<br/>
+                  The Campus, 57 Sloane Street<br/>
+                  Bryanston (2021)<br/>
+
+               </address>
+            </div>
+            <div class='col-xs-8 bg-primary text-right repDetails'>
+               <h4>Server Administration</h4>
+               <dl class="dl-horizontal">
+                  <dt>Total Servers</dt><dd>28</dd>
+                  <dt>Operating Servers</dt><dd>11</dd>
+                  <dt>Idle Servers</dt><dd>17</dd>
+               </dl>
+            </div>
+         </div>
+         <!--input row-->
+         <div class="row">
+            <div class='col-xs-12'>&nbsp;</div>
+         </div>
+         <!--navigation row-->
+         <div class="row">
+            <div class='col-xs-12 bg-info'>&nbsp;</div>
+         </div>
+         <!--content row-->
+         <div class="row repContent">
+            <div class='col-xs-12 table-responsive'>
+               <table class="table table-hover table-condensed">
+                  <thead>
+                     <tr class='row repRowHead'>
+                        <td class='cnt'>#</td>
+                        <td class=''><a class="link" ng-click="order('name')">Server Name</a></td>
+                        <td class=''><a class="link" ng-click="order('address')">Address</a></td>
+                        <td class=''><a class="link" ng-click="order('status')">Status</a></td>
+                        <td class=''><a class="link" ng-click="order('modified')">Time</a></td>
+                        <td class=''><a class="link" ng-click="order('client_name')">Client</a></td>
+                        <td class=''><a class="link" ng-click="order('user')">Admin</a></td>
+                        <td class=' opt'><a class="link" ng-click="order('option')"><input type="checkbox"> Option</a></td>
+                     </tr>
+                  </thead>
+                  <tbody class="text-primary">
+                     <tr ng-if="!data" class='row repRowContent'><td class="2">{{data.msg}}</td></tr>
+                     <tr ng-repeat="(key,row) in data | filter:inputSearch | orderBy:ord" class='row repRowContent'>
+                        <td class=' cnt'>{{key+1}}</td>
+                        <td class=''>{{row.name}}</td>
+                        <td class=''>{{row.address}}</td>
+                        <td class=''>{{row.status}}</td>
+                        <td class=''>{{row.modified}}</td>
+                        <td class=''>{{row.client_name}}</td>
+                        <td class=''>{{row.user}}</td>
+                        <td class=' opt'><input type="checkbox"></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+         <!--summary row-->
+         <div class="row">
+            <div class='col-xs-12 bg-primary'>&nbsp;</div>
+         </div>
+         <!--footer row-->
+         <div class="row">
+            <div class='col-xs-12 bg-info'>&nbsp;</div>
+         </div>
+      </div>
+   </section>
+</article>

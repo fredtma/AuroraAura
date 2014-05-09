@@ -6,9 +6,9 @@ iyona={
    view:true,
    enableLog:true,
    pop:console.log,
-   pup:function(){var isChrome = navigator.userAgent.indexOf("Chrome") !== -1;if(isChrome){var stack = new Error().stack; var file = stack.split("\n")[3].split("/"); return '('+file[file.length-1]+')';}else{return ''}},
+   pup:function(){var isChrome = navigator.userAgent.indexOf("Chrome") !== -1;if(isChrome||true){var stack = new Error().stack,n=isChrome?3:2;var file = stack.split("\n")[n].split("/"); return '('+file[file.length-1]+')';}else{return ''}},
    obj:function(arg){
-      var first="",obj,x,l=arg.length;
+      var first,obj,x,l=arg.length;
       if(l>1)first=arg[0];
       for(x=0;x<l;x++){obj=arg[x];
          if(typeof obj=="undefined"||arg==null){console.log("<null>");}
@@ -16,50 +16,78 @@ iyona={
          else {for(var key in obj){if(typeof obj[key]=="object") this.obj(obj[key]); else console.log(key+'='+obj[key]);} }
       }
    },
-   see:function(){
-      var l=arguments.length,variable;
-      for(var x=0;x<l;x++){variable=typeof arguments[x]==="function"?encodeURI(arguments[x].toString()):arguments[x];console.log(variable);}},/*gap or worker display without iteration*/
    dir:function(){
       var l=arguments.length;
       for(var x=0;x<l;x++){
          if(typeof arguments[x]==="function")console.log(encodeURI(arguments[x].toString()));
          else if (typeof arguments[x]==="object") {for (var index in arguments[x]); console.log(arguments[x][index])}
          else console.log(arguments[x]);}},/*for workers or gap application display objects*/
-   log:function(){if(iyona.enableLog){if(arguments[1]!==false)console.log('%c'+arguments[0],'background:#2d79aa;color:#d9edf7;width:100%;display:block;font-weight:bold;',arguments); else console.log('%c'+arguments[0],'background:#ff0000;color:#d9edf7;width:100%;display:block;font-weight:bold;',arguments);}},/*notification msg for the log and all set var*/
-   msg:function(msg,permanent,clss,opt){if(iyona.view){console.log(arguments);clss=clss||'';_$("#notification span").html(msg).removeClass().addClass('blink_me '+clss);if(permanent!==true)setTimeout(function(){_$("#notification span").html("...").removeClass('blink_me');},5000); }},/*debug msg and all set var*/
-   deb:function(){if(iyona.view){if(!PASCO||true){arguments[arguments.length++]=this.pup();this.pop.apply(console,arguments);}else{this.obj(arguments);} }}/*break down all set var into arr, custom debug msg re-created*/
+   log:function(){if(iyona.enableLog){arguments[arguments.length++]=this.pup();console.info('%c'+arguments[0],'background:#2d79aa;color:#d9edf7;width:100%;display:block;font-weight:bold;',arguments);}},/*notification msg for the log and all set var*/
+   msg:function(msg,permanent,clss,opt){if(iyona.view){console.info(arguments);clss=clss||'';_$("#notification span").html(msg).removeClass().addClass('blink_me '+clss);if(permanent!==true)setTimeout(function(){_$("#notification span").html("...").removeClass('blink_me');},5000); }},/*debug msg and all set var*/
+   deb:function(){if(iyona.view){
+         if(!PASCO||true){
+            arguments[arguments.length++]=this.pup();
+            this.pop.apply(console,arguments);
+         }else{this.obj(arguments);} }}/*break down all set var into arr, custom debug msg re-created*/,
+   sync:function(settings){//method,format,url,var
+      var xhr=new XMLHttpRequest(),params;
+
+      xhr.open(settings.method,settings.url,true);
+      xhr.responseType=settings.format;
+      xhr.onreadystatechange=function(e){
+         if(this.readyState==4 && this.status==200){
+            var response=this.response||"{}";//@fix:empty object so as to not cause an error
+            if(typeof response==="string"&&settings.format==="json")response=JSON.parse(response);//wen setting responseType to json does not work
+            if(typeof settings.callback==="function")settings.callback(response);
+         }
+      }//xhr.onload=function(e){iyona.deb("III",e,this.readyState,this.status,this.response);};
+
+      if(settings.var&&typeof settings.var==="object") {
+         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");params=JSON.stringify(settings.var);
+      }else{
+         params=settings.var;xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+      }
+      if(settings.format==="json"){
+         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");//questionable, to be removed?
+         xhr.setRequestHeader("Accept","text/html,application/xhtml+xml,application/xml;application/json;q=0.9,*/*;q=0.8");//used in FF
+      }
+      xhr.onerror=function(e){iyona.deb(e)}
+      xhr.send(params);
+   }
 }
 //============================================================================//STORAGE
 dynamis={
    set:function(_key,_value,_local){
-      var set={},string;set[_key]=_value;string=JSON.stringify(_value);
+      var set={},string;set[_key]=_value;var isChrome=(typeof chrome !== "undefined" && chrome.hasOwnProperty("identity"));;string=JSON.stringify(_value);
       if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.set(set);sessionStorage.setItem(_key,string);}
       else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.set(set);sessionStorage.setItem(_key,string);}
-      else if(_local==true){localStorage.setItem(_key,string);}
+      else if(_local==true&&!isChrome){localStorage.setItem(_key,string);}
       else{sessionStorage.setItem(_key,string);}//endif
    },
    get:function(_key,_local){
-      var value;
+      var value,isChrome=(typeof chrome !== "undefined" && chrome.hasOwnProperty("identity"));;
       if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.get(_key,function(obj){return obj[_key]});value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
       else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.get(_key,function(obj){return obj[_key]});value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
-      else if(_local==true){value=localStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
+      else if(_local==true&&!isChrome){value=localStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
       else{value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}//endif
    },
-   del:function(_key,_local){
+   del:function(_key,_local){var isChrome=(typeof chrome !== "undefined" && chrome.hasOwnProperty("identity"));
       if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.remove(_key);sessionStorage.removeItem(_key);}
       else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.remove(_key);sessionStorage.removeItem(_key);}
-      else if(_local==true){localStorage.removeItem(_key);}
+      else if(_local==true&&!isChrome){localStorage.removeItem(_key);}
       else{sessionStorage.removeItem(_key);}//endif
    },
-   clear:function(_local){
+   clear:function(_local){var isChrome=(typeof chrome !== "undefined" && chrome.hasOwnProperty("identity"));
       if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.clear();}
       else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.clear();}
-      else if(_local==true){localStorage.clear();}
+      else if(_local==true&&!isChrome){localStorage.clear();}
       else{sessionStorage.clear();}//endif
    }
 }
-
 //============================================================================//CONFIG
+/*
+ * The config needs to be a function in order for the user to login again after a logout clear session.
+ */
 function configuration(){}
 configuration.prototype.config=function(){
    sessionStorage.startTime=new Date().getTime();
@@ -67,13 +95,14 @@ configuration.prototype.config=function(){
    sessionStorage.SITE_NAME="Exchange Aurora Aura";
    sessionStorage.SITE_DATE='fullDate';
    sessionStorage.SITE_TIME='mediumTime';
-   sessionStorage.SITE_URL='https://nedbankqa.jonti2.co.za/modules/exchange/';
+   sessionStorage.SITE_URL='http://demo.xpandit.co.za/app_xpandit/';
    sessionStorage.SITE_SERVICE=sessionStorage.SITE_URL+'inc/services.php';
    sessionStorage.SITE_MILITIA=sessionStorage.SITE_URL+'inc/notitia.php';
+   sessionStorage.SITE_CLASS=sessionStorage.SITE_URL+'cron/is-connect.php';
    sessionStorage.SITE_UPLOADS=sessionStorage.SITE_URL+'uploads/';
    sessionStorage.MAIL_SUPPORT='support@xpandit.co.za';
-   sessionStorage.DB_NAME='mobile_app';
-   sessionStorage.DB_VERSION=4;//always integer 4 iDB
+   sessionStorage.DB_NAME='app_xpandit';
+   sessionStorage.DB_VERSION=20;//always integer 4 iDB
    sessionStorage.DB_DESC='The local application Database';
    sessionStorage.DB_SIZE=15;
    sessionStorage.DB_LIMIT=20;
@@ -82,6 +111,7 @@ configuration.prototype.config=function(){
       "Worker":window.hasOwnProperty('Worker'),
       "openDatabase":"openDatabase" in window,
       "indexedDB":"indexedDB" in window||"webkitIndexedDB" in window||"mozIndexedDB" in window||"msIndexedDB" in window,
+      "iDB":true,
       "WebSocket":window.hasOwnProperty('WebSocket'),
       "history":window.hasOwnProperty('history'),
       "formValidation":hasFormValidation(),
@@ -91,7 +121,10 @@ configuration.prototype.config=function(){
       "projectID":"17238315752",
       "app":(typeof chrome !== "undefined" && chrome.hasOwnProperty("identity"))
    });
-   dynamis.set("EXEMPLAR",JSON.stringify({"username":["^[A-Za-z0-9_]{6,15}$","requires at least six alpha-numerique character"],
+   iyona.sync({"url":sessionStorage.SITE_URL+'json/scope.json',"method":"get","format":"json","callback":function(data){iyona.deb("defaultScope-",data);
+      dynamis.set("defaultScope",data,true);
+   }});
+   dynamis.set("EXEMPLAR",{"username":["^[A-Za-z0-9_]{6,15}$","requires at least six alpha-numerique character"],
    "pass1":["((?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{6,20})","requires complex phrase with upperCase, lowerCase, number and a minimum of 6 chars"],
    "pass2":["^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$","requires complex phrase with upperCase, lowerCase, number and a minimum of 6 chars"],
    "password":["(?=^.{6,}$)((?=.*[0-9])|(?=.*[^A-Za-z0-9]+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$","requires upperCase, lowerCase, number and a minimum of 6 chars"],
@@ -104,41 +137,13 @@ configuration.prototype.config=function(){
    "colour":["^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$","requires a valid colour in the form of (#ccc or #cccccc)"],
    "bool":["^1|0","requires a boolean value of 0 or 1"],
    "email":["^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$","the email address is not the right formated"],
-   "single":["^[a-zA-Z0-9]","requires a single value"]}));
-   var config = dynamis.get("CONFIG"); config.openDatabase=false;config.indexedDB=false;dynamis.set("CONFIG",config);
+   "single":["^[a-zA-Z0-9]","requires a single value"]});
+   var config = dynamis.get("CONFIG"); config.openDatabase=false;config.indexedDB=false; dynamis.set("CONFIG",config);
 return this;
 };
 (function(){var settings= new configuration(); settings.config(); })();
 //============================================================================//INNITIATOR
-_$=function(element){return angular.element(document.querySelectorAll(element));}
-//============================================================================//
-function aSync(options,data,callback){//www, var, object, method, format, call_success
-   var settings={"method":"post","format":"json","www":dynamis.get("SITE_SERVICE")},params;
-   if(typeof options === "object")for(var att in options)settings[att]=options[att];
-   else {settings.www=options;settings.var=data;settings.callback=callback;}
-
-   var xhr=new XMLHttpRequest();
-   xhr.responseType=settings.format;
-   xhr.open(settings.method,settings.www,true);
-   xhr.onreadystatechange=function(e){
-      if(this.readyState==4 && this.status==200){
-         var response=this.response||"{}";//@fix:empty object so as to not cause an error
-         if(typeof response==="string"&&settings.format==="json")response=JSON.parse(response);//wen setting responseType to json does not work
-         if(typeof settings.callback==="function")settings.callback(response);
-      }
-   }
-   if(settings.var&&typeof settings.var==="object") {
-//      var params=new FormData();for (var key in settings.var)params.append(key,settings.var[key]);
-      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      params=JSON.stringify(settings.var);
-   }else{
-      params=settings.var;
-      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-//      xhr.setRequestHeader("Content-length", params.length);xhr.setRequestHeader("Connection","close");
-   }
-   xhr.onerror=function(e){e;}
-   xhr.send(params);
-}
+_$=function(element){if(typeof element=="string")return angular.element(document.querySelectorAll(element)); else return angular.element(element);}
 //============================================================================//
 /**
  * similar to jquery creates an DOM element
@@ -188,6 +193,7 @@ $iyona=function(section){
 }
 //============================================================================//
 !function ($) {
+   if(typeof $==='undefined') return false;
    $.fn.anima=function(element,options){
       var opts=$.extend({},{
          "element":element,
@@ -230,24 +236,25 @@ $iyona=function(section){
  * @param string <var>sync</var> load the script with async option on
  * @return void
  */
-function load_async(url,sync,position,fons){
-   var s,ele,c;
+function load_script(urls,sync,position,fons){
+   var s,ele,c,url;iyona.deb("LOADS",urls, typeof urls);
    var script=document.createElement('script');
+   if(typeof urls==="string") url=urls;
+   else {url=urls[0]; urls.shift();}
+
    s=document.querySelector('script[data-fons]');
    c=document.querySelector('script[src="'+url+'"]');
    if(c)return false;
    if(!position)ele=document.getElementsByTagName('head')[0];
    else if(position==='end')ele=document.getElementsByTagName('body')[0];
 
-   if(s)$(s).remove();//ele.removeChild(s);
+   if(s)_$(s).remove();//ele.removeChild(s);
    if (sync !== false) script.async = true;
    script.src  = url;script.type="text/javascript";
    if(fons){script.setAttribute('data-fons',fons);}
-   script.onreadystatechange = function(){iyona.log("Loaded script "+url)};
-   script.onload = function(){iyona.log("Loaded script "+url)};;
+   script.onreadystatechange = function(){iyona.log("Loaded script StateChange "+url)};
+   script.onload = function(){if(typeof urls=="object"&&urls.length>0) load_script(urls,sync,position,fons);};;
    ele.appendChild(script);
-   return true;
-//   head.parentNode.insertBefore(script, head);
 }
 //============================================================================//
 /**
@@ -274,21 +281,9 @@ profectus=function(_msg,_reset,_process){
  * @return bool
  */
 function isset() {
-   var a=arguments;
-   var l=a.length;
-   var i=0;
-
-   if (l==0) {
-      throw new Error('Empty isset');
-   }//end if
-
-   while (i!=l) {
-      if (typeof(a[i])=='undefined' || a[i]===null) {
-         return false;
-      } else {
-         i++;
-      }//endif
-   }
+   var a=arguments,l=a.length,i=0;
+   if (l==0) {throw new Error('Empty isset');}//end if
+   while (i!=l) {if (typeof(a[i])=='undefined' || a[i]===null) {return false;} else {i++;}}
    return true;
 }//end function
 //============================================================================//
@@ -346,7 +341,7 @@ ucwords = function (str)
         return $1.toUpperCase();
     });
 }//end function
-ucfirst=function(word){return word.charAt(0).toUpperCase() + word.substring(1);}
+ucfirst=function(word){if(!word)return false;; if(!word)return false; return word.charAt(0).toUpperCase() + word.substring(1);}
 //============================================================================//
 /**
  * change into alpha numerical, with no spacing
@@ -366,78 +361,6 @@ alphaNumeric = function(the_str,transform)
    return the_str;
 }
 //============================================================================//
-/*
- * display the message notification
- * @param {string} <var>msg</var> the message to display
- * @param {bool} <var>animation</var> enable animation
- * @returns void
- */
-function notice(msg,animation,text){
-   if(!msg){$(".db_notice").empty();$(".sys_msg").empty(); return true;}
-   msg=text==2?"<strong class='text-success'>"+msg+"</strong>":text==1?"<span class='text-success'>"+msg+"</span>":(text==0)?"<span class='text-error'>"+msg+"</span>":msg;
-   if(animation)$(".db_notice").html(msg).animate({opacity:0},200,"linear",function(){$(this).animate({opacity:1},200);});
-   else $(".db_notice").html(msg);
-}
-//============================================================================//
-/**
- * reset a the body, removes the pagination and new button
- * @author fredtma
- * @version 3.4
- * @category reset, new
- * @see dashboard,res.notitia
- * @return void
- */
-function newSection(){
-   $('#newItem').remove();$('.pagination').remove();$('#verbum').empty();$('.headRow').empty();
-   $('.search-all').val('').prop('disabled',true);$('#displayMensa').empty();$('#displayList').empty();
-   $('#link_home').tab('show');
-   sessionStorage.genesis=0;//reset each time ur on dashboard
-}
-//============================================================================//
-function liberoAnimus(){
-   notice();sessionStorage.genesis=0;//reset each time ur on dashboard
-   $('.body article').removeClass('totalView');//remove the class that is placed by the cera's
-   for(var instance in CKEDITOR.instances){iyona.log(instance,"/instance/",CKEDITOR.instances); CKEDITOR.instances[instance].destroy()}//@fix: ce si et necessaire, if faut detruire toute instance avant de naviger
-   $("footer").removeData('lateCall').removeData('examiner');
-   //$("#displayMensa").removeData('mensa');
-}
-//============================================================================//
-/*
- * function to activate the dashboard blocks and links of the navTab
- */
-function activateMenu(_mensa,_mensula,_set,_script,_tab,_formType){
-   liberoAnimus();
-   _mensula=_mensula||_mensa;var value=true;//the return value if it was passed successfully or not
-   var iota=$(_set).data('iota');var narro={};
-   if(_formType)sessionStorage.formTypes=_formType;//used to change from beta to alpha display
-//   iyona.log(_mensa,_mensula,_script,'[FORM]',_tab,_formType,sessionStorage.formTypes,'[this is it]',_set,'----------------------',$(_set)[0],"/");
-   recHistory(_mensa,_mensula,_script,_tab,_formType);
-   if(!_script)$.getJSON("json/"+_mensa+".json",findJSON).fail(onVituim);
-   else if(_script==="cera")get_ajax("/cera/"+_mensa+".html","",".body article");
-   else {
-      value=load_async("js/agito/"+_mensa+".js",true,'end',true);
-      if(value===false&&typeof agitoScript==="function"){
-         if(iota)$("footer").data("temp",[iota,_tab]);//@fix:this will initiate a value, when changing via dropdown @only dealer&saleman
-         agitoScript();
-      }else{//@explain:ce program et appeler une deuxiem foi avec agitoScript() qui et standard
-         agitoScript=function(){return true;}
-      }
-   }
-   if(_mensa=='salesman')_mensula='salesman';//ce si cest pour les sales seulment
-   if(!_tab){
-      $(_set).tab('show');
-      $(".navLinks").removeClass('active');
-      $("#nav_"+_mensula).addClass('active');}//montre la tab et le menu
-   else{
-      _mensula=_tab;
-      if(iota!=0)$('footer').data('temp',[iota,_tab])//montre seulment les list qui on des uniter iota
-      else {$('footer').removeData('temp');$('footer').removeData('display');}//change les deux, pour raison de afficher un neauvaux titre
-   }//change de nom pour les button, pour avoir access aux menu des dealer & des salesman
-   if(_mensa=='salesman')_mensula='salesmen';
-   if(iota){sideDisplay(iota,_mensula);}//fair apparaitre la table si une existance de parametre iota exists.
-   return value;//currently only for the script
-}
-//============================================================================//
 /**
  * reset a form input data
  * @author fredtma
@@ -451,7 +374,7 @@ function resetForm(_frm){
    $('button[type=button]',_frm).removeClass('active');
 }
 //============================================================================//
-impetroUser=function(){
+function impetroUser(){
    var USER_NAME=dynamis.get("USER_NAME",true)?dynamis.get("USER_NAME",true):(dynamis.get("USER_NAME"))?dynamis.get("USER_NAME"):false;
    return USER_NAME;
 }
@@ -465,9 +388,9 @@ impetroUser=function(){
 enableFullScreen=function(elem){
    elem=elem||'fullBody';
    elem=document.getElementById(elem);
-   if(elem.webkitRequestFullscreen){iyona.log('webKit FullScreen');elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);}
-   else if(elem.mozRequestFullScreen){iyona.log('moz FullScreen');elem.mozRequestFullScreen();}
-   else if(elem.requestFullscreen) {iyona.log('FullScreen');elem.requestFullscreen();}
+   if(elem.webkitRequestFullscreen){elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);}
+   else if(elem.mozRequestFullScreen){elem.mozRequestFullScreen();}
+   else if(elem.requestFullscreen) {elem.requestFullscreen();}
    var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;//the element in fullscreen
    var fullscreenEnabled = document.fullscreenEnabled || document.mozFullScreenEnabled || document.webkitFullscreenEnabled;//is the view in fullscreen?
 }
@@ -615,7 +538,7 @@ function hasFormValidation() {
  * @version 2.8
  * @category json
  */
-eternalCall=function(){
+function eternalCall(){
    if(sessionStorage.active)return JSON.parse(sessionStorage.active);else return false;
 }
 //============================================================================//
@@ -643,14 +566,17 @@ function version_db(cur,rev,trans){
  * @category worker
  * @param object <var>notitiaWorker</var> the worket object
  */
-function readWorker(notitiaWorker){
+function readWorker(notitiaWorker,callback){
    notitiaWorker.addEventListener('message',function(e){
-      iyona.log('Worker on Notitia:', e.data);
+//      iyona.log('Worker on Notitia:', e.data);
       if(e.data=="licentia")licentia();
       if(e.data=="reset progress"){profectus("starting db reset",true,10);}
       if(e.data.progress==true){profectus(e.data.resetTable);}
+      if(callback)callback(e.data,notitiaWorker);
    },false);
-   notitiaWorker.addEventListener('error',onError,false)
+   notitiaWorker.addEventListener('error',function(e){
+      iyona.deb("Worker on strike "+e.message,e);
+   },false)
 }
 //============================================================================//
 /**
@@ -661,12 +587,13 @@ function readWorker(notitiaWorker){
  * @param object <var>option</var> the option to be passed to the worker
  * @return void
  */
-function callWorker(option){
-   var opt=$.extend({},{"procus":impetroUser().singularis,"moli":moli},option);
+function callWorker(option,callback){
+   var ext=(typeof $!="undefined")?$.extend:angular.extend,moli=screen.height*screen.width;
+   var opt=ext({},{"procus":impetroUser().singularis,"moli":moli,"DB_VERSION":sessionStorage.DB_VERSION,"defaultScope":dynamis.get("defaultScope",true),"SITE_SERVICE":sessionStorage.SITE_SERVICE,"SITE_MILITIA":sessionStorage.SITE_MILITIA},option);
    if(window.Worker&&impetroUser()){
-      var notitiaWorker=new Worker("js/bibliotheca/worker.notitia.js");
-      var moli=screen.height*screen.width;notitiaWorker.postMessage(opt);
-      readWorker(notitiaWorker);
+      var notitiaWorker=new Worker("js/biliotheca/worker.notitia.js");
+      notitiaWorker.postMessage(opt);
+      readWorker(notitiaWorker,callback);
    }
 }
 //=============================================================================//
@@ -735,8 +662,8 @@ function isOnline(_display){
  * @return object
  */
 function setQuaerere(mensa,res,tau,consuetudinem) {
-    var procus=impetroUser(),moli=screen.height*screen.width,consuetudinem=consuetudinem||0;
-    var quaerere=JSON.stringify({"eternal":res,"Tau":tau,"mensa":mensa,"procus":procus.jesua,"moli":moli,"consuetudinem":consuetudinem,"cons":procus.cons});
+    var procus=impetroUser(),moli=screen.height*screen.width,cons=consuetudinem||0;
+    var quaerere=JSON.stringify({"eternal":res,"Tau":tau,"mensa":mensa,"procus":procus.jesua||0,"moli":moli,"consuetudinem":consuetudinem||0,"cons":procus.cons||0});
     dynamis.set("quaerere",quaerere,true);
     return quaerere;
 }
@@ -753,6 +680,32 @@ function checkConnection() {
    states[Connection.CELL_4G] = 'a Cell 4G connection';
    states[Connection.NONE] = 'with No network connection';
    return Array('Connection type is ' + states[networkState],networkState);
+}
+//============================================================================//
+/**
+ * use prototype to add a function that searches an object value
+ * @author fredtma
+ * @version 2.3
+ * @category search, object
+ * @param array </var>value</var> the value to search in the object
+ * @return bool
+ */
+objSearch = function(ele,value){
+   var key,l,found=false,obj;
+   if(ele instanceof Array){
+      l=ele.length;
+      for(key=0;key<l;key++){obj=ele[key];
+         if(typeof obj==='object' )found=objSearch(obj,value);
+         if(found!==false) return [found,key];
+         if(typeof obj==="string"&&obj.indexOf(value)!==-1 ) return [ele,key];
+      }
+   }
+    for(key in ele ) {obj=ele[key];
+        if(typeof obj==='object' )found=objSearch(obj,value);
+        if(found!==false) return [found,key];
+        if(typeof obj==="string"&&obj.indexOf(value)!==-1 ) return [ele,key];
+    }
+    return false;
 }
 //============================================================================//
 /**
@@ -784,7 +737,7 @@ function timeDifference(t) {
  * @version 0.5
  * @category asthetic
  */
-function SETiSCROLL (id) {id=id||"#mainContent"; iyona.deb("   EXECUTED CODE  ")
+function SETiSCROLL (id) {id=id||"#mainContent";
 	return new IScroll(id, {scrollbars: true,mouseWheel: true,interactiveScrollbars: true,shrinkScrollbars: 'scale',fadeScrollbars: true, tab:true, click:true});
 }
 //============================================================================//
@@ -798,6 +751,55 @@ function SETiSCROLL (id) {id=id||"#mainContent"; iyona.deb("   EXECUTED CODE  ")
  */
 function getLicentia(perm) {
    return impetroUser().licencia;
+}
+//============================================================================//
+/**
+ * creates a unique id based upon time
+ * @author fredtma
+ * @version 1.2
+ * @category random,generation
+ */
+function uRand() {
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+    d = new Date(),text=d.getDate()+d.getMonth();
+
+    for( var i=0; i < 5; i++ ){
+       text += possible.charAt(Math.floor(Math.random() * possible.length));
+       if(i%2 && i!=0) text+=Math.floor(Math.random() * 90)+10;
+    }
+    return text;
+}
+//============================================================================//
+/*
+ * restores the default event if it was blocked with e.preventDefault()
+ */
+function restore(e) {return true;}
+//============================================================================//
+//JSGRAPHS
+//============================================================================//
+function jsGraph(labels,dataSet,ele,options){
+   var   chartData={"labels":labels,"datasets":[]},
+         set, tmpObj={},
+         fillColor=options.fillColor||["rgba(217,83,79,1)","rgba(151,187,205,0.5)","rgba(220,220,220,0.5)"],
+         strokeColor=options.strokeColor||["rgba(220,220,220,1)","rgba(151,187,205,1)","rgba(220,220,220,0.5)"],
+         x=0,
+         ele=ele||'canvas',
+         canvas=document.getElementById(ele),
+         context=canvas.getContext('2d'),
+         chart=new Chart(context);
+
+   for(var key in dataSet){
+      set=dataSet[key];
+      tmpObj = {"fillColor":fillColor[x],"strokeColor":strokeColor[x],"data":set};
+      if(options.pointColor) tmpObj.pointColor = options.pointColor[x];
+      if(options.pointStrokeColor) tmpObj.pointStrokeColor = options.pointStrokeColor[x];
+      chartData.datasets.push(tmpObj);
+      x++;
+   }
+
+   this.barChart= function (){chart.Bar(chartData);}
+   this.lineChart= function (){chart.Line(chartData);}
+   this.radarChart= function (){chart.Radar(chartData,{scaleShowLabels : false, pointLabelFontSize : 10});}
 }
 //============================================================================//
 //GOOGLE API USER DETAILS                                                     //
@@ -843,12 +845,12 @@ function GPLUS_USER() {
    this.onUserInfoFetched = function(error, status, response) {
       if (!error && status == 200) {
          that.user_info = JSON.parse(response);//displayName,image
-         that.callFunction(that.user_info,that.access_token);
-         iyona.deb(that.user_info,that.access_token);
+         that.callFunction(that.user_info,that.access_token,true);
+         iyona.deb("AUTO LOGIN",that.user_info,that.access_token);
       } else {
          that.user_info = {"id":0,"type":0,"emails":[{"value":0}]};
-         that.callFunction(that.user_info,error);
-         iyona.msg("could not retrive user data:"+error.message,false,"danger",error,response);
+         that.callFunction(that.user_info,error, false);
+         iyona.log("could not retrive user data:"+error.message,false,"danger",error,response);
       }
    }
 
@@ -866,6 +868,29 @@ function GPLUS_USER() {
       });
    }
 };
+//============================================================================//
+//ANGULAR HELPER
+//============================================================================//
+function executiveDirector(e,key,node){iyona.deb("KEY, EVENT, ARRAY",key,e,node,node[key]);
+   var enter=e.keyCode==13?true:false,
+       tab=e.keyCode==9?true:false,
+       prev=(key>0)?key-1:0;
+   if(enter||e.keyCode==38||e.keyCode==40)e.preventDefault();
+   if(enter){
+      e.target.autofocus=false;
+      node.splice(key+1,0,{"name":"","focus":true});
+   }
+   if(tab){//node[key].name=e.target.value;//prevent empty scope.items//this is no longer neccessary bsoc of contenteditable
+      e.preventDefault();//debugger;
+      if(key===0)return false;
+      var newNode=node[key];newNode.focus=true;
+      if(node[prev].child instanceof Array)node[prev].child.push(newNode);
+      else node[prev].child=[newNode];
+
+      node.splice(key,1);
+      return [prev,key,node];
+   }
+}
 //============================================================================//
 //FETCH IMAGE
 //============================================================================//

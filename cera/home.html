@@ -1,10 +1,18 @@
 <article  ng-controller="bethel">
-   <header class="menuHeader"><ol class="breadcrumb"><li><a href="#genesis">Home</a></li><li class="active">Device Details</li></ol><a title="View operating server" href="#genesis/live" class="glyphicon glyphicon-thumbs-up white"></a><a  href="#genesis/down" title="View down server" class="glyphicon glyphicon-thumbs-down white"></a><a title="View all server" href="#genesis/all" class="glyphicon glyphicon-hand-up white"></a></header>
+   <header class="menuHeader">
+      <ol class="breadcrumb">
+         <li><a href="#genesis">Home</a></li>
+         <li class="active">Device Details</li>
+         <li class="menu-icon"><a title="View operating server" href="#genesis/live" class="glyphicon glyphicon-thumbs-up white"></a></li>
+         <li class="menu-icon"><a  href="#genesis/down" title="View down server" class="glyphicon glyphicon-thumbs-down white"></a></li>
+         <li class="menu-icon"><a title="View all server" href="#genesis/all" class="glyphicon glyphicon-hand-up white"></a></li>
+      </ol>
+   </header>
    <section class="dashboard listContainer" >
       <ul>
          <li class="dashRow">
             <div class="panel panel-primary dashCell cell ">
-               <div class="panel-body whiteShadow"  ng-click="moveTo('leviticus/servers/view/all',true)">
+               <div class="panel-body whiteShadow"  ng-click="moveTo('leviticus/servers/list',true)">
                   <span class="glyphicon glyphicon-hdd panelIcon"></span>
                   <p>Currently {{total}} monitored server<br/>
                      The last system check ran on {{last}}

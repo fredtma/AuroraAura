@@ -1,63 +1,51 @@
 'use strict'
-angular.module('KingOFkings',['ngRoute','angular-gestures','ngSanitize','ngAnimate','KingsControllers','KingsServices','KingsFilters'])
-.config(['$routeProvider','$compileProvider',function($routeProvider,$compileProvider){
+angular.module('KingOFkings',['ngRoute','angular-gestures','ngSanitize','ngAnimate','KingsControllers','KingsServices','KingsFilters','KingsDirectives','ui.bootstrap'])
+.config(['$routeProvider','$compileProvider','$sceDelegateProvider',function($routeProvider,$compileProvider,$sceDelegateProvider){
    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel|mail|chrome-extension):/);
-//   $compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel|chrome-extension):/);
+   $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|chrome-extension|file):/);
+   $sceDelegateProvider.resourceUrlWhitelist(['self', /demo.xpandit.co.za/]);
    $routeProvider
       .when('/genesis/:view?',{templateUrl:'cera/home.html'})
       .when('/exodus/:login?',{templateUrl:'cera/login.html'})
       .when('/deuteronomy/:page/:log?/:server?',{templateUrl:'cera/log_servers.html'})
-      .when('/leviticus/:page/:opt?/:view?',{templateUrl:'cera/servers.html'})
-      .when('/joshua/:page/:opt?/:view?',{templateUrl:'cera/users.html'})
-      .when('/numbers/:page/:opt?/:view?',{templateUrl:'cera/clients.html'})
+      .when('/leviticus/:page/:view?/:jesua?',{templateUrl:'cera/servers.html'})
+      .when('/joshua/:page/:view?/:jesua?',{templateUrl:'cera/users.html'})
+      .when('/proverbs/:page/:view?/:jesua?',{templateUrl:'cera/lists.html'})
+      .when('/numbers/:page/:view?/:jesua?',{templateUrl:'cera/clients.html'})
+      .when('/isaiah/:page/:view?/:jesua?',{templateUrl:'cera/adsl.html'})
+      .when('/template',{templateUrl:'cera/templates/template.html'})
+      .when('/report/:report?',{templateUrl:'cera/reports/servers-rpt.html'})
+      .when('/reportAll/:report?',{templateUrl:'cera/reports/reports.html'})
       .otherwise({redirectTo:'/genesis'});
-}]).run(['notitia','$location','$rootScope',function(notitia,$location,$rootScope){
+}]).run(['notitia','$location','$rootScope','crud',function(notitia,$location,$rootScope,crud){
+   Hammer.defaults.stop_browser_behavior.userSelect=PASCO?'NONE':'text';//in desktop mode allow selectable text
+   var user = dynamis.get('USER_NAME',true);
    notitia.notitia();/*innitiate the DB*/
-   if(!impetroUser().operarius&&$location.$$url!='/exodus') {
-   $location.path("/exodus");}/*less intensive redirect when not login*/
+   if(!impetroUser().operarius&&$location.$$url!='/exodus') {$location.path("/exodus");}/*less intensive redirect when not login*/
+
    //$rootScope.$on("$routeChangeStart",function(event,next,current){if(!impetroUser().singularis && next.loadedTemplateUrl!="cera/login.html"){$location.path("/exodus");}});//redirect when not login by watching event
-   var href=(impetroUser())?"#joshua/administrator/"+impetroUser().operarius+"/details":"#joshua/administrator/none/details";
+   var href=(impetroUser())?"#joshua/administrator/"+impetroUser().operarius+"/details":"#joshua/administrator/view/none";
    $rootScope.site={"title":sessionStorage.SITE_NAME,"company":"XpandIT"};
-   $rootScope.menus=[{"link":true,"header":"dropdown-header","text":"Action List"},{"link":true,"icon":"glyphicon glyphicon-user","text":"User Profile","href":href},{"link":true,"icon":"glyphicon glyphicon-list","text":"Profile List","href":"#joshua/administrator/view/all"},{"link":true,"icon":"glyphicon glyphicon-briefcase","text":"Clients","href":"#numbers/clients/view/all"},{"link":true,"icon":"glyphicon glyphicon-hdd","text":"Servers","href":"#leviticus/servers/view/all"},{"divider":"divider"},{"link":true,"header":"dropdown-header","text":"Settings"},{"link":true,"icon":"glyphicon glyphicon-cog","text":"Configuration"},{"link":true,"icon":"glyphicon glyphicon-off","href":"#exodus/logoff","text":"Log Off"}];
-   $rootScope.panelLeft=[{"name":"Functions","id":"panelFunctions","header":true,"cls":"list-header"},{"name":"User Profile","id":"panelProfile","header":false,"icon":"glyphicon-user","href":href},{"name":"Profile List","id":"panelProfileList","header":false,"icon":"glyphicon-list","href":"#joshua/administrator/view/all"},{"name":"Clients","id":"panelClients","header":false,"icon":"glyphicon-briefcase","href":"#numbers/clients/view/all"},{"name":"Servers","id":"panelServers","header":false,"icon":"glyphicon-hdd","href":"#leviticus/servers/view/all"},{"name":"System","id":"panelCommunicate","header":true,"cls":"list-header"},{"name":"Share","id":"panelShare","header":false,"icon":"glyphicon-retweet"},{"name":"Feed Back","id":"panelFeed","header":false,"icon":"glyphicon-comment"},{"name":"Configuration","id":"panelConfig","header":false,"icon":"glyphicon-cog"},{"name":"Help","id":"panelHelp","header":false,"icon":"glyphicon-question-sign"},{"name":"Log Off","id":"panelLogOff","header":false,"icon":"glyphicon-off danger","href":"#exodus/logoff"}];
+   $rootScope.menus=[{"link":true,"header":"dropdown-header","text":"Action List"},{"link":true,"icon":"glyphicon glyphicon-user","text":"User Profile","href":href},{"link":true,"icon":"glyphicon glyphicon-list","text":"Profile List","href":"#joshua/administrator/list"},{"link":true,"icon":"glyphicon glyphicon-briefcase","text":"Clients","href":"#numbers/clients/list"},{"link":true,"icon":"glyphicon glyphicon-hdd","text":"Servers","href":"#leviticus/servers/list"},{"link":true,"icon":"glyphicon glyphicon-road","text":"ADSL List","href":"#isaiah/adsl/list"},{"divider":"divider"},{"link":true,"header":"dropdown-header","text":"Settings"},{"link":true,"icon":"glyphicon glyphicon-cog","text":"Configuration"},{"link":true,"icon":"glyphicon glyphicon-off","href":"#exodus/logoff","text":"Log Off"}];
+   $rootScope.panelLeft=[{"name":"Functions","id":"panelFunctions","header":true,"cls":"list-header"},{"name":"User Profile","id":"panelProfile","header":false,"icon":"glyphicon-user","href":href},{"name":"Profile List","id":"panelProfileList","header":false,"icon":"glyphicon-list","href":"#joshua/administrator/list"},{"name":"Clients","id":"panelClients","header":false,"icon":"glyphicon-briefcase","href":"#numbers/clients/list"},{"name":"Servers","id":"panelServers","header":false,"icon":"glyphicon-hdd","href":"#leviticus/servers/list"},{"header":false,"id":"panelADSL","name":"ADSL List","icon":"glyphicon glyphicon-road","text":"ADSL List","href":"#isaiah/adsl/list"},{"name":"System","id":"panelCommunicate","header":true,"cls":"list-header"},{"name":"Share","id":"panelShare","header":false,"icon":"glyphicon-retweet"},{"name":"Feed Back","id":"panelFeed","header":false,"icon":"glyphicon-comment"},{"name":"Configuration","id":"panelConfig","header":false,"icon":"glyphicon-cog"},{"name":"Help","id":"panelHelp","header":false,"icon":"glyphicon-question-sign"},{"name":"Log Off","id":"panelLogOff","header":false,"icon":"glyphicon-off danger","href":"#exodus/logoff"}];
    $rootScope.panelRight=[{"name":"Knowledge Graph","id":"panelKnowledge","header":true,"cls":"list-header"},{"name":"Email","id":"panelEmail","header":false},{"name":"Network","id":"panelNetword","header":false},{"name":"Setup","id":"panelSetup","header":false},{"name":"Server","id":"panelServer","header":false},{"name":"Software","id":"panelSoftware","header":false}];
    $rootScope.PASCO=PASCO;
-   $rootScope.debug=PASCO?false:false;
+   $rootScope.debug=PASCO?false:false;//no mobile debug
+   $rootScope.debug=(typeof chrome !== "undefined" && chrome.hasOwnProperty("identity"))?false:$rootScope.debug;//no app debug
+   $rootScope.debug=(user!==null&&user.operarius==="fredtma")?true:$rootScope.debug;//no app debug
    $rootScope.showPanel=false;
-   $rootScope.exit=function(){if('app' in navigator && 'exitApp' in navigator.app && confirm("Are you sure you want to exit the application?"))navigator.app.exitApp(); else close();}
-   $rootScope.panelMenu=function(swipe){
-      iyona.deb("SWIPE",swipe,$rootScope.showPanel);
+   $rootScope.exit=function(){crud.modalMessage("Are you sure you want to exit the application?",function(selected){$location.path("/exodus");if("app" in navigator)navigator.app.exitApp();if("localStorage" in window) localStorage.clear(); sessionStorage.clear();},function(selected){iyona.deb("The btn is::"+selected);});}
+   $rootScope.panelMenu=function(swipe,e){
       if(swipe==='left')$rootScope.showPanel=$rootScope.showPanel=='left'?false:'right';
       else if(swipe==='right')$rootScope.showPanel=$rootScope.showPanel=='right'?false:'left';
       else $rootScope.showPanel=false;
+      iyona.deb("EVENT2",e);e.cancelBuble=true; e.stopPropagation(); e.gesture.stopPropagation(); e.gesture.stopDetect(); return true;
    }
-   $rootScope.isViewLoading = false;
+   $rootScope.isViewLoading = {"display":"none"};
 }]);
 //============================================================================//
-if (window.PASCO) {load_async("cordova.js", false, 'end', false);load_async("js/PushNotification.js", false, 'end', false);load_async("js/index.js", false, 'end', false); }else{load_async("js/welcome.js", false, 'end', false);}
+//if (window.PASCO) {load_async("cordova.js", false, 'end', false);load_async("js/PushNotification.js", false, 'end', false);load_async("js/index.js", false, 'end', false); }else{load_async("js/welcome.js", false, 'end', false);}
+if (window.PASCO) {load_script(["cordova.js","js/PushNotification.js","js/index.js"], false, 'end', false);}else{load_script(["js/welcome.js"], false, 'end', false);}
 //============================================================================//
-configuration.prototype.eternal=function(){
-   var date = new Date().format("isoDateTime");
-   var scope = {
-      "users":{"created":date, "modified":date,"jesua":null,"firstname":null,"lastname":null,"username":null,"email":null,"mobile":null,"title":"Mr.","communication":"email"},
-      "clients":{"created":date, "modified":date,"jesua":null,"name":null,"code":null,"desc":null},
-      "servers":{"created":date, "modified":date,"jesua":null,"name":null,"address":null,"mailbox":null,"email":null,"password":null,"status":null,"period":null},
-      "log_servers":{"hour":null,"created":date, "modified":date,"name":null,"address":null,"reason":null,"status":null}
-   };
-   var defaults={"jesua":{"type":"TEXT","key":"unique"},"created":{"type":"TEXT"},"modified":{"type":"TIMESTAMP","default":"CURRENT_TIMESTAMP"}};
-   var loremIpsum={
-         "users":{"defaults":defaults,"fields":{"username":{"type":"TEXT","unique":true},"firstname":{"type":"TEXT","null":true},"lastname":{"type":"TEXT"},"email":{"type":"TEXT","null":true},"password":{"type":"TEXT","null":true},"mobile":{"type":"TEXT"},"title":{"type":"TEXT"},"communication":{"type":"TEXT"} }},
-         "clients":{"defaults":defaults,"fields":{"name":{"type":"TEXT","null":true,"unique":true},"code":{"type":"TEXT","null":true,"unique":true},"desc":{"type":"TEXT"} }},
-         "contacts":{"defaults":defaults,"fields":{"ref_user":{"type":"TEXT","null":true,"ref":{"table":"users","field":"jesua"}},"type":{"type":"TEXT","null":true},"contact":{"type":"TEXT","null":true,"ndx":"ndxContact"},"instruction":{"type":"TEXT"},"ext":{"type":"TEXT"}}},
-         "servers":{"defaults":defaults,"fields":{"name":{"type":"TEXT","null":true,"ndx":"ndxServerName"},"address":{"type":"TEXT","null":true},"mailbox":{"type":"TEXT"},"email":{"type":"TEXT","unique":true},"password":{"type":"TEXT"},"status":{"type":"TEXT"},"period":{"type":"INTEGER"}}},
-         "version_db":{"fields":{"id":{"type":"INTEGER","key":true},"ver":{"type":"REAL"}}},
-         "log_servers":{"fieds":{"hour":{"type":"TEXT","key":true},"created":{"type":"TEXT"}, "modified":{"type":"TEXT"},"name":{"type":"TEXT","unique":true},"address":{"type":"TEXT"},"reason":{"type":"TEXT"},"status":{"type":"TEXT"}}}
-      }
 
-   scope.administrator=scope.users;
-   dynamis.set("scope",scope);
-   dynamis.set("loremIpsum",loremIpsum);
-   return this;
-};
-(function(){var settings= new configuration(); settings.eternal(); })();
 //============================================================================//

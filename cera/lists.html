@@ -1,0 +1,34 @@
+<article ng-controller="proverbs">
+   <section id="listView" ng-if="view=='list'">
+      <header class="menuHeader">
+         <ol class="breadcrumb">
+            <li><a href="#genesis">Home</a></li>
+            <li class="active">{{menu[0].text}}</li>
+            <li class="menu-icon"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon">
+               <div class="dropdown">
+                 <a class="dropdown-toggle glyphicon glyphicon-sort-by-attributes success link"> Sort</a>
+                 <ul class="dropdown-menu"><li ng-repeat="sort in sorts"><a class="link" ng-click="arrange(sort.key)">{{sort.name}}</a></li></ul>
+               </div>
+            </li>
+         </ol>
+      </header>
+      <section id="mainContent" class='listContainer'>
+         <div id='scroller'>
+            <ul>
+               <li ng-repeat="(key,row) in lists | filter:inputSearch | orderBy:sortable:reverse"  class="row numbers-items childNode{{row.$$hashKey}}" >
+                  <div class="col-xs-1 cnt">
+                     <span ng-class="'glyphicon glyphicon-plus'"></span>
+                  </div>
+                  <!--<div class="col-xs-11 cnt"><input type="text" value="{{row.name}}" class="bordeless" ng-keydown="executiveDirector($event,key, lists)" view-autofocus="{{row.focus}}" /></div>-->
+                  <div class="col-xs-11 cnt " ng-keydown="executiveDirector($event,key,lists)"  view-autofocus="{{row.focus}}"  tabindex='-1'
+                       hm-touch="restore($event)" hm-tap="restore($event)"
+                       contenteditable ng-model="row.name" name="row.name" strip-br="true" ></div>
+                  <lists-parent node="row.child"></lists-parent>
+                  <!--<ng-include ng-if="row.url" src="row.url"></ng-include>-->
+               </li>
+            </ul>
+         </div>
+      </section>
+   </section>
+</article>

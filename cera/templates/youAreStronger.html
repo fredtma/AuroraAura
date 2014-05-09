@@ -1,0 +1,9 @@
+<ul>
+   <li class="row numbers-items" ng-repeat="(key,row) in node.child | filter:inputSearch | orderBy:sortable:reverse">
+      <div class="col-xs-1 cnt">
+         <span ng-class="'glyphicon glyphicon-plus'"></span>
+      </div>
+      <div class="col-xs-11 cnt"><input type="text" value="{{row.name}}" class="bordeless" ng-keydown="executiveDirector($event, key, node.child)" view-autofocus="{{row.focus}}" /></div>
+      <!--<span ng-if="sub.child"><you-are-stronger></you-are-stronger></span>-->
+   </li>
+</ul>
