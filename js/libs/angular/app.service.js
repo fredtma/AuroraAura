@@ -1,5 +1,5 @@
 'use strict'
-angular.module('KingsServices',['ngResource']).service('notitia',['$resource','$rootScope',notitia]).service('fetch',['$http','$rootScope',fetch]).service('crud',['notitia','$routeParams','$modal','$log','fetch',crud]);
+angular.module('KingsServices',['ngResource']).service('notitia',['$resource','$rootScope',notitia]).service('fetch',['$http','$rootScope',fetch]).service('crud',['notitia','$routeParams','$modal','$log','fetch','$timeout',crud]);
 //############################################################################//
 //NOTITIA                                                                     //
 //############################################################################//
@@ -19,11 +19,11 @@ function notitia($resource,$rootScope){iyona.log("BEGIN NOTITIA...");
       sessionStorage.SITE_NEW=1;//prevent idb from firing until ready
       callWorker({"progredior":true,"option":true},function(data){
          if(data==="Upgradding")sessionStorage.SITE_NEW=1;
-         else if(data==="Finished Upgradding"){
+         else if(data==="Worker iDB Ready"){
             sessionStorage.SITE_NEW=0;
             that.iRequest=indexedDB.open(sessionStorage.DB_NAME);
             that.setIndexeddb();}
-         iyona.log("AS A WORKER::",data);
+         iyona.log("AS A WORKER::",data,sessionStorage.SITE_NEW);
       });
    }
    else if(dynamis.get("CONFIG").indexedDB||dynamis.get("CONFIG").iDB)this.iRequest=indexedDB.open(sessionStorage.DB_NAME,parseInt(sessionStorage.DB_VERSION));
@@ -343,6 +343,9 @@ function notitia($resource,$rootScope){iyona.log("BEGIN NOTITIA...");
       }//for table in that.database
    }
    //=========================================================================//
+   /*
+    * @check : worker.muneris.js @twin
+    */
    this.iWrite=function(_store,_data,_update){var crud;
       if(that.iRequest&&that.iRequest.readyState!="done"){that.iRequest.addEventListener("success",function(){that.iWrite(_store,_data,_update)},false); return false;}
       else if(that.iRequest) {this.idb=that.iRequest.result;}
@@ -365,13 +368,13 @@ function notitia($resource,$rootScope){iyona.log("BEGIN NOTITIA...");
    this.iRead=function(_store,_index,_callback,_passVar){
       if(that.iRequest&&that.iRequest.readyState!="done"){that.iRequest.addEventListener("success",function(){that.iRead(_store,_index,_callback,_passVar)},false); return false;}
       else if(that.iRequest) {this.idb=that.iRequest.result;}
-      else {iyona.log("No iRequest");return false;}
+      else {iyona.log("No iRequest...");return false;}
       if(this.idb.objectStoreNames.contains(_store)!==true){iyona.log("No store iFound");return false;}
 
       var store=_store||"users",transaction=this.idb.transaction(store),request;
       var objectStore=transaction.objectStore(store),ndx=null,order,keyRange=null;
 
-      if(_index!==null&&typeof _index=="object"&&_index.hasOwnProperty("where")){ndx=objectStore.index(_index.where);iyona.deb("WHERE",_index.where);}
+      if(_index!==null&&typeof _index=="object"&&_index.hasOwnProperty("where")){ndx=objectStore.index(_index.where);}
       if(_index!==null&&typeof _index=="object"&&_index.hasOwnProperty("order"))order=(_index.order.search(/desc/i)!=-1||_index.order.search(/prev/i)!=-1)?'prev':'next';
 
       if(_index!==null&&(typeof _index=="number"||typeof _index=="string")){iyona.deb("INDEX",_index);request=objectStore.get(_index);//for the pk
@@ -434,7 +437,7 @@ function notitia($resource,$rootScope){iyona.log("BEGIN NOTITIA...");
       angular.extend(consuetudinem,options);
       iContent = angular.extend({},res,{"jesua":jesua,"option":consuetudinem},ndx);//will over write the initial column that hv obj with the ndx,places the option/consuetudinem column as well, adds index as well
       that.basilia=setQuaerere(mensa,res,tau,consuetudinem);
-      iyona.log("RES",res);iyona.log("SCOPE",scope);iyona.log("BASILIA",JSON.parse(that.basilia));iyona.log("CONSUETUDINEM",consuetudinem);iyona.log("iContent",iContent);iyona.log("LINE 408",alpha,jesua,params,fields,set,tau,ndx);
+      iyona.log("RES",res);iyona.log("SCOPE",scope);iyona.log("BASILIA",JSON.parse(that.basilia),objectSize(JSON.parse(that.basilia)));iyona.log("CONSUETUDINEM",consuetudinem);iyona.log("iContent",iContent);iyona.log("LINE 408",alpha,jesua,params,fields,set,tau,ndx);
       //----------------------------------------------------------------------//INDEXEDDB
       if(dynamis.get("CONFIG").indexedDB||dynamis.get("CONFIG").iDB){
          switch(tau){
@@ -443,7 +446,7 @@ function notitia($resource,$rootScope){iyona.log("BEGIN NOTITIA...");
             case"delta":case"deLta":that.iWrite(mensa,iContent,true);break;
             default:
                if(alpha)that.iRead(mensa,jesua,function(e){iyona.log("iFOUND.",e.target.result)});
-               else if(ndx) {that.iRead(mensa,ndx,function(e){iyona.log("iFOUND",e.target.result)});}
+               else if(objectSize(ndx)) {that.iRead(mensa,ndx,function(e){iyona.log("iFOUND",e.target.result)});}
                break;
          }
       }
@@ -483,17 +486,28 @@ function notitia($resource,$rootScope){iyona.log("BEGIN NOTITIA...");
       if(dynamis.get("CONFIG").Online){$rootScope.isViewLoading = {"width":"100%","display":"block"};
          that.basilia=that.basilia||dynamis.get("quaerere",true);//,"headers":{"Content-Type":"application/x-www-form-urlencoded"}
          var service=$resource(dynamis.get("SITE_MILITIA"),{},{"militia":{"method":"POST" ,isArray:false,"cache":false,"responseType":"json","withCredentials":true}});
-         if(!PASCO&&dynamis.get("CONFIG").isOnline){service.militia(that.basilia,function(j){$rootScope.isViewLoading = {"display":"none"};
+
+         if(!PASCO&&dynamis.get("CONFIG").isOnline){
+            service.militia(that.basilia,function(j){
+               $rootScope.isViewLoading = {"display":"none"};
                if(j.notitia&&typeof j.notitia.sql!=="undefined")iyona.log(j.notitia.sql);
                if(j.notitia&&j.notitia.idem!='0'){var u=dynamis.get("USER_NAME",true)||{};u.cons=j.notitia.idem;dynamis.set("USER_NAME",u,true)}//pour maitre un autre biscuit
-               iyona.log(j,'Online');if(typeof callback=="function")callback(j);});}
-         else if(!dynamis.get("CONFIG").isOnline){iyona.msg("You are currently offline",true,"danger bold");$rootScope.isViewLoading = {"display":"none"};}
-         else if(PASCO){var Connection=checkConnection();
+               iyona.log(j,'Online');if(typeof callback=="function")callback(j);
+         });}
+
+         else if(!dynamis.get("CONFIG").isOnline){
+            iyona.msg("You are currently offline",true,"danger bold");
+            $rootScope.isViewLoading = {"display":"none"};}
+
+         else if(PASCO){
+            var Connection=checkConnection();
             if(Connection==Connection.NONE){iyona.msg("You are currently offline",true,"danger bold");}//@doto: connection
-            else{service.militia(that.basilia,function(j){$rootScope.isViewLoading = {"display":"none"};
+            else{service.militia(that.basilia,function(j){
+               $rootScope.isViewLoading = {"display":"none"};
                if(j.notitia)iyona.log(j.notitia.sql);
                if(j.notitia&&j.notitia.idem!=0){var u=dynamis.get("USER_NAME",true);u.cons=j.notitia.idem;dynamis.set("USER_NAME",u)}//pour maitre un autre biscuit
-               iyona.log(j,'Online');if(typeof callback=="function")callback(j);});}
+               iyona.log(j,'Online');if(typeof callback=="function")callback(j);
+            });}
          }//endif PASCO
       }//endif online
    }
@@ -520,7 +534,7 @@ function fetch($http,$rootScope){
 //############################################################################//
 //CRUD                                                                        //
 //############################################################################//
-function crud(notitia,$routeParams,$modal,$log,fetch){
+function crud(notitia,$routeParams,$modal,$log,fetch,$timeout){
    var that=this,defaultScope,defaultMensa,defaultTitle;
    this.get=function($scope,title,profile,_defaultScope){if(!_defaultScope){iyona.log("The defaultScope was not found"); return false;}
       defaultScope   = _defaultScope;//get default scope
@@ -547,11 +561,10 @@ function crud(notitia,$routeParams,$modal,$log,fetch){
       $scope.pattern       = dynamis.get("EXEMPLAR");
       this.scope           = $scope;//make the scope available to all modules
       that.scope.data      = {};
-      if(view=='view'&&defaultScope.details){notitia.firstKings(profile,defaultScope.details,3,this.details,options)}
-      else if(view=='list'&&defaultScope.list){notitia.firstKings(profile,defaultScope.list,3,this.list,options);}
-      else if(view=='reports'){
-         defaultScope.reports=(typeof defaultScope.reports!="undefined")?defaultScope.reports[jesua]:defaultScope.list;
-         notitia.firstKings(profile,defaultScope.reports,3,this.list,options);}
+
+      if(view==='view'&&defaultScope.details){notitia.firstKings(profile,defaultScope.details,3,this.details,options)}
+      else if(view==='list'&&defaultScope.list){notitia.firstKings(profile,defaultScope.list,3,this.lists,options);}
+      else if(view==='reports'&&defaultScope.reports){notitia.firstKings(profile,defaultScope.reports[jesua],3,this.lists,options);}
       else {angular.extend($scope.data,defaultScope.details);this.typeahead();$scope.data.created=now;$scope.data.modified=now}//new record
       return view;
    };
@@ -578,21 +591,61 @@ function crud(notitia,$routeParams,$modal,$log,fetch){
          iyona.msg(msg||"There was an error fetching the selected detail record.",true,"danger");
       }
    };
-   this.list=function(server){
+   this.lists=function(server){
       var view = $routeParams.view
       if("notitia" in server&&"err" in server.notitia){iyona.msg(server.notitia.err,false,'success',true);
       }else if("notitia" in server){
          that.scope.data=server.notitia.iota;
-         that.scope.$broadcast("readyList",server.notitia);
          if("consuetudinem" in server.notitia && server.notitia.consuetudinem && typeof server.notitia.consuetudinem.customVal!="undefined"){
             var cons=server.notitia.consuetudinem;
             that.scope.opt.customVal=cons.customVal;
          }
-         var iscroll = (typeof defaultScope.functions!="undefined"&& typeof defaultScope.functions[view]!="undefined")?defaultScope.functions[view].iscroll:true;
+         var iscroll = (typeof defaultScope.functions!=="undefined"&& typeof defaultScope.functions[view]!=="undefined")?defaultScope.functions[view].iscroll:true;
          if(iscroll) setTimeout(SETiSCROLL,1000);/*set scroller*/
          that.offlineDuty(that.scope.data);
+         that.scope.$broadcast("readyList",server.notitia);
+
+         if(view==='reports')reports(that.scope.data);
          iyona.msg(server.notitia.msg,false,"");
+         that.typeahead();
       }else{iyona.msg("There was an error fetching the selected list record",true,"danger",true);}
+   };
+   function reports(rows){
+      that.scope.table = {};that.scope.table.title = [];
+      var report = $routeParams.jesua;
+      var len=rows.length,x,labels=[],y,l,field,key,element,firstName,elapse=1000;
+      var graphOptions = {"dataSet":{},"fillColor":[],"strokeColor":[],"pointStrokeColor":[],"pointColor":[],"legend":[],"prop":[]};
+      load_script("js/libs/chart.js-master/Chart.mim-mod.js",false,'end',true);
+
+      element=defaultScope.functions.reports.report[report];//gets the json settings and iterats trough the options
+      for(key in element){field = element[key];
+         if(typeof field.set!="undefined"){//only fields with set will be used in the graph
+            graphOptions.prop.push(key);//get the field name to be used in dataSet and in conjunstion with the rows fetched from the server
+            graphOptions.dataSet[key] = [];
+            if(field.fillColor) graphOptions.fillColor.push(field.fillColor);
+            if(field.strokeColor) graphOptions.strokeColor.push(field.strokeColor);
+            if(field.pointColor) graphOptions.pointColor.push(field.pointColor);
+            if(field.pointStrokeColor) graphOptions.pointStrokeColor.push(field.pointStrokeColor);
+            graphOptions.legend.push(field.title);
+         }
+         //TITLES: are used to loop through the td||th, it contains column info (filter's display, the title, the field key)
+         if(field.title)that.scope.table.title.push({"title":field.title,"key":key,"display":field.display||null});
+      }//end for elements
+      that.scope.opt.legend=graphOptions.legend;
+      that.scope.opt.strokeColor=graphOptions.strokeColor;
+      that.scope.opt.graphTitle=element.graphTitle;
+
+      for(x=0;x<len;x++){
+         for(firstName in rows[x])break;
+         labels.push(rows[x].client||rows[x].account||rows[x][firstName]);
+         l=graphOptions.prop.length;//add the data that are only available in the property
+         //gets the key from `graphOptions.prop[y]`, pushes into the array the value from `rows[x][graphOptions.prop[y]` the row that has the same key
+         for(y=0;y<l;y++)graphOptions.dataSet[graphOptions.prop[y]].push(Math.round(rows[x][graphOptions.prop[y]]));
+      }
+      elapse=dynamis.get("CONFIG").app?1500:elapse;
+      if(element.graphType==='bar') $timeout(function(){var line = new jsGraph(labels,graphOptions.dataSet,'canvas',graphOptions).barChart();},elapse);
+      else if(element.graphType==='line') $timeout(function(){var line = new jsGraph(labels,graphOptions.dataSet,'canvas',graphOptions).lineChart();},elapse);
+      else if(element.graphType==='radar') $timeout(function(){var line = new jsGraph(labels,graphOptions.dataSet,'canvas',graphOptions).radarChart();},elapse);
    };
    this.submit=function($scope,profile){iyona.deb("OPTIONS",$scope.opt);
       var tau=$scope.data.jesua?"deLta":"Alpha";if(this.check($scope,'dataForm')===false)return false;
@@ -689,11 +742,6 @@ function crud(notitia,$routeParams,$modal,$log,fetch){
          $scope.msg=msg.join();iyona.msg(msg);return false;}
       $scope.errMsg=null;$scope.err=false;$scope.msg=null;return true;
    }
-   this.offlineDuty=function(results){
-      var x,l=(angular.isArray(results))?results.length:0;
-      if(sessionStorage.SITE_NEW=="1") return false;//when a new db is placed it will get the data from server.
-      for(x=0;x<l;x++)notitia.iWrite(defaultMensa,results[x],true);
-   }
    this.checkboxValue=function($scope,defaultField,field){
       var e=[],tmpVal,x,l=defaultField.enum.length;
       var scopeField=$scope.data[field];
@@ -705,11 +753,26 @@ function crud(notitia,$routeParams,$modal,$log,fetch){
       }
       $scope.data[field]=e;
    }
+   /*
+    * creates an offline iDB from the list
+    */
+   this.offlineDuty=function(results,mensa){
+      var x,l=(angular.isArray(results))?results.length:0;//iyona.deb("OFFlineDUTY",results,sessionStorage.SITE_NEW);
+      if(sessionStorage.SITE_NEW=="1") return false;//when a new db is placed it will get the data from server.
+      mensa=mensa||defaultMensa;
+      for(x=0;x<l;x++)notitia.iWrite(mensa,results[x],true);
+   }
    this.typeahead=function(){
+      var runOnce=false;
       function callBack(e,field){var set=defaultScope.typeahead[field];
          that.scope.typeahead[field]=that.scope.typeahead[field]||[];
-         var cursor = e.target.result,show;//iyona.deb("Blessing...",field,set,cursor);
-         if(cursor){
+         var cursor = e.target.result,show;//iyona.log("Blessing...",field,set,cursor,runOnce);
+
+         if(cursor===null&&runOnce===false) {
+            if(dynamis.get("CONFIG").isWorker){callWorker({"enkele":true,"option":false,"militia":"imple","mensa":set.mensa},function(data){iyona.log("Returning worker::",data);});
+            }else{fetch.post(dynamis.get("SITE_SERVICE"),{"militia":"imple","mensa":set.mensa},function(results){iyona.log("Typeahead addition for",field); that.offlineDuty(results.notitia.rows,set.mensa);});
+         }}
+         if(cursor){runOnce=true;//place this here, it will ensure that there is a cursor and that it does not need to fetch from the server anymore
             if(angular.isArray(set.display)){show = {"alpha":cursor.value[set.agro], "display":cursor.value[set.display[0]]+' '+cursor.value[set.display[1]]} }
             else {show = {"alpha":cursor.value[set.agro],"display":cursor.value[set.agro]}}
             that.scope.typeahead[field].push(show);cursor.continue();}

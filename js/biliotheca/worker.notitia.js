@@ -40,81 +40,28 @@ self.addEventListener('message',function(e){
    }
    //=========================================================================//
    else if(data.hasOwnProperty("progredior")){
-      var ver = data.DB_VERSION||null,x,l;
-      var iRequest=self.indexedDB.open("app_xpandit",parseInt(ver)),idb,option=data.option,upgrading=false;
-
-      iRequest.onsuccess=function(e){self.postMessage("Worker iDB Ready");
-         idb=idb||e.target.result||iRequest.result;
-         //place the addition of data in seperate loop, in order to prevent `transaction running`
-         if(upgrading==true){
-            for(var profile in defaultScope){
-               var table = defaultScope[profile].mensa;
-               aSync(SITE_SERVICE,{"militia":"imple","mensa":table},function(e){
-                  //iyona.log("RESOURCE",e);
-                  if("notitia" in e===false){iyona.log("could not auto update iDB");return false;}
-                  l=e.notitia.rows.length;
-                  for(x=0;x<l;x++){iWrite(e.notitia.mensa,e.notitia.rows[x],true);}
-               });
-         }}upgrading=false;
-      }
-      iRequest.onerror=function(e){iyona.log("Database error code: "+e.target.error.message);}
-
-      iRequest.onupgradeneeded=function(e){self.postMessage("Upgradding");
-         idb=e.target.result||iRequest.result;upgrading=true;
-
-         for(var profile in defaultScope){
-            if(option!==true||(typeof option=="object" && option.hasOwnProperty(profile)==false )){iyona.log("skipping",profile); continue;}
-            var table = defaultScope[profile].mensa;
-            var mensa = defaultScope[profile].creation;
-
-            if(idb.objectStoreNames.contains(table)!==true){//new store creation
-               var store=iRequest.result.createObjectStore(table,{keyPath:"jesua"});
-               for(var field in mensa){//@note:no need to add store as the store is dynamic.
-                  var current=mensa[field]; if(field==='jesua')continue;
-                  if(current.unique) store.createIndex('uniq_'+field,field,{unique:true});//keyname,keypath
-                  if(current.ndx) store.createIndex(current.ndx,field);
-               }//for field in mensa.fields
-            }else{//to update the object store's index
-               store=(iRequest.transaction)?iRequest.transaction.objectStore(table):e.currentTarget.transaction.objectStore(table);
-               var x,l=store.indexNames.length;
-               //iyona.log("COLUMN",typeof store.indexNames,store.indexNames instanceof Array,store.indexNames,table);
-               for(x=0;x<l;x++){if(typeof store.indexNames[x]==='string')store.deleteIndex(store.indexNames[x]);}//remove all indexs
-
-               for(var field in mensa){//@note:no need to add store as the store is dynamic.
-                  var current=mensa[field];//if(field==='jesua')continue;iyona.log("CURRENT",current,field);
-                  try{
-                     if(current.unique&&!objSearch(store.indexNames,'uniq_'+field)) {store.createIndex('uniq_'+field,field,{unique:true});}
-                     if(current.ndx&&!objSearch(store.indexNames,current.ndx)) {store.createIndex(current.ndx,field);}
-                  }catch(e){iyona.log("An error occured in creating the index::"+e.message, field,e)}
-
-               }//for field in mensa.fields
-            }
-            iRequest.transaction.onerror=function(e){iyona.log("A database error code: "+e.target.errorCode,e);}
-
-         }
-      }
-      iWrite=function(_store,_data,_update){var crud;
-         if(iRequest&&iRequest.readyState!="done"){iRequest.addEventListener("success",function(){iyona.log("Here it act"); iWrite(_store,_data,_update)},false); return false;}
-         else if(iRequest) {idb=iRequest.result;}
-         else {iyona.log("No iRequest");return false;}
-         if(idb.objectStoreNames.contains(_store)!==true){iyona.log("No store iFound");return false;}
-
-         var store=_store||"users",transaction=idb.transaction(store,"readwrite"),request;
-         var objectStore=transaction.objectStore(store);
-         if(typeof _data!=="object") {iyona.log("No iData");return false;}
-
-         if(!_update){request=objectStore.add(_data);crud='inserted';}
-         else {request=objectStore.put(_data);crud='updated';}
-         request.onsuccess=function(e){iyona.log("Successfully "+crud+" iWrite to "+store);}
-         request.oncomplete=function(e){iyona.log("Successfully completed iWrite to "+store+"::"+e.target.error.message);}
-         request.onerror=function(e){iyona.log("Error while writing to "+store+"::"+e.target.error.message,_data);}
-         if(x>=l){iyona.log("Closing worker");self.close();}//closes worker after last iteration
+      var iDB = callIdb(data,self,defaultScope,SITE_SERVICE);
+   }
+   //=========================================================================//
+   else if (data.hasOwnProperty("enkele")){
+      var iDB = callIdb(data,self,defaultScope,SITE_SERVICE),l,x;
+      iyona.log("WORKING ENKELE", typeof data.militia);
+      if(data.militia==="imple"){
+         aSync(SITE_SERVICE,{"militia":"imple","mensa":data.mensa},function(e){
+            if("notitia" in e===false){iyona.log("could not auto update iDB");return false;}
+            l=e.notitia.rows.length;
+            for(x=0;x<l;x++){iDB.iWrite(data.mensa,e.notitia.rows[x],true);}
+            WORK.postMessage("Worker Typeahead addition for "+data.mensa);
+         });
       }
    }
+   //=========================================================================//
    else if (data.hasOwnProperty("factum")){
-      var serverEvent=new EventSource("http://demo.xpandit.co.za/app_xpandit/services/tester.php");
-      serverEvent.addEventListener('init',function(ev){cnt++;if(cnt>=50){iyona.log("Closing worker"); serverEvent.close();self.close();}
-         var results=JSON.parse(ev.data);iyona.log("SERVER EVENT INIT-"+cnt);
+      var serverEvent;
+      serverEvent=new EventSource("http://demo.xpandit.co.za/app_xpandit/services/tester.php?test=true");
+      serverEvent.addEventListener('init',function(ev){
+         cnt++;if(cnt>=50){iyona.log("Closing worker"); serverEvent.close();self.close();}
+         var results=JSON.parse(ev.data);iyona.log("WK + SERVER EVENT INIT-"+cnt);
          if(!results||"servers" in results===false) {iyona.log("There was an error in bethel's results");return false;}
          var back = {"results":results,"scope":{"servers":null,"online":null,"serverLine":null}};
          var scope=results;
@@ -133,6 +80,17 @@ self.addEventListener('message',function(e){
          }catch(e){iyona.log("There was an error in bethel",e.message);}
       });
       serverEvent.onerror=function(ev){iyona.deb("Server event error.",ev);}
+      self.onclose=function(){serverEvent.close();iyona.log("Closing worker && SSE :: OnClose");}
+
+      if(data.factum==="close"){
+         serverEvent.close();
+         serverEvent=new EventSource("http://demo.xpandit.co.za/app_xpandit/services/tester.php?close=true");
+         iyona.log("Living God, Closing worker && SSE");
+         self.close();
+      }
+   }
+   else if (data.hasOwnProperty("proxime")){iyona.log("Closing worker && SSE");
+      self.close();//serverEvent.close();
    }
 });//evenlistener for message
 

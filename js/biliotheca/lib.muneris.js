@@ -57,27 +57,27 @@ iyona={
 }
 //============================================================================//STORAGE
 dynamis={
-   set:function(_key,_value,_local){
-      var set={},string;set[_key]=_value;var isChrome=(typeof chrome !== "undefined" && chrome.hasOwnProperty("identity"));;string=JSON.stringify(_value);
+   set:function(_key,_value,_local){//chrome.app.window
+      var set={},string;set[_key]=_value;var isChrome=(typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined");string=JSON.stringify(_value);
       if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.set(set);sessionStorage.setItem(_key,string);}
       else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.set(set);sessionStorage.setItem(_key,string);}
       else if(_local==true&&!isChrome){localStorage.setItem(_key,string);}
       else{sessionStorage.setItem(_key,string);}//endif
    },
    get:function(_key,_local){
-      var value,isChrome=(typeof chrome !== "undefined" && chrome.hasOwnProperty("identity"));;
+      var value,isChrome=(typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined");
       if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.get(_key,function(obj){return obj[_key]});value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
       else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.get(_key,function(obj){return obj[_key]});value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
       else if(_local==true&&!isChrome){value=localStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
       else{value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}//endif
    },
-   del:function(_key,_local){var isChrome=(typeof chrome !== "undefined" && chrome.hasOwnProperty("identity"));
+   del:function(_key,_local){var isChrome=(typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined");
       if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.remove(_key);sessionStorage.removeItem(_key);}
       else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.remove(_key);sessionStorage.removeItem(_key);}
       else if(_local==true&&!isChrome){localStorage.removeItem(_key);}
       else{sessionStorage.removeItem(_key);}//endif
    },
-   clear:function(_local){var isChrome=(typeof chrome !== "undefined" && chrome.hasOwnProperty("identity"));
+   clear:function(_local){var isChrome=(typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined");
       if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.clear();}
       else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.clear();}
       else if(_local==true&&!isChrome){localStorage.clear();}
@@ -109,6 +109,7 @@ configuration.prototype.config=function(){
    dynamis.set("CONFIG",{"localStorage":window.hasOwnProperty('localStorage'),
       "sessionStorage":window.hasOwnProperty('sessionStorage'),
       "Worker":window.hasOwnProperty('Worker'),
+      "isWorker":true,
       "openDatabase":"openDatabase" in window,
       "indexedDB":"indexedDB" in window||"webkitIndexedDB" in window||"mozIndexedDB" in window||"msIndexedDB" in window,
       "iDB":true,
@@ -119,7 +120,7 @@ configuration.prototype.config=function(){
       "isOnline":navigator.onLine,
       "Online":true,
       "projectID":"17238315752",
-      "app":(typeof chrome !== "undefined" && chrome.hasOwnProperty("identity"))
+      "app":(typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined")
    });
    iyona.sync({"url":sessionStorage.SITE_URL+'json/scope.json',"method":"get","format":"json","callback":function(data){iyona.deb("defaultScope-",data);
       dynamis.set("defaultScope",data,true);
@@ -304,7 +305,14 @@ function objectSize( object ) {
         else if(typeof value === 'string') {bytes += value.length * 2;}
         else if(typeof value === 'number') {bytes += 8;}
         else if(typeof value === 'object'&& objectList.indexOf( value ) === -1)
-        {objectList.push( value );for( i in value ){stack.push( value[ i ] );cnt++;if(cnt>500)return bytes;}}
+        {
+           objectList.push( value );
+           for( i in value ){
+              stack.push( value[ i ] );
+              cnt++;
+              if(cnt>500)return bytes;
+           }
+        }
     }
     return bytes;
 }
@@ -589,7 +597,15 @@ function readWorker(notitiaWorker,callback){
  */
 function callWorker(option,callback){
    var ext=(typeof $!="undefined")?$.extend:angular.extend,moli=screen.height*screen.width;
-   var opt=ext({},{"procus":impetroUser().singularis,"moli":moli,"DB_VERSION":sessionStorage.DB_VERSION,"defaultScope":dynamis.get("defaultScope",true),"SITE_SERVICE":sessionStorage.SITE_SERVICE,"SITE_MILITIA":sessionStorage.SITE_MILITIA},option);
+   var opt=ext({},
+      {
+         "procus":impetroUser().singularis,
+         "moli":moli,
+         "DB_VERSION":sessionStorage.DB_VERSION,
+         "defaultScope":dynamis.get("defaultScope",true),
+         "SITE_SERVICE":sessionStorage.SITE_SERVICE,
+         "SITE_MILITIA":sessionStorage.SITE_MILITIA
+      },option);
    if(window.Worker&&impetroUser()){
       var notitiaWorker=new Worker("js/biliotheca/worker.notitia.js");
       notitiaWorker.postMessage(opt);
@@ -770,11 +786,6 @@ function uRand() {
     return text;
 }
 //============================================================================//
-/*
- * restores the default event if it was blocked with e.preventDefault()
- */
-function restore(e) {return true;}
-//============================================================================//
 //JSGRAPHS
 //============================================================================//
 function jsGraph(labels,dataSet,ele,options){
@@ -871,25 +882,101 @@ function GPLUS_USER() {
 //============================================================================//
 //ANGULAR HELPER
 //============================================================================//
-function executiveDirector(e,key,node){iyona.deb("KEY, EVENT, ARRAY",key,e,node,node[key]);
-   var enter=e.keyCode==13?true:false,
+function arrayManifestation(e,key,node){
+   var now,obj,r,enter=e.keyCode==13?true:false,
        tab=e.keyCode==9?true:false,
        prev=(key>0)?key-1:0;
-   if(enter||e.keyCode==38||e.keyCode==40)e.preventDefault();
+   if(enter||tab){e.preventDefault();iyona.deb("KEY=",key,"EVENT=",e,"NODE=",node,"NODE[key]=",node[key]);}
    if(enter){
-      e.target.autofocus=false;
-      node.splice(key+1,0,{"name":"","focus":true});
+      now   = new Date();//get current time created & modified will receive formated date, jesua will receive timestamp
+      r     = Math.floor((Math.random()*179)+1);//used for jesua
+      obj   = {"created":now.format("isoDateTime"),"modified":now.format("isoDateTime"),"jesua":md5(now+r),"name":null,"description":null,"sub":node[key].sub,"rank":node[key].rank+1,"focus":true};//focus also used to insert/update
+      e.target.autofocus=false;//remove focus on current target
+      if(typeof node[key].child !=="undefined") {obj.sub=node[key].id; node[key].child.splice(0,0,obj);}
+      else node.splice(key+1,0,obj);
    }
    if(tab){//node[key].name=e.target.value;//prevent empty scope.items//this is no longer neccessary bsoc of contenteditable
-      e.preventDefault();//debugger;
-      if(key===0)return false;
-      var newNode=node[key];newNode.focus=true;
+      if(key===0){iyona.deb("Zero return");return false;iyona.deb("Zero return");}
+      var newNode={"name":node[key].name,"focus":true,"child":node[key].child};
       if(node[prev].child instanceof Array)node[prev].child.push(newNode);
       else node[prev].child=[newNode];
 
       node.splice(key,1);
       return [prev,key,node];
    }
+}
+//============================================================================//
+function moveCursor(mainNode,curNode,key,e,isTopLevel){
+   var num,inputEle=curNode.find("div")[1],keyCode=e.keyCode;
+
+   if(keyCode===38)movetop();
+   else if (keyCode===40)movebot()
+   else if (keyCode===39 && (getCaretPosition(inputEle)===inputEle.innerHTML.length) ) {movebot();e.preventDefault();}//key moving right//cannot use inputEle.selectionStart on div
+   else if (keyCode===37 && (getCaretPosition(inputEle)<=0) ) movetop();//key moving right//cannot use inputEle.selectionStart on div
+
+   function movetop(){
+      num=(key-1)*1;
+      if(num<0) {
+         if(isTopLevel===true)return;
+         var parentNode=mainNode.parent();
+         parentNode.find("div")[1].focus();
+      }else{
+         var prevNode=_$(mainNode.children()[num]),
+         prevNodeChild=prevNode.find("ul"),
+         prevNodeChildExist=prevNodeChild.find("li")[0],
+         prevNodeChildLen=prevNodeChild.children().length;
+iyona.deb("TOP2",prevNode,prevNodeChild,prevNodeChildLen,prevNodeChildExist);
+         if(prevNodeChildExist)_$(prevNodeChild.find("li")[prevNodeChildLen-1]).find("div")[1].focus();//el-shaddai. find the prev parent last node
+         else prevNode.find("div")[1].focus();
+      }//find the children & the prev DOM element,set the DOM element to element then find the second DOM div, then focus
+   }
+   function movebot(){
+      var hasChild,childExist,nextParent,nodeLength=mainNode.children().length;
+      hasChild = curNode.find("ul");//check if last node has child
+      childExist = hasChild.find("li")[0];
+      num=(key+1)*1;
+//            iyona.deb("DOWN",nodeLength,num,key,mainNode,curNode,hasChild,childExist);
+
+      if (childExist){
+         _$(hasChild.find("li")[0]).find("div")[1].focus();//if has sub childreen
+      } else if (num>=nodeLength) {
+         nextParent=mainNode.parent().next();//check if mainNode [ul] has a sibling li
+         if(nextParent[0] && nextParent[0].nodeName==='LI')nextParent.find("div")[1].focus();
+      } else {
+         curNode.next().find("div")[1].focus();
+      }
+   }
+}
+//============================================================================//
+/*
+ * @http://stackoverflow.com/questions/3972014/get-caret-position-in-contenteditable-div
+ */
+function getCaretPosition(editableDiv) {
+    var caretPos = 0, sel, range;
+    if (window.getSelection) {
+        sel = window.getSelection();
+        if (sel.rangeCount) {
+            range = sel.getRangeAt(0);
+            if (range.commonAncestorContainer.parentNode == editableDiv) {
+                caretPos = range.endOffset;
+            }
+        }
+    } else if (document.selection && document.selection.createRange) {
+        range = document.selection.createRange();
+        if (range.parentElement() == editableDiv) {
+            var tempEl = document.createElement("span");
+            editableDiv.insertBefore(tempEl, editableDiv.firstChild);
+            var tempRange = range.duplicate();
+            tempRange.moveToElementText(tempEl);
+            tempRange.setEndPoint("EndToEnd", range);
+            caretPos = tempRange.text.length;
+        }
+    }
+    return caretPos;
+}
+//============================================================================//
+function orderList(e,key,sub){
+   iyona.deb("LISTS",e,key,sub);
 }
 //============================================================================//
 //FETCH IMAGE

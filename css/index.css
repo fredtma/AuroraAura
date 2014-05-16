@@ -37,7 +37,7 @@ a:hover{text-decoration: none;}
 .breadcrumb li {color: #C7CCD0} .breadcrumb li.active {color: #ffffff;}
 .breadcrumb{background: url(../img/bg-dark.jpg); margin-bottom:0px;box-shadow: 0px 5px 5px rgba(100,100,100,0.5);font-size: 0.8em;}
 .breadcrumb a{color:white;}
-.theMenu{cursor: pointer;color:#3071a9;margin-top: 0.2em;font-size: 1.4em;}
+.theMenu{cursor: pointer;color:#3071a9;margin-top: 0.2em;font-size: 1.4em;                    background: -webkit-linear-gradient(45deg,#00f 20%, #f00 92%);-webkit-background-clip: text;-webkit-text-fill-color: transparent;}
 .dropdown-header {display: block;padding: 3px 0px;font-size: 1.2em;line-height: 1.428571429;color: #999999;}
 .dropdown-menu>li.dropdown-header>a {display: block;color: #999999;font-size: 1.4em;}
 .dropdown-menu>li>a {font-size: 1.6em;}

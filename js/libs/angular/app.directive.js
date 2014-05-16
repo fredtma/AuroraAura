@@ -15,14 +15,20 @@ function contenteditable() {
             element.html(ngModel.$viewValue || '');
          };
          // Listen for change events to enable binding
-         element.on('keyup change', function() {
+         element.on('keyup change', function(e) {
+            if(e.keyCode===37||e.keyCode===38||e.keyCode===39||e.keyCode===40||e.keyCode===9||e.keyCode===13) return;
+            scope.contentChange=true;
             scope.$apply(readViewText);
+         });
+         element.on("blur",function(){
+            var blessing = scope.row||scope.sub;
+            iyona.deb("BLUR",element,scope,blessing);
          });
          // No need to initialize, AngularJS will initialize the text based on ng-model attribute// Write data to the model
          function readViewText() {
             var html = element.html();
             // When we clear the content editable the browser leaves a <br> behind// If strip-br attribute is provided then we strip this out
-            if (attrs.stripBr && html == '<br>') {html = '';}
+            if (attrs.stripBr && html === '<br>') {html = '';}
             ngModel.$setViewValue(html);
          }
       }
@@ -33,9 +39,8 @@ function viewAutofocus(){
       restrict:"A",
       link:function(scope,element,attrs){
          var val=attrs.viewAutofocus;
-         if(val==true||val=="true"){element.css({"background":"green"});
+         if(val==true||val=="true"){
             attrs.$set("autofocus",true); element[0].focus();
-            iyona.log("PLAY",scope,element[0]);
             if(typeof scope.sub!="undefined") scope.sub.focus=false;
             else if(typeof scope.row!="undefined") scope.row.focus=false;
          }//if focus is true,then set it to false so that is does not repeat
@@ -50,9 +55,9 @@ function listsParent(){
       scope:{"node":"="},
       templateUrl:'cera/templates/lists-parent.html',
       link:function(scope,element,attrs){
-         iyona.deb("PARENT",scope);
+         //iyona.deb("PARENT",scope);
       }
-   }
+   };
 }
 function listsChild($compile){
    return {
@@ -62,58 +67,46 @@ function listsChild($compile){
       scope:{"sub":"=","key":"="},
       templateUrl:'cera/templates/lists-child.html',
       link:function(scope,element,attrs){
-         var html;iyona.deb("CHILD",scope);//return;
+         var html;//iyona.deb("CHILD",scope);//return;
          if(angular.isArray(scope.sub.child)){
-            iyona.log("THIRD",scope.sub);
-            if(typeof scope.sub.child[0].name=="undefined")html="<lists-parent node='sub.child[0].child'></lists-parent>";
+            //iyona.log("THIRD",scope.sub);
+            if(typeof scope.sub.child[0].name==="undefined")html="<lists-parent node='sub.child[0].child'></lists-parent>";
             else html="<lists-parent node='sub.child'></lists-parent>";
             $compile(html)(scope,function(cloned,scope){element.append(cloned);});
          }
       }
-   }
+   };
 }
 function listsCtrl($scope,$compile,$element,$timeout){
    $scope.tmp=true;
-   $scope.restore=function(e){e.stopPropagation(); e.gesture.stopDetect(); e.gesture.stopPropagation();return true;}
+   $scope.restore=function(e){e.stopPropagation(); e.gesture.stopDetect(); e.gesture.stopPropagation();return true;};
    $scope.executiveDirector=function(e){
-      var mainNode=$element.parent(),num;//mainNode is the parent ul
+      var mainNode=$element.parent();//mainNode is the parent ul
       var mainScope = mainNode.scope(),html,key=$scope.key;
-      var parentArray=(typeof mainScope.$parent.sub!="undefined")?//for deep row
-         mainScope.$parent.sub.child:(typeof mainScope.row!="undefined")?//for top row
+      var parentArray=(typeof mainScope.$parent.sub!=="undefined")?//for deep row
+         mainScope.$parent.sub.child:(typeof mainScope.row!=="undefined")?//for top row
             mainScope.row.child:$scope.sub.child;
-      iyona.deb("$SCOPE ",$scope,mainScope,mainNode);
+      if(e.keyCode===9)iyona.log("$SCOPE ",$scope,mainScope,mainNode,parentArray,e.keyCode);
 
-      var tab = executiveDirector(e,key,parentArray);
+      var tab = arrayManifestation(e,key,parentArray);
+      if(tab===false) return;//this will prevent script to continue and prevent the lost child data.
+      moveCursor(mainNode,$element,key,e);
+
+      //disable the tab before angular's apply, so that it applied nothing. will later on add manual apply with new content.
+      if(e.keyCode===9){if(typeof mainScope.row!=='undefined')mainScope.row.child = []; if(typeof mainScope.sub!=='undefined')mainScope.sub.child=[];}
       $timeout(function(){
-
-         if(e.keyCode==38){//key moving up
-            num=(key-1)*1;
-            if(num<0) {
-               var parentNode=mainNode.parent(),parentLength=parentNode.length;iyona.deb("parentNode",parentNode,parentLength);
-               parentNode.find("div")[1].focus();
-            }else{
-               _$(mainNode.children()[num]).find("div")[1].focus();
-            }//find the children & the prev DOM element,set the DOM element to element then find the second DOM div, then focus
-         }//key moving down
-         else if (e.keyCode==40) {
-            var nodeLength=mainNode.children().length,subNode;
-            num=(key+1)*1;
-            if(num>=nodeLength){
-               subNode=_$(mainNode.children()[nodeLength-1]);iyona.deb("subNode",subNode.find("ul"));
-               _$(subNode.find("ul").find("li")[0]).find("div")[1].focus();
-            }else{
-               _$(mainNode.children()[num]).find("div")[1].focus();
-            }
-         }//pressing the tab
-         else if(tab&&e.keyCode==9) {iyona.deb("START...",mainNode.children());
-            mainNode.children().remove();//delete all content and recalculate
-            if(typeof mainScope.row!=="undefined")mainScope.sub=mainScope.row;//for the second level tree
-
-            if(typeof mainScope.sub.child[0].name=="undefined"){html = '<lists-child ng-repeat="(key,sub) in sub.child[0].child | filter:inputSearch | orderBy:sortable:reverse" sub="sub" key="key" ></lists-child>';}
-            else {html = '<lists-child ng-repeat="(key,sub) in sub.child | filter:inputSearch | orderBy:sortable:reverse" sub="sub" key="key" ></lists-child>';}
-            mainNode.append(html);//you can use append!=html bcos the array has been deleted in func executiveDirector and angular will remove the HTML
-            $compile(mainNode.contents())(mainScope);$scope.$destroy();
+         if(tab&&e.keyCode===9){//pressing the tab
+            iyona.deb("START...",mainNode.children());
+            $scope.$apply(function(){
+               mainNode.children().remove();//delete all content and recalculate
+               if(typeof mainScope.row!=="undefined")mainScope.sub=mainScope.row;//for the second level tree
+               mainScope.sub.child=tab[2];iyona.deb("UP",tab,mainScope);
+               if(typeof mainScope.sub.child[0].name==="undefined"){html = '<lists-child ng-repeat="(key,sub) in sub.child[0].child | filter:inputSearch | orderBy:sortable:reverse" sub="sub" key="key" ></lists-child>';}
+               else {html = '<lists-child ng-repeat="(key,sub) in sub.child | filter:inputSearch | orderBy:sortable:reverse" sub="sub" key="key" ></lists-child>';}
+               mainNode.append(html);//you can use append!=html bcos the array has been deleted in func executiveDirector and angular will remove the HTML
+               //$compile(mainNode.contents())(mainScope);$scope.$destroy();
+            });
          }
       },10);
-   }
+   };
 }

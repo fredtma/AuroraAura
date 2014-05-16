@@ -13,19 +13,17 @@
             </li>
          </ol>
       </header>
-      <section id="mainContent" class='listContainer'>
+      <section id="mainContent" class='listContainer scrollerContainer'>
          <div id='scroller'>
             <ul>
-               <li ng-repeat="(key,row) in lists | filter:inputSearch | orderBy:sortable:reverse"  class="row numbers-items childNode{{row.$$hashKey}}" >
+               <li ng-repeat="(key,row) in data | filter:inputSearch | orderBy:sortable:reverse"  class="row numbers-items childNode{{row.$$hashKey}}" >
                   <div class="col-xs-1 cnt">
                      <span ng-class="'glyphicon glyphicon-plus'"></span>
                   </div>
-                  <!--<div class="col-xs-11 cnt"><input type="text" value="{{row.name}}" class="bordeless" ng-keydown="executiveDirector($event,key, lists)" view-autofocus="{{row.focus}}" /></div>-->
-                  <div class="col-xs-11 cnt " ng-keydown="executiveDirector($event,key,lists)"  view-autofocus="{{row.focus}}"  tabindex='-1'
+                  <div class="col-xs-11 cnt" ng-keydown="executiveDirector($event,key,data)"  view-autofocus="{{row.focus}}"  tabindex='-1'
                        hm-touch="restore($event)" hm-tap="restore($event)"
                        contenteditable ng-model="row.name" name="row.name" strip-br="true" ></div>
                   <lists-parent node="row.child"></lists-parent>
-                  <!--<ng-include ng-if="row.url" src="row.url"></ng-include>-->
                </li>
             </ul>
          </div>

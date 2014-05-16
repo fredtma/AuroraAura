@@ -11,7 +11,7 @@ angular.module('KingsControllers',[])
    .controller('tmplUser',['$scope','crud','$routeParams',tmplUser])
    .controller('tmplClient',['$scope','crud','$routeParams',tmplClient])
    .controller('psalm',['$scope','crud','$routeParams',psalm])
-   .controller('proverbs',['$scope','crud','fetch','$element',proverbs])
+   .controller('proverbs',['$scope','crud',proverbs])
    .controller('rptServers',['$scope','$routeParams','crud','fetch',rptServers]);
 //============================================================================//
 /*
@@ -108,17 +108,22 @@ function bethel($scope,fetch,$rootScope,$location,$routeParams){
       if(window.hasOwnProperty("chrome")){
          callWorker({"factum":true},function(data,worker){if(!data) {iyona.log("There was a problem with the server."); return false;}
             var results = typeof data.results=="string"?JSON.parse(data.results):data.results;cnt++;
-            $rootScope.init=results;dynamis.set("init",results,true);iyona.deb("RESULTS-"+cnt,results);
+            $rootScope.init=results;dynamis.set("init",results,true);iyona.deb("WK RESULTS-"+cnt,results);
             angular.extend($scope,data.scope);
             $scope.$apply();
             if(PASCO){navigator.splashscreen.hide();worker.terminate()}//for mobile platform close the SSE & splash
-            if(cnt<=1)$scope.$on("$routeChangeStart",function(ev,newLoc,oldLoc){worker.terminate();iyona.log("server event closed.")});//use an if <1 so that the event is not recorded multiple times
+            if(cnt<=1){
+               $scope.$on("$routeChangeStart",function(ev,newLoc,oldLoc){
+                  worker.postMessage({"factum":"close"});
+//                  worker.terminate();
+                  iyona.log("server event closed.")});
+            }//use an if <1 so that the event is not recorded multiple times
          });
       }else{//for FF and other eventSource support
          var serverEvent=new EventSource("http://demo.xpandit.co.za/app_xpandit/services/tester.php?view="+view);
          serverEvent.onmessage=function(ev){iyona.log("SERVER EVENT MESSAGE",results,ev);}
          serverEvent.addEventListener('init',function(ev){
-            var results=JSON.parse(ev.data);iyona.log("SERVER EVENT INIT...",results,ev);
+            var results=JSON.parse(ev.data);iyona.log("SSE INIT...",results,ev);
             if(!results||"servers" in results===false) {iyona.log("There was an error in bethel's results");return false;}
             $rootScope.init=results;dynamis.set("init",results,true);$scope.servers={},$scope.online={};$scope.serverLine={};
             try{ angular.extend($scope,results);results=null;
@@ -271,10 +276,9 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
    defaultScope.details.account={"delta":"!@=!#","alpha":$routeParams.jesua,"beta":true};
    defaultScope.details.period={"delta":"AND !@=!#","alpha":month};
    defaultScope.list.period={"delta":"!@=!#","alpha":month};
-   $scope.sorts=[{"name":"By Accounts","key":"account"},{"name":"By Size","key":"total"},{"name":"By Status","key":"status"}];$scope.sortable=null;$scope.reverse=false;
+   $scope.sortable=null;$scope.reverse=false;
 
    if(view=='reports'){
-      load_script("js/libs/chart.js-master/Chart.mim-mod.js",false,'end',true);
       if(!jesua){$routeParams.jesua='data'; jesua='data';}
       defaultScope.reports[jesua].period = {"delta":"!@=!#","alpha":month};
    }
@@ -294,10 +298,10 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
    $scope.licentia=getLicentia();$scope.prima=impetroUser().jesua;
    $scope.$on("readyForm",function(e,server){
       var packages = $scope.opt.customVal.package.rows,
-      found=objSearch(packages,$scope.data.current_package.alpha,true),
+      found=objSearch(packages,$scope.data.current_package.alpha,true),//searches the current package in the list of packages
       result=found[0][0],
       next,
-      total = parseFloat($scope.data.total.alpha.replace(",",'') );
+      total = parseFloat($scope.data.total.alpha.replace(",",'') );//get the total mb of current package
       $scope.data.choice = result;
 
       if(total < 10240)next=1+found[1];
@@ -307,66 +311,11 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
       else if(result.class=='hca28'||result.class=='hca29')next=2+found[1];
       else if(result.class=='hca30')next=1+found[1];
 
-      iyona.deb("Found",found,'next=',next,'total=',total,$scope.data.total.alpha);
       $scope.data.next=packages[next].description;
       $scope.data.next_cost=packages[next].cost;
 
    });
-   $scope.$on("readyList",function(e,server){
-      if(typeof server.iota!="undefined"&&view=='reports'){
-         $scope.table = {};$scope.table.title = [];
-         var rows=server.iota,len=rows.length,x,labels=[],y,l,field,key,dataSet={},element;
-         var fillColor=[],strokeColor=[],pointStrokeColor=[],pointColor=[],legend=[],prop=[],options={};
-         if(jesua=='data'){
-            element=defaultScope.functions.reports.report.data;//gets the json settings and iterats trough the options
-            for(key in element){field = element[key];
-               if(typeof field.set!="undefined"){
-                  prop.push(key);//get the field name to be used in dataSet and in conjunstion with the rows fetched from the server
-                  dataSet[key] = [];
-                  fillColor.push(field.fillColor);
-                  strokeColor.push(field.strokeColor);
-                  legend.push(field.title);
-               }
-               //used for table td,filter with display, servers the field key as well
-               if(field.title)$scope.table.title.push({"title":field.title,"key":key,"display":field.display||null});
-            }
-            options={"fillColor":fillColor,"strokeColor":strokeColor};//set the bar graph colors and options settings
-            $scope.opt.legend=legend;//used in the presentation page to display the legends
-            $scope.opt.strokeColor=strokeColor;// used as a background color in the presentation page
-            $scope.opt.graphTitle="Data usage by Clients";
-            for(x=0;x<len;x++){
-               labels.push(rows[x].client||rows[x].account);
-               l=prop.length;//add the data that are only available in the property
-               for(y=0;y<l;y++)dataSet[prop[y]].push(Math.round(rows[x][prop[y]]));
-            }
-            $timeout(function(){var bar = new jsGraph(labels,dataSet,'canvas',options).barChart();},1000);
-         }else if(jesua=='cost'){
-            element=defaultScope.functions.reports.report.cost;
-            for(key in element){field = element[key];
-               if(typeof field.set!="undefined"){
-                  prop.push(key);
-                  dataSet[key] = [];
-                  fillColor.push(field.fillColor);
-                  strokeColor.push(field.strokeColor);
-                  pointColor.push(field.pointColor);
-                  pointStrokeColor.push(field.pointStrokeColor);
-                  legend.push(field.title);
-               }
-               if(field.title)$scope.table.title.push({"title":field.title,"key":key,"display":field.display||null});
-            }
-            options={"fillColor":fillColor,"strokeColor":strokeColor,"pointColor":pointColor,"pointStrokeColor":pointStrokeColor};
-            $scope.opt.legend=legend;
-            $scope.opt.strokeColor=strokeColor;
-            $scope.opt.graphTitle="Data usage by Clients";
-            for(x=0;x<len;x++){
-               labels.push(rows[x].client||rows[x].account);
-               l=prop.length;//add the data that are only available in the property
-               for(y=0;y<l;y++)dataSet[prop[y]].push(Math.round(rows[x][prop[y]]));
-            }
-            $timeout(function(){var line = new jsGraph(labels,dataSet,'canvas',options).lineChart();},1000);
-         }
-      }
-   });
+   $scope.$on("readyList",function(e,server){});
 }//function
 //============================================================================//
 function psalm($scope){
@@ -376,34 +325,20 @@ function psalm($scope){
    ];
 }
 //============================================================================//
-function proverbs($scope,crud,fetch,$element){
+function proverbs($scope,crud){
    var title="System List",profile='lists',defaultScope=dynamis.get("defaultScope",true)[profile];
    $scope.lists=[{"name":"First","focus":true},{"name":"Second","focus":false,"child":[{"name":"un"},{"name":"deux"},{"name":"trois"}]}];
    $scope.lists[1].child[2].child=[{"name":"you"},{"name":"are"},{"name":"Good"},{"name":"all the time","child":[{"name":"Success"},{"name":"2014"}]}];
 
    crud.get($scope,title,profile,defaultScope);
+
    $scope.executiveDirector=function(e,key,node){
-      var mainNode=$element.parent(),num;//mainNode is the parent ul
-      if(e.keyCode==38){
-         num=(key-1)*1;
-         if(num<0) {
-            return false;
-         }else{
-            _$(mainNode.children()[num]).find("div")[1].focus();
-         }//find the children & the prev DOM element,set the DOM element to element then find the second DOM div, then focus
-      }
-      else if (e.keyCode==40) {
-         var nodeLength=mainNode.children().length,subNode;
-         num=(key+1)*1;
-         if(num>=nodeLength){
-            subNode=_$(mainNode.children()[nodeLength-1]);iyona.deb("subNode",subNode.find("ul"));
-            _$(subNode.find("ul").find("li")[0]).find("div")[1].focus();
-         }else{
-            _$(mainNode.children()[num]).find("div")[1].focus();
-         }
-      }
-      executiveDirector(e,key,node);
+      var mainNode=_$(e.target).parent().parent();//mainNode is the parent ul
+      moveCursor(mainNode,_$(e.target).parent(),key,e,true);
+      var kepPress = arrayManifestation(e,key,node);
    }
+   $scope.come=function(row){iyona.deb("FOCUS",row);}
+   $scope.gone=function(row){iyona.deb("BLUR",row);}
    $scope.restore=function(e){e.stopPropagation(); e.gesture.stopDetect(); e.gesture.stopPropagation();return true;}
 }
 //============================================================================//
