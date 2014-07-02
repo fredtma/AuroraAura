@@ -48,6 +48,7 @@ function viewAutofocus(){
       }
    }
 }
+//@http://sporto.github.io/blog/2013/06/24/nested-recursive-directives-in-angular/
 function listsParent(){
    return {
       restrict:"E",

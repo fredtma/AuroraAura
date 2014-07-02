@@ -3,8 +3,8 @@
  * @todo:version_db
  */
 var set_version,db;
-var SITE_MILITIA='http://demo.xpandit.co.za/app_xpandit/inc/notitia.php';
-var SITE_SERVICE='http://demo.xpandit.co.za/app_xpandit/inc/services.php';
+var SITE_MILITIA='http://demo.xpandit.co.za/aura/notitia';
+var SITE_SERVICE='http://demo.xpandit.co.za/aura/services';
 var DB_VERSION=10;//@also:DB_VERSION in lib.muneris.js
 var iyona= new iyonaLog();
 function $DB(_quaerere,params,_msg,callback,reading,_eternal){
@@ -240,8 +240,8 @@ callIdb = function(data,self,defaultScope,SITE_SERVICE) {
          for(var profile in defaultScope){
             var table = defaultScope[profile].mensa;
             aSync(SITE_SERVICE,{"militia":"imple","mensa":table},function(e){
-               //iyona.log("RESOURCE",e);
-               if("notitia" in e===false){iyona.log("could not auto update iDB");return false;}
+               iyona.log("RESOURCE",e);
+               if(typeof e.notitia==='undefined' && typeof e.notitia.rows!=='undefnied' ){iyona.log("could not auto update iDB on "+table);return false;}
                l=e.notitia.rows.length;
                for(x=0;x<l;x++){iWrite(e.notitia.mensa,e.notitia.rows[x],true);}
             });

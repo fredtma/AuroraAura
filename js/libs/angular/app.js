@@ -19,7 +19,7 @@ angular.module('KingOFkings',['ngRoute','angular-gestures','ngSanitize','ngAnima
       .otherwise({redirectTo:'/genesis'});
 }]).run(['notitia','$location','$rootScope','crud',function(notitia,$location,$rootScope,crud){
    Hammer.defaults.stop_browser_behavior.userSelect=PASCO?'NONE':'text';//in desktop mode allow selectable text
-   var user = dynamis.get('USER_NAME',true);
+   var user = impetroUser();
    notitia.notitia();/*innitiate the DB*/
    if(!impetroUser().operarius&&$location.$$url!='/exodus') {$location.path("/exodus");}/*less intensive redirect when not login*/
 

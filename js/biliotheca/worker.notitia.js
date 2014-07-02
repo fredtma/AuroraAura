@@ -58,7 +58,7 @@ self.addEventListener('message',function(e){
    //=========================================================================//
    else if (data.hasOwnProperty("factum")){
       var serverEvent;
-      serverEvent=new EventSource("http://demo.xpandit.co.za/app_xpandit/services/tester.php?test=true");
+      serverEvent=new EventSource("https://demo.xpandit.co.za/aura/home-event");
       serverEvent.addEventListener('init',function(ev){
          cnt++;if(cnt>=50){iyona.log("Closing worker"); serverEvent.close();self.close();}
          var results=JSON.parse(ev.data);iyona.log("WK + SERVER EVENT INIT-"+cnt);
@@ -84,7 +84,7 @@ self.addEventListener('message',function(e){
 
       if(data.factum==="close"){
          serverEvent.close();
-         serverEvent=new EventSource("http://demo.xpandit.co.za/app_xpandit/services/tester.php?close=true");
+         serverEvent=new EventSource("http://demo.xpandit.co.za/aura/home-event,close");
          iyona.log("Living God, Closing worker && SSE");
          self.close();
       }

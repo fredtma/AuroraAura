@@ -20,7 +20,7 @@ angular.module('KingsControllers',[])
  * $routerParams /section/:page/:opt[name,view,new]/:view[all,details]
  */
 function exodus($scope,fetch,$rootScope,$location,$routeParams,crud) {
-   var service=dynamis.get("SITE_SERVICE")||"http://demo.xpandit.co.za/app_xpandit/inc/services.php",
+   var service=dynamis.get("SITE_ALIQUIS")||"http://demo.xpandit.co.za/aura/aliquis",
    gPlus={"user_info":{"id":0,"type":0,"emails":[{"value":0}]}};
    //=========================================================================//LOGIN BUTTON
    $scope.login=function(e,s,t){
@@ -33,10 +33,10 @@ function exodus($scope,fetch,$rootScope,$location,$routeParams,crud) {
          u=$scope.data.username;p=md5($scope.data.password);//aliquis
       }else{}//skip validation on autologin
       $scope.attempt=0;
-      fetch.post(service,{"militia":"aliquis","u":u,"p":p,"s":s,"e":e,"t":t},function(server){var setting= new configuration(),row;
-         if(server.length>0){row=server.rows[0];procurator=(row['level']==='super')?1:0;
-            USER_NAME={"operarius":row['username'],"licencia":row['aditum'],"nominis":row['name'],"jesua":row['jesua'],"procurator":procurator,"cons":row["sess"]};
-            dynamis.set("USER_NAME",USER_NAME,true);$rootScope['USER_NAME']=USER_NAME;
+      fetch.post(service,{"u":u,"p":p,"s":s,"e":e,"t":t},function(server){var setting= new configuration(),row;
+         if(server.length){row=server.rows[0];procurator=(row['level']==='super')?1:0;
+            USER_NAME={"operarius":row['username'],"licencia":row['aditum'],"nominis":row['name'],"jesua":row['jesua'],"procurator":procurator,"cons":row["sess"],"mail":row['email']};
+            dynamis.set("USER_NAME",USER_NAME);dynamis.set("USER_NAME",USER_NAME,true);$rootScope['USER_NAME']=USER_NAME;
             setting.config();//when login in run setup of default setting
 
             $rootScope.menus[1].href="#joshua/administrator/view/"+USER_NAME.operarius;
@@ -120,7 +120,7 @@ function bethel($scope,fetch,$rootScope,$location,$routeParams){
             }//use an if <1 so that the event is not recorded multiple times
          });
       }else{//for FF and other eventSource support
-         var serverEvent=new EventSource("http://demo.xpandit.co.za/app_xpandit/services/tester.php?view="+view);
+         var serverEvent=new EventSource("http://demo.xpandit.co.za/aura/home-event,"+view);
          serverEvent.onmessage=function(ev){iyona.log("SERVER EVENT MESSAGE",results,ev);}
          serverEvent.addEventListener('init',function(ev){
             var results=JSON.parse(ev.data);iyona.log("SSE INIT...",results,ev);
@@ -145,7 +145,7 @@ function bethel($scope,fetch,$rootScope,$location,$routeParams){
          $scope.$on("$routeChangeStart",function(ev,newLoc,oldLoc){serverEvent.close();iyona.log("server event closed.")});
       }
    }else{//when the browser does not support SSE
-      fetch.post(dynamis.get('SITE_SERVICE'),{'militia':'init'},function(results){
+      fetch.post(dynamis.get('SITE_SERVICE')+',creo,server_events',{},function(results){
          if(!results||"servers" in results===false) {iyona.log("There was an error in bethel's results");return false;}
          $rootScope.init=results;dynamis.set("init",results,true);$scope.servers={},$scope.online={};$scope.serverLine={};
          try{ angular.extend($scope,results);results=null;
@@ -180,7 +180,7 @@ function deuteronomy($scope,fetch,$location,$routeParams){
    $scope.menu={"list":[{"name":"Server Logs", "url":"#deuteronomy/log-servers"}]}//set the menu
 //   if(address)$scope.menu.list[1]={"name":"View server: "+serverName, "url":"#leviticus/servers/"+serverName+"/details"};
    if(serverName)$scope.menu.list[2]={"name":serverName+" logs"};
-   fetch.post(dynamis.get('SITE_SERVICE'),{"militia":"deut","servus":serverName},function(server){
+   fetch.post(dynamis.get('SITE_SERVICE')+',creo,server_logs',{"militia":"server_logs","servus":serverName},function(server){
       iyona.deb(server,'server');if(server&&"rows" in server===false) return false;/*set scroller*/setTimeout(SETiSCROLL,1000);
       angular.extend($scope.data,server.rows);iyona.deb($scope.data,'$scope.data');
    });
@@ -273,21 +273,74 @@ function numbers($scope,crud,$routeParams) {
 function isaiah($scope,crud,$routeParams,fetch,$timeout) {
    var title="ADSL Customers",profile='isaiah',defaultScope=dynamis.get("defaultScope",true)[profile];
    var month = new Date().getMonth()+1,view=$routeParams.view,jesua=$routeParams.jesua;
+   month = sessionStorage.isaiah||month;
+
    defaultScope.details.account={"delta":"!@=!#","alpha":$routeParams.jesua,"beta":true};
    defaultScope.details.period={"delta":"AND !@=!#","alpha":month};
    defaultScope.list.period={"delta":"!@=!#","alpha":month};
+   defaultScope.messenger = {"period":month,"run_consue":"cost summary"};
    $scope.sortable=null;$scope.reverse=false;
+   $scope.months = [{"name":"May","id":"5"},{"name":"June","id":"6"},{"name":"July","id":"7"},{"name":"Email Report","id":0}];$scope.month=objSearch($scope.months,month)[0][0];
 
    if(view=='reports'){
       if(!jesua){$routeParams.jesua='data'; jesua='data';}
+      if(jesua==='cost'){
+         //rumor and runner used to run quaerre on the data cost graph report
+         $scope.rumor='data cost',$scope.runner='cost summary';}
       defaultScope.reports[jesua].period = {"delta":"!@=!#","alpha":month};
+   }
+
+   $scope.change_month=function(m,rep,consue){
+      if(m.id===0){$scope.downloadCSV();return false;}
+
+      $scope.month=m;sessionStorage.isaiah = m.id;
+      rep=rep||'list-history';//if report is list only run main quaerre, else use second quaerre
+      consue=consue||false;consue='cost summary';
+      var run=consue?consue:false;
+      var set=consue?"quaerre_sets":false;
+      fetch.post(dynamis.get("SITE_MILITIA")+',rumor',{"mensa": "adsl_history","consuetudinem":{"rumorConf":rep,"uProfile":"isaiah","consuetudinem":set,"messenger":{"period":m.id,"run_consue":run}} },function(server){
+         iyona.deb("NOTITIA",server);
+         if(server && typeof server.notitia!=="undefined" && typeof server.notitia.iota!=="undefined" ) {
+            $scope.data = server.notitia.iota;
+            if(typeof server.notitia.consuetudinem.customVal!=="undefined"&&typeof server.notitia.consuetudinem.customVal['cost summary']!=="undefined") {
+               var cust = server.notitia.consuetudinem.customVal;
+               $scope.opt.savings = cust['cost summary'].rows[0].savings;
+               $scope.footer = cust['cost summary'].rows[0];
+            }
+         }
+      });
+   }
+   $scope.downloadCSV=function(){
+      fetch.responseType = "application/octet-stream";
+      fetch.post(dynamis.get("SITE_ALPHA")+',creo,relatione menstrua',{"messenger":{"period":sessionStorage.isaiah,"mail":impetroUser().mail} },function(server){
+         if(typeof server === "undefined") return false;
+         iyona.msg("Please check your inbox.");
+         window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+         window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs){
+            fs.root.getFile("monthly_report.xls", {create: true},function(dataFile){
+               iyona.deb("FILE",dataFile,dataFile.isFile,dataFile.name,dataFile.fullPath);
+               var url = dataFile.toURL();
+               dataFile.createWriter(function(fileWriter) {
+                  var blob = new Blob([server], {type: "text/plain"});
+
+                  fileWriter.onwriteend = function(e) {console.log('Write completed.');};
+                  fileWriter.onerror = function(e) {console.log('Write failed: ' + e.toString());};
+                  fileWriter.write(blob);
+//                  downloadURL(url);
+//                  var win = window.open(url, '_blank');win.focus();
+               },function(){fileErrorHandler()});
+            });
+         },function(){fileErrorHandler()});
+
+         iyona.deb("NOTITIA",server);
+      });
    }
 
    crud.get($scope,title,profile,defaultScope);
    $scope.submit=function(dataForm){
       $scope.dataForm=dataForm;
       var params = {"set_change":true,"customer":$scope.data.account.alpha,"choice":$scope.data.choice.class,"prev":$scope.data.current_package.alpha,"init":$scope.data.init_package.alpha};
-      fetch.post(sessionStorage.SITE_CLASS,params,function(server){
+      fetch.post(sessionStorage.SITE_CONNECT,params,function(server){
          var tmp=$scope.btn;$scope.btn=server.msg;setTimeout(function(){$scope.btn=tmp;$scope.$apply();},2000);
       });
    }
@@ -296,12 +349,18 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
    $scope.DBset=function(field,val){return crud.DBset(field,val);}
    $scope.arrange=function(sort){$scope.sortable=sort;$scope.reverse=!$scope.reverse;}
    $scope.licentia=getLicentia();$scope.prima=impetroUser().jesua;
+   $scope.$on("readyList",function(e,server){
+      var cust = server.consuetudinem.customVal;iyona.deb("server",server,cust);
+      if (typeof cust!=="undefined" && typeof cust['cost summary']!=="undefined" && typeof cust['cost summary'].rows!=="undefined" && typeof cust['cost summary'].rows[0]!=="undefined") {
+         $scope.opt.savings = cust['cost summary'].rows[0].savings}
+   });
    $scope.$on("readyForm",function(e,server){
       var packages = $scope.opt.customVal.package.rows,
       found=objSearch(packages,$scope.data.current_package.alpha,true),//searches the current package in the list of packages
       result=found[0][0],
       next,
-      total = parseFloat($scope.data.total.alpha.replace(",",'') );//get the total mb of current package
+      num=(typeof $scope.data.total!=="undefined" && typeof $scope.data.total.alpha!=="undefined")?$scope.data.total.alpha:0;iyona.deb("PASS",num);
+      var total = parseFloat(num.replace(",",''));//get the total mb of current package
       $scope.data.choice = result;
 
       if(total < 10240)next=1+found[1];
@@ -349,7 +408,7 @@ function rptServers($scope,$routeParams,crud,fetch){
    defaultScope.details.name={"delta":"!@=!#","alpha":$routeParams.jesua};
 
    crud.get($scope,title,profile,defaultScope);
-   fetch.post(sessionStorage.SITE_SERVICE,{"militia":"invloice-example"},function(server){
+   fetch.post(sessionStorage.SITE_SERVICE+',creo,invoice-example',{},function(server){
       if(typeof server.rows!=="undefined"){
          $scope.data = server.rows;
          //SETiSCROLL('#repTable');

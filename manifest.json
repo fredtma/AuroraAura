@@ -1,7 +1,7 @@
 {
    "name":"Aurora Aura",
    "description":"Internal application, for exchange mail surveillance",
-   "version":"0.81.79",
+   "version":"0.92.69",
    "offline_enabled":false,
    "author":"fredtma mondeEntier",
    "minimum_chrome_version":"29",
@@ -12,7 +12,7 @@
       }
    },
 
-   "permissions":["storage","http://demo.xpandit.co.za/app_xpandit/*","contextMenus","notifications","identity", "https://accounts.google.com/*", "https://www.googleapis.com/*"],
+   "permissions":["storage","http://demo.xpandit.co.za/app_xpandit/*","https://demo.xpandit.co.za/app_xpandit/*","https://app.xpandit.co.za/*","contextMenus","notifications","identity", "https://accounts.google.com/*", "https://www.googleapis.com/*"],
    "oauth2":{"client_id":"17238315752-70srani0vfquctqoj54a90gvf07ep0rb.apps.googleusercontent.com","scopes":["https://www.googleapis.com/auth/plus.login","https://www.googleapis.com/auth/plus.me","https://www.googleapis.com/auth/userinfo.email","https://www.googleapis.com/auth/userinfo.profile"]},
    "icons":{"16":"img/icon-16-sdpi.png","48":"img/icon-48-mdpi.png","128":"img/icon-128-xxhdpi.png"}
 }
