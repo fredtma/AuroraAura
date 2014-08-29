@@ -14,7 +14,7 @@ iyona={
    view:true,
    enableLog:true,
    pop:console.log,
-   pup:function(){var isChrome = navigator.userAgent.indexOf("Chrome") !== -1;if(isChrome||true){var stack = new Error().stack,n=isChrome?3:2;var file = stack.split("\n")[n].split("/"); return '('+file[file.length-1]+')';}else{return ''}},
+   pup:function(){var isChrome = navigator.userAgent.indexOf("Chrome") !== -1;if(isChrome){var stack = new Error().stack,n=isChrome?3:2;var file = stack.split("\n")[n].split("/"); return '('+file[file.length-1]+')';}else{return ''}},
    obj:function(arg){
       var first,obj,x,l=arg.length;
       if(l>1)first=arg[0];
@@ -67,28 +67,28 @@ iyona={
 dynamis={
    set:function(_key,_value,_local){//chrome.app.window
       var set={},string;set[_key]=_value;var isChrome=(typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined");string=JSON.stringify(_value);
-      if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.set(set);sessionStorage.setItem(_key,string);}
+      if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local===true){chrome.storage.local.set(set);sessionStorage.setItem(_key,string);}
       else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.set(set);sessionStorage.setItem(_key,string);}
-      else if(_local==true&&!isChrome){localStorage.setItem(_key,string);}
+      else if(_local===true&&!isChrome){localStorage.setItem(_key,string);}
       else{sessionStorage.setItem(_key,string);}//endif
    },
    get:function(_key,_local){
       var value,isChrome=(typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined");
-      if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.get(_key,function(obj){return obj[_key]});value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
-      else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.get(_key,function(obj){return obj[_key]});value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
-      else if(_local==true&&!isChrome){value=localStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
+      if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local===true){chrome.storage.local.get(_key,function(obj){return obj[_key];});value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!==-1)?JSON.parse(value):value;}
+      else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.get(_key,function(obj){return obj[_key];});value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!==-1)?JSON.parse(value):value;}
+      else if(_local===true&&!isChrome){value=localStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
       else{value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}//endif
    },
    del:function(_key,_local){var isChrome=(typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined");
       if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.remove(_key);sessionStorage.removeItem(_key);}
       else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.remove(_key);sessionStorage.removeItem(_key);}
-      else if(_local==true&&!isChrome){localStorage.removeItem(_key);}
+      else if(_local===true&&!isChrome){localStorage.removeItem(_key);}
       else{sessionStorage.removeItem(_key);}//endif
    },
    clear:function(_local){var isChrome=(typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined");
       if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.clear();}
       else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.clear();}
-      else if(_local==true&&!isChrome){localStorage.clear();}
+      else if(_local===true&&!isChrome){localStorage.clear();}
       else{sessionStorage.clear();}//endif
    }
 }
@@ -106,7 +106,7 @@ configuration.prototype.config=function(){
    sessionStorage.SITE_NAME="Exchange Aurora Aura";
    sessionStorage.SITE_DATE='fullDate';
    sessionStorage.SITE_TIME='mediumTime';
-   sessionStorage.SITE_URL='https://demo.xpandit.co.za/aura/';
+   sessionStorage.SITE_URL='http://demo.xpandit.co.za/aura/';
    sessionStorage.SITE_SERVICE=sessionStorage.SITE_URL+i+'services';
    sessionStorage.SITE_MILITIA=sessionStorage.SITE_URL+i+'notitia';
    sessionStorage.SITE_ALPHA=sessionStorage.SITE_URL+i+'alpha';
@@ -115,19 +115,19 @@ configuration.prototype.config=function(){
    sessionStorage.SITE_UPLOADS=sessionStorage.SITE_URL+'uploads/';
    sessionStorage.MAIL_SUPPORT='support@xpandit.co.za';
    sessionStorage.DB_NAME='app_xpandit';
-   sessionStorage.DB_VERSION=21;//always integer 4 iDB
+   sessionStorage.DB_VERSION=57;//always integer 4 iDB
    sessionStorage.DB_DESC='The local application Database';
    sessionStorage.DB_SIZE=15;
    sessionStorage.DB_LIMIT=20;
-   dynamis.set("CONFIG",{"localStorage":window.hasOwnProperty('localStorage'),
-      "sessionStorage":window.hasOwnProperty('sessionStorage'),
-      "Worker":window.hasOwnProperty('Worker'),
+   dynamis.set("CONFIG",{"localStorage":typeof window.localStorage!=="undefined",
+      "sessionStorage":typeof window.sessionStorage!=="undefined",
+      "Worker":typeof window.Worker!=="undefined",
       "isWorker":true,
-      "openDatabase":"openDatabase" in window,
-      "indexedDB":"indexedDB" in window||"webkitIndexedDB" in window||"mozIndexedDB" in window||"msIndexedDB" in window,
+      "openDatabase":typeof openDatabase!=="undefined"||"openDatabase" in window,
+      "indexedDB":"IDBIndex" in window||"indexedDB" in window||"webkitIndexedDB" in window||"mozIndexedDB" in window||"msIndexedDB" in window,
       "iDB":true,
-      "WebSocket":window.hasOwnProperty('WebSocket'),
-      "history":window.hasOwnProperty('history'),
+      "WebSocket":typeof window.WebSocket!=="undefined",
+      "history":typeof window.history!=="undefined",
       "formValidation":hasFormValidation(),
       "PASCO":window.PASCO,
       "isOnline":navigator.onLine,
@@ -152,7 +152,10 @@ configuration.prototype.config=function(){
    "bool":["^1|0","requires a boolean value of 0 or 1"],
    "email":["^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$","the email address is not the right formated"],
    "single":["^[a-zA-Z0-9]","requires a single value"]});
-   var config = dynamis.get("CONFIG"); config.openDatabase=false;config.indexedDB=false; dynamis.set("CONFIG",config);
+   var config = dynamis.get("CONFIG");
+   config.openDatabase=false;
+//   config.indexedDB=false;
+   dynamis.set("CONFIG",config);
 return this;
 };
 (function(){var settings= new configuration(); settings.config(); })();
@@ -296,10 +299,24 @@ profectus=function(_msg,_reset,_process){
  */
 function isset() {
    var a=arguments,l=a.length,i=0;
-   if (l==0) {throw new Error('Empty isset');}//end if
-   while (i!=l) {if (typeof(a[i])=='undefined' || a[i]===null) {return false;} else {i++;}}
+   if (l===0) {return false;}//end if
+   while (i!=l) {if (a[i]===null || typeof(a[i])==='undefined') {return false;} else {i++;}}
    return true;
 }//end function
+//not for object
+function hasValue(val){
+   if(typeof val!=="object" && typeof val!=="undefined" && val!==null) return true; else return false;
+}
+//check element structure to find value in current form and alpha form
+function pray(obj){
+   if(hasValue(obj)) return obj;
+   else if(hasValue(obj.alpha)) return obj.alpha;
+   return 0;
+}
+function modalist(ele){
+   ele = ele || 'dialog';
+   document.querySelector(ele).showModal();
+}
 //============================================================================//
 /**
  * get the size of an object
@@ -609,7 +626,7 @@ function readWorker(notitiaWorker,callback){
  * @return void
  */
 function callWorker(option,callback){
-   var ext=(typeof $!="undefined")?$.extend:angular.extend,moli=screen.height*screen.width;
+   var ext=(typeof $!=="undefined")?$.extend:angular.extend,moli=screen.height*screen.width;
    var opt=ext({},
       {
          "procus":impetroUser().singularis,
@@ -690,9 +707,10 @@ function isOnline(_display){
  * @param array </var>theValue</var> the desc Comment
  * @return object
  */
-function setQuaerere(mensa,res,tau,consuetudinem) {
+function setQuaerere(mensa,res,tau,consuetudinem,profile) {
     var procus=impetroUser(),moli=screen.height*screen.width,cons=consuetudinem||0;
-    var quaerere=JSON.stringify({"eternal":res,"Tau":tau,"mensa":mensa,"procus":procus.jesua||0,"moli":moli,"consuetudinem":consuetudinem||0,"cons":procus.cons||0});
+//    var quaerere=JSON.stringify({"eternal":res,"Tau":tau,"mensa":mensa,"procus":procus.jesua||0,"moli":moli,"consuetudinem":consuetudinem||0,"cons":procus.cons||0,"uProfile":profile});
+    var quaerere={"eternal":res,"Tau":tau,"mensa":mensa,"procus":procus.jesua||0,"moli":moli,"consuetudinem":consuetudinem||0,"cons":procus.cons||0,"uProfile":profile};
     dynamis.set("quaerere",quaerere,true);
     return quaerere;
 }
@@ -770,7 +788,7 @@ function SETiSCROLL (id) {id=id||"#mainContent";
 	return new IScroll(id, {scrollbars: true,mouseWheel: true,interactiveScrollbars: true,shrinkScrollbars: 'scale',fadeScrollbars: true, tab:true, click:true});
 }
 //============================================================================//
-function fileErrorHandler(e) {
+fileErrorHandler=function(e) {
   var msg = '';
 
   switch (e.code) {
@@ -794,7 +812,7 @@ function fileErrorHandler(e) {
       break;
   };
 
-  console.log('Error: ' + msg);
+  console.log('Error: ' + msg,e);
 }
 //============================================================================//
 //@http://stackoverflow.com/questions/3749231/download-file-using-javascript-jquery@
@@ -808,7 +826,18 @@ function downloadURL(url) {
         document.body.appendChild(iframe);
     }
     iframe.src = url;
+    var win = window.open(url, '_blank');win.focus();
 };
+//http://stackoverflow.com/questions/4845215/making-a-chrome-extension-download-a-file
+function downloadLINK(url,filename){
+   var a = document.createElement('a');
+   a.href = url;
+   a.download = filename;
+   a.style.display = 'none';
+   document.body.appendChild(a);
+   a.click();
+   a=null;
+}
 //============================================================================//
 /**
  * check the users permission
@@ -828,14 +857,31 @@ function getLicentia(perm) {
  * @version 1.2
  * @category random,generation
  */
-function uRand() {
+function uRand(len) {
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
     d = new Date(),text=d.getDate()+d.getMonth();
+    len = len||5;
 
-    for( var i=0; i < 5; i++ ){
+    for( var i=0; i < len; i++ ){
        text += possible.charAt(Math.floor(Math.random() * possible.length));
        if(i%2 && i!=0) text+=Math.floor(Math.random() * 90)+10;
     }
+    return text;
+}
+function uRand2(len,num,date,bin) {
+    var possible,
+    d = new Date(),text=d.getDate()+''+d.getMonth(),l;
+    possible = (num===true)?"0123456789":"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    l    = possible.length;
+    len  = len||5;
+    text = (date===true)?text:'';
+
+    for( var i=0; i < len; i++ ){
+       text += possible.charAt(Math.floor(Math.random() * l));
+       if(i%2 && i!=0 && num!==true) {text+=Math.floor(Math.random() * 90)+10;i++;}
+    }
+    text = (date===true)?text+''+d.getMinutes()+''+d.getHours():text;
+    text = (num===true && bin===true)? (+parseInt(text)).toString(2):text;
     return text;
 }
 //============================================================================//

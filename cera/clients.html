@@ -4,7 +4,7 @@
          <ol class="breadcrumb">
             <li><a href="#genesis">Home</a></li>
             <li class="active">{{menu[0].text}}</li>
-            <li class="menu-icon"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Create Clients']" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
          </ol>
       </header>
       <section id="mainContent" class='listContainer'>
@@ -29,8 +29,8 @@
             <li><a href="#genesis">Home</a></li>
             <li><a ng-href="{{menu[0].link}}">{{menu[0].text}}</a></li>
             <li class="active">{{jesua|ucfirst}} {{menu[1].text}}</li>
-            <li class="menu-icon"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
-            <li class="menu-icon"><a ng-if="licentia.omegA"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Create Clients']" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Delete Clients']"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
          </ol>
       </header>
       <section  class='listContainer'><span id="messager" ng-class="'help-block '+{true:'text-danger',false:'text-info'}[err]" ng-show="msg">{{msg}}</span>
@@ -61,7 +61,7 @@
             </div>
          </div>
          <div  class="input-group">
-            <button ng-if="licentia.deLta" type="submit" ng-class="btnClass" name="submit" >{{btn}}</button>
+            <button ng-if="( (!data.jesua&&licentia['Create Clients']) || (data.jesua&&licentia['Edit Clients']) || true )" type="submit" ng-class="btnClass" name="submit" >{{btn}}</button>
          </div>
          </form>
       </section>

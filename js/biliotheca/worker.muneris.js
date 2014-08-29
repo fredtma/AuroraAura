@@ -67,8 +67,9 @@ function aSync(options,data,callback){//www, var, object, method, format, call_s
    else {settings.www=options;settings.var=data;settings.callback=callback;}
 
    var xhr=new XMLHttpRequest();
-   xhr.responseType=settings.format;
    xhr.open(settings.method,settings.www,true);
+   xhr.responseType=settings.format;
+   xhr.withCredentials=true;
    xhr.onreadystatechange=function(e){
       if(this.readyState==4 && this.status==200){
          var response=this.response||"{}";//@fix:empty object so as to not cause an error
@@ -239,11 +240,12 @@ callIdb = function(data,self,defaultScope,SITE_SERVICE) {
       if(upgrading==true){
          for(var profile in defaultScope){
             var table = defaultScope[profile].mensa;
+            if(table==='creo') continue;
             aSync(SITE_SERVICE,{"militia":"imple","mensa":table},function(e){
-               iyona.log("RESOURCE",e);
-               if(typeof e.notitia==='undefined' && typeof e.notitia.rows!=='undefnied' ){iyona.log("could not auto update iDB on "+table);return false;}
+               if(typeof e.notitia==='undefined' || typeof e.notitia.rows==='undefined' || e.notitia.found===false){iyona.log("could not auto update iDB on upgrade",e,table);return false;}
+               iyona.log("RESOURCE::"+e.notitia.mensa,e);
                l=e.notitia.rows.length;
-               for(x=0;x<l;x++){iWrite(e.notitia.mensa,e.notitia.rows[x],true);}
+               for(x=0;x<l;x++){iWrite(e.notitia.mensa,e.notitia.rows[x],false);}
             });
       }}upgrading=false;
    }
@@ -256,17 +258,20 @@ callIdb = function(data,self,defaultScope,SITE_SERVICE) {
          if(option!==true||(typeof option==="object" && option.hasOwnProperty(profile)===false )){iyona.log("skipping",profile); continue;}
          var table = defaultScope[profile].mensa;
          var mensa = defaultScope[profile].creation;
-
+         iyona.log(profile);
+         //if(table==='creo') continue;
          if(idb.objectStoreNames.contains(table)!==true){//new store creation
             var store=iRequest.result.createObjectStore(table,{keyPath:"jesua"});
             for(var field in mensa){//@note:no need to add store as the store is dynamic.
-               var current=mensa[field]; if(field==='jesua')continue;
+               var current=mensa[field]; if(field==='jesua' || typeof current==="undefined" || current===null)continue;
+
                if(current.unique) store.createIndex('uniq_'+field,field,{unique:true});//keyname,keypath
                if(current.ndx) store.createIndex(current.ndx,field);
             }//for field in mensa.fields
          }else{//to update the object store's index
             store=(iRequest.transaction)?iRequest.transaction.objectStore(table):e.currentTarget.transaction.objectStore(table);
             var x,l=store.indexNames.length;
+            if(true){store.clear();}//removing all records from the object store and removing all records in indexes that reference the object store
             //iyona.log("COLUMN",typeof store.indexNames,store.indexNames instanceof Array,store.indexNames,table);
             for(x=0;x<l;x++){if(typeof store.indexNames[x]==='string')store.deleteIndex(store.indexNames[x]);}//remove all indexs
 
@@ -279,6 +284,7 @@ callIdb = function(data,self,defaultScope,SITE_SERVICE) {
 
             }//for field in mensa.fields
          }
+
          iRequest.transaction.onerror=function(e){iyona.log("A database error code: "+e.target.errorCode,e);}
 
       }
@@ -292,6 +298,9 @@ callIdb = function(data,self,defaultScope,SITE_SERVICE) {
       var store=_store||"users",transaction=idb.transaction(store,"readwrite"),request;
       var objectStore=transaction.objectStore(store);
       if(typeof _data!=="object") {iyona.log("No iData");return false;}
+
+//      if(_update===false){var cursor = objectStore.openCursor();if(cursor){objectStore.delete(cursor.primaryKey);cursor.continue;}}//delete all the record
+//      if(_update===false){objectStore.clear();}//delete all the record
 
       if(!_update){request=objectStore.add(_data);crud='inserted';}
       else {request=objectStore.put(_data);crud='updated';}

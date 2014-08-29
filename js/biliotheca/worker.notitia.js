@@ -39,11 +39,11 @@ self.addEventListener('message',function(e){
       WORK.postMessage('Database reseted.');
    }
    //=========================================================================//
-   else if(data.hasOwnProperty("progredior")){
+   else if(data.hasOwnProperty("progredior")){//progress
       var iDB = callIdb(data,self,defaultScope,SITE_SERVICE);
    }
    //=========================================================================//
-   else if (data.hasOwnProperty("enkele")){
+   else if (data.hasOwnProperty("enkele")){//single
       var iDB = callIdb(data,self,defaultScope,SITE_SERVICE),l,x;
       iyona.log("WORKING ENKELE", typeof data.militia);
       if(data.militia==="imple"){

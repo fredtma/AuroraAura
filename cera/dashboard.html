@@ -1,0 +1,104 @@
+<article  ng-controller="gospel">
+   <header class="menuHeader">
+      <ol class="breadcrumb">
+         <li><a href="#genesis">Home</a></li>
+      </ol>
+   </header>
+   <section class="dash listContainer" >
+      <div class="row">
+         <a href="#isaiah/adsl/list" class=" col-md-6" ng-if="licentia['View ADSL']">
+            <div class="panel panel-info">
+               <div class="panel-heading"><i class="glyphicon glyphicon-road"></i> ADSL Lines</div>
+               <div class="panel-body">
+                  Total number of ADSL <span class="badge">36</span>
+                  <span class="label label-info">View details <i class="glyphicon glyphicon-arrow-right"></i></span>
+               </div>
+            </div>
+         </a>
+         <a href="#joshua/administrator/list" class=" col-md-2" ng-if="licentia['View Admin']">
+            <div class="panel panel-info">
+               <div class="panel-heading"><i class="glyphicon glyphicon-user"></i> Profiles</div>
+               <div class="panel-body">
+                  View list of current administrator
+                  <span class="label label-info">View details <i class="glyphicon glyphicon-arrow-right"></i></span>
+               </div>
+            </div>
+         </a>
+         <a href="#judges/groups/list" class=" col-md-2" ng-if="licentia['View Groups']">
+            <div class="panel panel-info">
+               <div class="panel-heading"><i class="glyphicon glyphicon-flag"></i> Groups</div>
+               <div class="panel-body">
+                  View list of groups
+                  <span class="label label-info">View details <i class="glyphicon glyphicon-arrow-right"></i></span>
+               </div>
+            </div>
+         </a>
+         <a href="#deuteronomy/permissions/list" class=" col-md-2" ng-if="licentia['View Licentia']">
+            <div class="panel panel-info">
+               <div class="panel-heading"><i class="glyphicon glyphicon-lock"></i> Permissions</div>
+               <div class="panel-body">
+                  The system permission system
+                  <span class="label label-info">View details <i class="glyphicon glyphicon-arrow-right"></i></span>
+               </div>
+            </div>
+         </a>
+      </div>
+      <div class="row">
+         <a href="#psalm/sales/list" class=" col-md-6" ng-if="licentia['View Sales']">
+            <div class="panel panel-info">
+               <div class="panel-heading"><i class="glyphicon glyphicon-th-list"></i> Sales Order</div>
+               <div class="panel-body">
+                  Add new sales from a client's accepted quote
+                  <span class="label label-info">View details <i class="glyphicon glyphicon-arrow-right"></i></span>
+               </div>
+            </div>
+         </a>
+         <a href="#leviticus/servers/list" class=" col-md-6" ng-if="licentia['View Server']">
+            <div class="panel panel-warning">
+               <div class="panel-heading"><i class="glyphicon glyphicon-envelope"></i> Mail Servers</div>
+               <div class="panel-body">
+                  <span class="label label-danger">Unavailable</span>
+               </div>
+            </div>
+         </a>
+      </div>
+      <div class="row">
+         <a href="#proverbs/list" class=" col-md-3" ng-if="licentia['View Lists']">
+            <div class="panel panel-info">
+               <div class="panel-heading"><i class="glyphicon glyphicon-align-justify"></i> List</div>
+               <div class="panel-body">
+                  List of categories
+                  <span class="label label-info">View details <i class="glyphicon glyphicon-arrow-right"></i></span>
+               </div>
+            </div>
+         </a>
+         <a href="#numbers/clients/list" class=" col-md-3" ng-if="licentia['View Clients']">
+            <div class="panel panel-info">
+               <div class="panel-heading"><i class="glyphicon glyphicon-briefcase"></i> Clients</div>
+               <div class="panel-body">
+                  List of clients
+                  <span class="label label-info">View details <i class="glyphicon glyphicon-arrow-right"></i></span>
+               </div>
+            </div>
+         </a>
+         <a href="#" class=" col-md-3" ng-if="licentia['View Suppliers']">
+            <div class="panel panel-warning">
+               <div class="panel-heading"><i class="glyphicon glyphicon-shopping-cart"></i> Suppliers</div>
+               <div class="panel-body"><span class="label label-warning">Under construction</span></div>
+            </div>
+         </a>
+         <a href="#" class=" col-md-3" ng-if="licentia['View SABJ']">
+            <div class="panel panel-warning">
+               <div class="panel-heading"><i class="glyphicon glyphicon-stats"></i> SABJ Reports</div>
+               <div class="panel-body"><span class="label label-warning">Under construction</span></div>
+            </div>
+         </a>
+<!--         <a href="#" class=" col-md-3">
+            <div class="panel panel-warning">
+               <div class="panel-heading"><i class="glyphicon glyphicon-cog"></i> Configuration</div>
+               <div class="panel-body"><span class="label label-warning">Under construction</span></div>
+            </div>
+         </a>-->
+      </div>
+   </section>
+</article>

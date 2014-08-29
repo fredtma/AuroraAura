@@ -42,7 +42,7 @@
          </div>
          <div class="input-group btn-group" data-toggle="buttons">
             <span class="input-group-addon glyphicon glyphicon-book"></span>
-            <button ng-repeat="key in opt.extra.title.enum" required type="button" class="btn btn-primary" ng-model="data.title"  btn-radio="'{{key}}'" >{{key}}</button>
+            <button ng-repeat="key in opt.extra.title.enum" name="title[]" type="button" class="btn btn-primary" ng-model="data.title"  btn-radio="'{{key}}'" >{{key}}</button>
          </div>
          <div ng-class="'input-group '+{true:'has-error'}[errMsg.firstname]">
             <span class="input-group-addon glyphicon glyphicon-qrcode"></span>
@@ -62,7 +62,7 @@
          </div>
          <div class="input-group btn-group" data-toggle="buttons" >
             <span class="input-group-addon glyphicon glyphicon-book"></span>
-            <button ng-repeat="(key,value) in opt.extra.communication.enum" type="button" class="btn btn-primary" ng-model="data.communication[key]" btn-checkbox btn-checkbox-false="null" btn-checkbox-true="'{{value}}'" >{{value}}</button>
+            <button ng-repeat="(key,value) in opt.extra.communication.enum" type="button" name="communication" class="btn btn-primary" ng-model="data.communication[key]" btn-checkbox btn-checkbox-false="null" btn-checkbox-true="'{{value}}'" >{{value}}</button>
          </div>
          <div ng-class="'input-group '+{true:'has-error'}[errMsg.username]" ng-if="!data.jesua">
             <span class="input-group-addon glyphicon glyphicon-user"></span>
@@ -76,8 +76,37 @@
             <h4 class="refSection">{{opt.foreignConf[key].title}}</h4>
             <div class="input-group btn-group" data-toggle="buttons" ng-init="col1=opt.foreignConf[key].col1;col2=opt.foreignConf[key].col2;parent=data[opt.foreignConf[key].parent].alpha;type=opt.foreignConf[key].type;">
                <span class="input-group-addon glyphicon glyphicon-book"></span>
-               <button ng-if="type=='radio'" ng-repeat="(k,link) in links.rows" type="button" class="btn btn-primary" ng-model="link[col1]"  btn-radio="'{{parent}}'" ng-click="DBenum(links,parent,col1,k,'radio');">{{link[col2]}}</button>
-               <button ng-if="type=='checkbox'" ng-repeat="(k,link) in links.rows" type="button" class="btn btn-primary" ng-model="link[col1]" btn-checkbox btn-checkbox-false="null" btn-checkbox-true="'{{parent}}'" >{{link[col2]}}</button>
+               <button ng-if="type=='radio'" ng-repeat="(k,link) in links.rows" name="clients" type="button" class="btn btn-primary" ng-model="link[col1]"  btn-radio="'{{parent}}'" ng-click="DBenum(links,parent,col1,k,'radio');">{{link[col2]}}</button>
+               <button ng-if="type=='checkbox'" ng-repeat="(k,link) in links.rows" name="clients" type="button" class="btn btn-primary" ng-model="link[col1]" btn-checkbox btn-checkbox-false="null" btn-checkbox-true="'{{parent}}'" >{{link[col2]}}</button>
+            </div>
+         </div>
+            <hr/>
+         <div ng-if="opt.listsVal[ref]" class="table-responsive panel panel-primary">
+            <div class="panel-heading">
+               <h4 class="panel-title"><span  ng-bind="lists.title+' to '+selected"></span> <small>Select the group that will be associated with {{selected}}</small></h4>
+            </div>
+            <div class="panel-body">
+               <table class="table table-hover table-condensed table-dynamic">
+                  <thead>
+                     <tr>
+                        <th>#</th><th style="width:14%">Group name</th><th>Description</th><th class="funcSmall">Functions</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr ng-repeat="(key,list) in opt.listsVal[ref]| filter:inputSearch">
+                        <td>{{key+1}}</td>
+                        <td ng-bind="list.name"></td>
+                        <td ng-bind="list.description"></td>
+                        <td>
+                           <span  ng-click="linkItem(ref,[selected,list.name,list.group],key)" class="glyphicon funcSmall link" ng-class="{true:'glyphicon-ok-circle success',false:'glyphicon-remove-circle danger'}[list.group==list.name]" title="Link/Unlink item to group"></span>
+                           <input type="hidden" name="isNew[]" ng-model="list.isNew" />
+                        </td>
+                     </tr>
+                  </tbody>
+                  <tfoot ng-if="opt.listsVal">
+                     <td colspan="4">&nbsp;</td>
+                  </tfoot>
+               </table>
             </div>
          </div>
          <div ng-if="licentia.deLta||data.jesua==prima" class="input-group">

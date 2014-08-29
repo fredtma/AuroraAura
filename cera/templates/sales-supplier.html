@@ -1,0 +1,57 @@
+<article>
+   <section id="detailView">
+      <section  class='-listContainer'>
+         <header>
+            <h2 ng-bind="templates[1].name"></h2>
+         </header>
+         <span id="messager" ng-class="'help-block '+{true:'text-danger',false:'text-info'}[err]" ng-show="msg" ng-bind="msg"></span>
+         <form id="srvForm" name="dataForm" ng-submit="submit(dataForm)" class="withLabel" >
+            <input type="hidden" class="form-control" ng-model="data.jesua" />
+            <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.supplier]">
+               <span class="input-group-addon glyphicon glyphicon-book"></span>
+               <span class="input-group-addon form-label">Supplier's code</span>
+               <input type="text" class="form-control" required placeholder="Supplier's name" autofocus name="supplier" ng-model="data.supplier" title="Supplier's name"
+                      typeahead="value.alpha as value.display for value in typeahead.supplies | filter:{display:$viewValue} | limitTo:5" typeahead-min-length="1"/>
+            </div>
+            <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.delivery]">
+               <span class="input-group-addon glyphicon glyphicon-home"></span>
+               <span class="input-group-addon form-label">Delivery instruction</span>
+               <input type="text" class="form-control" required placeholder="Delivery instruction" autofocus name="delivery" ng-model="data.delivery" title="Delivery instruction" />
+            </div>
+            <div ng-if="licentia.deLta||true" id='srvModified'  class="input-group">
+               <button type="submit"  ng-class="btnClass" name="submit" >{{btn}}</button>
+            </div>
+         </form>
+         <hr/>
+         <div ng-repeat="(ref,lists) in opt.listsConf" class="table-responsive panel panel-primary">
+            <div class="panel-heading"><h3 class="panel-title">{{lists.title}}. <small class="white" ng-show="!opt.listsVal">Click on the add(+) icon to add new items</small> </h3></div>
+            <div class="panel-body">
+               <table class="table table-hover table-condensed table-dynamic">
+                  <thead>
+                     <tr>
+                        <th>#</th><th style="width:5%">QTY</th><th style="width:14%">Code <small style="#333">The code is generated from the dropdown</small></th><th>Description</th><th style="width:10%">Unit Cost</th><th style="width:10%">Total Cost</th><th><span ng-click="addItem(ref)" class="glyphicon glyphicon-plus success" title="Add a new item"></span></th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr ng-repeat="(key,list) in opt.listsVal[ref]">
+                        <td>{{key+1}}</td>
+                        <td><input type="text" placeholder="Add the quantity" name="quantity[]" ng-model="list.quantity" /></td>
+                        <td><input type="text" placeholder="Article code" name="code[]" ng-model="list.code" typeahead="value.alpha as value.display for value in typeahead.traders | filter:{display:$viewValue} | limitTo:5" typeahead-min-length="1"/></td>
+                        <td>
+                           <textarea a class="form-control" style="font-size:90%;" rows="3" ng-blur="savItem(ref,list)" placeholder="Add a description here" name="description[]" ng-model="list.description" ></textarea>
+                        </td>
+                        <td><input ng-blur="savItem(ref,list)" type="text" placeholder="Amount" name="cost[]" ng-model="list.cost" /></td>
+                        <td><output placeholder="Amount" name="total[]" ng-bind="list.total" ></output></td>
+                        <td><span ng-click="remItem(key,ref,{'sales_order':list.sales_order,'article':list.article})" class="glyphicon glyphicon-remove danger" title="Remove this item"></span><input type="hidden" name="isNew[]" ng-model="list.isNew" /></td>
+                     </tr>
+                  </tbody>
+                  <tfoot ng-if="opt.listsVal">
+                  <td colspan="6">&nbsp;</td>
+                  <td><span ng-click="submit(dataForm)" class="glyphicon glyphicon-ok success" title="Save all items"></span></td>
+                  </tfoot>
+               </table>
+            </div>
+         </div>
+      </section>
+   </section>
+</article>

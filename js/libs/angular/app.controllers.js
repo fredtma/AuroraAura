@@ -1,43 +1,55 @@
 'use strict'
 angular.module('KingsControllers',[])
-.controller('exodus',['$scope','fetch','$rootScope','$location','$routeParams','crud',exodus])
+.controller('exodus',['$scope','fetch','$rootScope','$location','$routeParams','crud','notitia',exodus])
    .controller('modalShow',['$scope','$modalInstance','passing','$log',modalShow])
+   .controller('gospel',['$scope','$rootScope',gospel])
    .controller('bethel',['$scope','fetch','$rootScope','$location','$routeParams',bethel])
-   .controller('deuteronomy',['$scope','fetch','$location','$routeParams',deuteronomy])
+   .controller('chronicles1',['$scope','fetch','$location','$routeParams',chronicles1])
    .controller('leviticus',['$scope','crud','$routeParams',leviticus])
    .controller('joshua',['$scope','crud','$routeParams',joshua])
+   .controller('judges',['$scope','crud','$routeParams',judges])
    .controller('numbers',['$scope','crud','$routeParams',numbers])
    .controller('isaiah',['$scope','crud','$routeParams','fetch','$timeout',isaiah])
    .controller('tmplUser',['$scope','crud','$routeParams',tmplUser])
    .controller('tmplClient',['$scope','crud','$routeParams',tmplClient])
-   .controller('psalm',['$scope','crud','$routeParams',psalm])
+   .controller('psalm',['$scope','crud','$routeParams','fetch',psalm])
+   .controller('deuteronomy',['$scope','crud','$routeParams','fetch',deuteronomy])
    .controller('proverbs',['$scope','crud',proverbs])
    .controller('rptServers',['$scope','$routeParams','crud','fetch',rptServers]);
+//============================================================================//
+function gospel($scope,$rootScope){iyona.deb("Check",$scope.licentia,$rootScope.licentia);}
 //============================================================================//
 /*
  * the controler for the login/logoff system.
  * the users data will stored into the localstorage and the permission will be retrieved.
  * $routerParams /section/:page/:opt[name,view,new]/:view[all,details]
  */
-function exodus($scope,fetch,$rootScope,$location,$routeParams,crud) {
+function exodus($scope,fetch,$rootScope,$location,$routeParams,crud,notitia) {
    var service=dynamis.get("SITE_ALIQUIS")||"http://demo.xpandit.co.za/aura/aliquis",
    gPlus={"user_info":{"id":0,"type":0,"emails":[{"value":0}]}};
+   $scope.attempt=0;
    //=========================================================================//LOGIN BUTTON
    $scope.login=function(e,s,t){
       var u,p,USER_NAME,procurator,msg;iyona.deb("Login",gPlus);
       if(typeof gPlus.user_info == "undefined") gPlus={"user_info":{"id":0,"type":0,"emails":[{"value":0}]}};
 
       s=s||gPlus.user_info.id;e=e||gPlus.user_info.emails[0].value;t=t||gPlus.user_info.kind;
-      if(!s||s==0){//check form when it is not an automated login.
+
+      if((!s||s==0) || $scope.attempt>0 ){//check form when it is not an automated login.
          if(crud.check($scope,'dataForm')===false)return false;
-         u=$scope.data.username;p=md5($scope.data.password);//aliquis
+         u=$scope.data.username;p=(e==='ad')?$scope.data.password:md5($scope.data.password);//aliquis
       }else{}//skip validation on autologin
-      $scope.attempt=0;
-      fetch.post(service,{"u":u,"p":p,"s":s,"e":e,"t":t},function(server){var setting= new configuration(),row;
-         if(server.length){row=server.rows[0];procurator=(row['level']==='super')?1:0;
-            USER_NAME={"operarius":row['username'],"licencia":row['aditum'],"nominis":row['name'],"jesua":row['jesua'],"procurator":procurator,"cons":row["sess"],"mail":row['email']};
+
+      fetch.post(service,{"u":u,"p":p,"s":s,"e":e,"t":t},function(server){
+         var setting= new configuration(),row;iyona.deb("SERVER",server);
+         if(server && server.length){
+            row         =server.rows[0];
+            procurator  =(row['level']==='super')?1:0;
+            USER_NAME   ={"operarius":row['username'],"nominis":row['name'],"jesua":row['jesua'],"procurator":procurator,"cons":row["sess"],"mail":row['email']};
             dynamis.set("USER_NAME",USER_NAME);dynamis.set("USER_NAME",USER_NAME,true);$rootScope['USER_NAME']=USER_NAME;
             setting.config();//when login in run setup of default setting
+            notitia.principio();//start and set local db
+            $rootScope.licentia = row['aditum'];
 
             $rootScope.menus[1].href="#joshua/administrator/view/"+USER_NAME.operarius;
             $rootScope.panelLeft[1].href="#joshua/administrator/view/"+USER_NAME.operarius;
@@ -70,7 +82,7 @@ function exodus($scope,fetch,$rootScope,$location,$routeParams,crud) {
    if($routeParams.login=='logoff'){
       crud.modalMessage("You are about to logout?\n\rClick yes to remove all your details and session.",
          function(selected){$scope.modalSelected=selected;
-            fetch.post(service,{"militia":"vel deleri"},function(server){iyona.msg(server.notitia.msg,server);});
+            fetch.post(service,{"militia":"vel deleri"},function(server){iyona.deb(server);});
                if("localStorage" in window) localStorage.clear(); sessionStorage.clear();//clear all session and traces of storages
                gPlus=gPlus||new GPLUS_USER();if(gPlus.hasOwnProperty("revokeToken")) gPlus.revokeToken();//remove the token when loginOff
          },function(selected){iyona.debug("The button selected is::",selected);}
@@ -79,6 +91,7 @@ function exodus($scope,fetch,$rootScope,$location,$routeParams,crud) {
 //============================================================================//
 function modalShow($scope,$modalInstance,passing,$log){
    $scope.passing = passing;
+   $scope.title = "Message Box";
    $scope.ok=function(){$modalInstance.close('accepted');};
    $scope.cancel=function(){$modalInstance.dismiss('cancel')};
 }
@@ -175,9 +188,9 @@ function bethel($scope,fetch,$rootScope,$location,$routeParams){
  * it depends if it will show all the last 10 logs or the logs for a specific server.
  * The menu is cutomized depending on what it is showing
  */
-function deuteronomy($scope,fetch,$location,$routeParams){
+function chronicles1($scope,fetch,$location,$routeParams){
    var address=$routeParams.server||null,serverName=$routeParams.log||null;$scope.data={};
-   $scope.menu={"list":[{"name":"Server Logs", "url":"#deuteronomy/log-servers"}]}//set the menu
+   $scope.menu={"list":[{"name":"Server Logs", "url":"#chronicles1/log-servers"}]}//set the menu
 //   if(address)$scope.menu.list[1]={"name":"View server: "+serverName, "url":"#leviticus/servers/"+serverName+"/details"};
    if(serverName)$scope.menu.list[2]={"name":serverName+" logs"};
    fetch.post(dynamis.get('SITE_SERVICE')+',creo,server_logs',{"militia":"server_logs","servus":serverName},function(server){
@@ -205,7 +218,7 @@ function leviticus($scope,crud,$routeParams){
    $scope.addItem=function(ref){crud.addItem(ref)};
    $scope.remItem=function(no,ref,list){crud.remItem(no,ref,list);};
    $scope.savItem=function(ref,list){crud.savItem(ref,list);};
-   $scope.licentia=getLicentia();
+
    $scope.submit=function(dataForm){
       if(!$scope.data.mailbox&&$scope.data.email){$scope.data.mailbox=$scope.data.email.substr(0,$scope.data.email.indexOf('@'));}
       $scope.data.name.delta=null;/*prevent the search field to be used instead use jesua*/
@@ -235,12 +248,39 @@ function joshua($scope,crud,$routeParams){
    defaultScope.details.username={"delta":"!@=!#","alpha":$routeParams.jesua};
 
    crud.get($scope,title,profile,defaultScope);
-   $scope.submit=function(dataForm){$scope.data.username.delta=null; $scope.dataForm=dataForm;crud.submit($scope,profile);}
+   $scope.submit=function(dataForm){ $scope.data.username.delta=null; $scope.dataForm=dataForm;crud.submit($scope,profile);}
    $scope.delete=function(){$scope.data.username.delta=null;/*prevent the search field to be used instead use jesua*/crud.delete($scope,profile);}
    $scope.DBenum=function(links,parent,col1,key,type){crud.DBenum(links,parent,col1,key,type)}//enum
    $scope.DBset=function(field,val){return crud.DBset(field,val);}
-   $scope.licentia=getLicentia();$scope.prima=impetroUser().jesua;
-   $scope.$on("readyForm",function(e,server){crud.checkboxValue($scope,defaultScope.extra.communication,'communication');});
+   $scope.linkItem=function(mensa2,list,key){crud.linkItem(mensa2,list,key); }
+   $scope.prima=impetroUser().jesua;
+   $scope.$on("readyForm",function(e,server){
+      crud.checkboxValue($scope,defaultScope.extra.communication,'communication');
+      $scope.ref = "link_users_groups"; $scope.lists = defaultScope.listsConf[$scope.ref];$scope.selected = $scope.data.username.alpha;
+   });
+}
+//============================================================================//
+/*
+ * users page for details and list
+ * @param {object} $scope
+ * @param {service} notitia
+ * @param {object} $routeParams
+ * @returns {void}
+ */
+function judges($scope,crud,$routeParams){
+   var title="System Groups",profile='judges',defaultScope=dynamis.get("defaultScope",true)[profile];iyona.deb("FASR",profile,$routeParams,defaultScope);
+   defaultScope.details.name={"delta":"!@=!#","alpha":$routeParams.jesua};
+
+   crud.get($scope,title,profile,defaultScope);
+   $scope.submit=function(dataForm){ $scope.data.name.delta=null; $scope.dataForm=dataForm;crud.submit($scope,profile);}
+   $scope.delete=function(){$scope.data.name.delta=null;/*prevent the search field to be used instead use jesua*/crud.delete($scope,profile);}
+   $scope.DBenum=function(links,parent,col1,key,type){crud.DBenum(links,parent,col1,key,type)}//enum
+   $scope.DBset=function(field,val){return crud.DBset(field,val);}
+   $scope.linkItem=function(mensa2,list,key){crud.linkItem(mensa2,list,key); }
+   $scope.prima=impetroUser().jesua;
+   $scope.$on("readyForm",function(e,server){
+      $scope.ref = "link_users_groups"; $scope.lists = defaultScope.listsConf[$scope.ref];$scope.selected = $scope.data.name.alpha;
+   });
 }
 //============================================================================//
 /*
@@ -250,19 +290,14 @@ function joshua($scope,crud,$routeParams){
 function numbers($scope,crud,$routeParams) {
    var title="Client",profile='clients',defaultScope=dynamis.get("defaultScope",true)[profile];
    defaultScope.details.name={"delta":"!@=!#","alpha":$routeParams.jesua};
-
-//   var notitiaWorker=new Worker("js/biliotheca/worker.js");
-//   notitiaWorker.postMessage({"notitia":"iDB"});
-//   notitiaWorker.addEventListener("message",function(e){
-//      iyona.deb("Working on",e.data,e);
-//   },false);
-
+iyona.deb("SCOPE SCOPE",$scope);
    crud.get($scope,title,profile,defaultScope);
+//   $scope.consent=function(perm){ iyona.log("Permission");return crud.consent(perm);};
    $scope.submit=function(dataForm){$scope.data.name.delta=null;/*prevent the search field to be used instead use jesua*/$scope.dataForm=dataForm;crud.submit($scope,profile);}
    $scope.delete=function(){$scope.data.name.delta=null;crud.delete($scope,profile);}
    $scope.DBenum=function(links,parent,col1,key,type){crud.DBenum(links,parent,col1,key,type)}//enum
    $scope.DBset=function(field,val){return crud.DBset(field,val);}
-   $scope.licentia=getLicentia();$scope.prima=impetroUser().jesua;
+   $scope.prima=impetroUser().jesua;
    $scope.$on("readyForm",function(e,server){});
 }//function
 //============================================================================//
@@ -280,12 +315,12 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
    defaultScope.list.period={"delta":"!@=!#","alpha":month};
    defaultScope.messenger = {"period":month,"run_consue":"cost summary"};
    $scope.sortable=null;$scope.reverse=false;
-   $scope.months = [{"name":"May","id":"5"},{"name":"June","id":"6"},{"name":"July","id":"7"},{"name":"Email Report","id":0}];$scope.month=objSearch($scope.months,month)[0][0];
+   $scope.months = [{"name":"May","id":"5"},{"name":"June","id":"6"},{"name":"July","id":"7"},{"name":"August","id":"8"},{"name":"September","id":"9"},{"name":"Email Report","id":0}];$scope.month=objSearch($scope.months,month)[0][0];
 
    if(view=='reports'){
       if(!jesua){$routeParams.jesua='data'; jesua='data';}
       if(jesua==='cost'){
-         //rumor and runner used to run quaerre on the data cost graph report
+         //rumor and runner used to run quaerere on the data cost graph report
          $scope.rumor='data cost',$scope.runner='cost summary';}
       defaultScope.reports[jesua].period = {"delta":"!@=!#","alpha":month};
    }
@@ -294,18 +329,22 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
       if(m.id===0){$scope.downloadCSV();return false;}
 
       $scope.month=m;sessionStorage.isaiah = m.id;
-      rep=rep||'list-history';//if report is list only run main quaerre, else use second quaerre
+      rep=rep||'list-history';//if report is list only run main quaerere, else use second quaerere
       consue=consue||false;consue='cost summary';
       var run=consue?consue:false;
-      var set=consue?"quaerre_sets":false;
+      var set=consue?"quaerere_sets":false;
       fetch.post(dynamis.get("SITE_MILITIA")+',rumor',{"mensa": "adsl_history","consuetudinem":{"rumorConf":rep,"uProfile":"isaiah","consuetudinem":set,"messenger":{"period":m.id,"run_consue":run}} },function(server){
          iyona.deb("NOTITIA",server);
          if(server && typeof server.notitia!=="undefined" && typeof server.notitia.iota!=="undefined" ) {
             $scope.data = server.notitia.iota;
             if(typeof server.notitia.consuetudinem.customVal!=="undefined"&&typeof server.notitia.consuetudinem.customVal['cost summary']!=="undefined") {
                var cust = server.notitia.consuetudinem.customVal;
-               $scope.opt.savings = cust['cost summary'].rows[0].savings;
-               $scope.footer = cust['cost summary'].rows[0];
+               if(typeof cust['cost summary']!=="undefined" && typeof cust['cost summary'].rows!=="undefined") {
+                  cust = cust['cost summary'].rows;
+                  $scope.opt.savings = cust[0].savings;
+                  $scope.footer = cust[0];
+               }
+               else iyona.log("Could not retrieve cost summary due to data not existing");
             }
          }
       });
@@ -348,7 +387,7 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
    $scope.DBenum=function(links,parent,col1,key,type){crud.DBenum(links,parent,col1,key,type)}//enum
    $scope.DBset=function(field,val){return crud.DBset(field,val);}
    $scope.arrange=function(sort){$scope.sortable=sort;$scope.reverse=!$scope.reverse;}
-   $scope.licentia=getLicentia();$scope.prima=impetroUser().jesua;
+   $scope.prima=impetroUser().jesua;
    $scope.$on("readyList",function(e,server){
       var cust = server.consuetudinem.customVal;iyona.deb("server",server,cust);
       if (typeof cust!=="undefined" && typeof cust['cost summary']!=="undefined" && typeof cust['cost summary'].rows!=="undefined" && typeof cust['cost summary'].rows[0]!=="undefined") {
@@ -377,11 +416,141 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
    $scope.$on("readyList",function(e,server){});
 }//function
 //============================================================================//
-function psalm($scope){
-   $scope.templates=[
-      {"name":"User Detail","url":"cera/templates/tmpl_user.html","disabled":false},
-      {"name":"Client Detail","url":"cera/templates/tmpl_client.html","disabled":true}
-   ];
+function psalm($scope,crud,$routeParams,fetch){
+   var title="Sales Order",profile='sales',defaultScope=dynamis.get("defaultScope",true)[profile];
+   defaultScope.details.jesua={"delta":"!@=!#","alpha":$routeParams.jesua};
+   $scope.sorts=[{"name":"By Supplier","key":"supplier"},{"name":"By Client","key":"client"},{"name":"By Quote Number","key":"quote_number"}];$scope.sortable=null;$scope.reverse=false;
+   $scope.dateOptions   = {showWeeks:false,"showButtonBar":false};
+
+   crud.get($scope,title,profile,defaultScope);
+   if(!$routeParams.jesua){$scope.data.sales_person = impetroUser().operarius;}
+
+   $scope.alert01=function(){$scope.msg="";};
+   $scope.arrange=function(sort){iyona.deb("clicked");$scope.sortable=sort;$scope.reverse=!$scope.reverse;};
+   $scope.addItem=function(ref,node){var custValue={"barcode":uRand2(5,true,true,true),"supplier_code":node.alpha,"description":"Supplier:"+node.display}; crud.addItem(ref,custValue);iyona.deb("Adding",$scope.opt.listsVal[ref]);};
+   $scope.remItem=function(no,ref,list){
+      iyona.deb("total",ref,no,$scope.opt.listsVal[ref],$scope.opt.listsVal[ref][no].total,$scope.data.sales_total);
+      var tmp = $scope.opt.listsVal[ref][no].total;
+      crud.remItem(no,ref,list);
+      $scope.$on("remItem",function(e,s){
+         iyona.deb("removing",s);
+         $scope.data.sales_total -=tmp;
+         $scope.calMrgn();
+      });
+   };
+   $scope.chkChng=function(list){list.changed=true;}
+   $scope.calMrgn=function(){
+      if(!isset($scope.data.quote_total,$scope.data.sales_total))return;
+      $scope.data.margin.alpha = ($scope.data.quote_total&&$scope.data.sales_total)?100-Math.round(($scope.data.sales_total/$scope.data.quote_total)*100):0;
+      if($scope.data.margin.alpha<10) {$scope.msg = "Profit is bellow 10%"; iyona.msg($scope.msg,true); } else {$scope.msg = "";}
+   }
+   $scope.savItem=function(ref,list){
+      if($scope.closed===true) return;
+      var x,l=$scope.opt.listsVal[ref].length;
+      $scope.data.sales_total = 0;
+      if(isset(list.quantity,list.cost))list.total=list.quantity*list.cost;
+      for(x=0;x<l;x++){var node = $scope.opt.listsVal[ref][x];$scope.data.sales_total+=node.total;}
+      $scope.calMrgn();
+      list.sales_total = $scope.data.sales_total;
+
+      if(list.changed &&list.description &&list.quantity &&list.cost){crud.savItem(ref,list); list.changed=false;}
+   };
+   $scope.finalize=function(e){
+      var proceed = true,msg="Would you like to close this sales?<br/>This will download the import file and close the sale";
+      if($scope.data.margin.alpha<10){proceed = false;msg="Please note that the profit is below 10%";}
+      crud.modalMessage(msg,
+         function(selected){
+            if(proceed){$scope.downloadCSV("pastelExport","pastelExport.csv",$scope.data.jesua);
+               $scope.closed=true;}
+            iyona.deb("Faith...",selected);
+         },
+         function(selected){iyona.deb("The button selected is::",selected);}
+      );
+   };
+
+   $scope.submit=function(dataForm){$scope.dataForm=dataForm;crud.submit($scope,profile);};
+   $scope.delete=function(){crud.delete($scope,profile);};
+   $scope.$on("readyForm",function(e,s){iyona.deb("readyForm",s); if(s.iota[0].status==="Closed") $scope.closed=true;$scope.calMrgn(); });
+   $scope.$on("readySubmit",function(e,s){iyona.deb("readySumit");});
+   $scope.$on("readyList",function(e,s){iyona.deb("readyList");});
+   $scope.downloadCSV=function(caller,filename,sales){
+      window.URL = window.webkitURL || window.URL;
+      window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+
+      fetch.responseType = "application/octet-stream";
+      sales = sales||0;
+
+      if(0){window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs){
+         fs.root.getFile(filename, {create: false},function(dataFile){
+            dataFile.remove(function(e){iyona.deb("Removed file",e)},fileErrorHandler);
+         });
+      });}
+      fetch.post(dynamis.get("SITE_ALPHA")+',creo,'+caller,{"messenger":{"filename":filename,"mail":impetroUser().mail,"operarius":impetroUser().operarius,"current":sales} },function(server){
+         if(typeof server === "undefined") return false;
+
+         iyona.msg("Please check your inbox.");
+
+         window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs){
+            fs.root.getFile(filename, {create: true},function(dataFile){
+               var url = dataFile.toURL();iyona.deb("FILE",url,dataFile,dataFile.isFile,dataFile.name,dataFile.fullPath);
+
+               dataFile.createWriter(function(fileWriter) {
+                  var blob = new Blob([server], {type: "text/plain"});
+                  fileWriter.onwriteend = function(e) {console.log('Write completed.');};
+                  fileWriter.onerror = function(e) {console.log('Write failed: ' + e.toString());};
+                  fileWriter.write(blob);
+//                  chrome.downloads.download({"url":url});
+                  downloadLINK(url,filename);
+//                  downloadURL(url);
+               },fileErrorHandler);
+            });
+         },fileErrorHandler);
+
+         iyona.deb("NOTITIA",server);
+      });
+   }
+   $scope.filesystem=function(){
+      chorme.filesystem.chooseEntry({"type":"openFile"},function(entry){
+         entry.file(function(file){
+            var reader = new FileReader();
+         });
+      });
+   }
+}
+//============================================================================//
+function deuteronomy($scope,crud,$routeParams,fetch){
+   var title="Permissions",profile='licentia',defaultScope=dynamis.get("defaultScope",true)[profile];
+   defaultScope.details.name={"delta":"!@=!#","alpha":$routeParams.jesua||null};
+
+   crud.get($scope,title,profile,defaultScope);
+iyona.deb("SCOPE",$scope);
+   $scope.alert01=function(){$scope.msg="";};
+   $scope.addItem=function(ref,node){
+      var name=$scope.data.name.alpha,custValue={"name":node+" "+name,"description":"This permission will allow users to "+node+" "+name,"created":new Date().format("isoDate") };
+      var node = $scope.opt.listsVal[ref];
+      crud.addItem(ref,custValue);
+      var l=node.length,list=node[l-1];
+      list.changed=true;
+      $scope.savItem(ref,list);
+      iyona.deb("Adding",list,l,node);
+   };
+   $scope.remItem=function(no,ref,list){
+      crud.remItem(no,ref,list);
+      $scope.$on("remItem",function(e,s){iyona.deb("removing",s);});
+   };
+   $scope.listItems=function(mensa2,list){$scope.selected=list.search; crud.listItem(mensa2,list); iyona.deb("THE SCOPE",$scope);}
+   $scope.linkItem=function(mensa2,list,key){crud.linkItem(mensa2,list,key); }
+   $scope.savItem=function(ref,list){
+      if(list.changed &&list.name &&list.description){crud.savItem(ref,list); list.changed=false;}
+   };
+
+   $scope.submit=function(dataForm){$scope.dataForm=dataForm;crud.submit($scope,profile);};
+   $scope.delete=function(){crud.delete($scope,profile);};
+   $scope.$on("readyForm",function(e,s){iyona.deb("readyForm",s); });
+   $scope.$on("readySubmit",function(e,s){iyona.deb("readySumit");});
+   $scope.$on("readyList",function(e,s){iyona.deb("readyList");});
+   $scope.$on("readyListItem",function(e,s){iyona.deb("readyListItem",$scope);$scope.ref="link_permissions_groups";$scope.lists=$scope.opt.listsConf.link_permissions_groups;});
+
 }
 //============================================================================//
 function proverbs($scope,crud){

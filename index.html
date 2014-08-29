@@ -17,7 +17,7 @@
                      <small>{{site.title}}
                         <span class="dropdown pull-right">
                            <span class="glyphicon glyphicon-th dropdown-toggle theMenu" data-toggle="dropdown"></span>
-                           <ul class="dropdown-menu pull-right" id="theMenu" role="menu"><li ng-repeat="menu in menus" role="presentation" ng-class="(menu.header||menu.divider||'')" ><a ng-show="menu.link" role="menuitem" tabindex="-1" ng-href="{{menu.href}}"><span ng-show="menu.icon" ng-class="'custIcon glyphicon '+(menu.icon||'')"></span>{{menu.text}}</a></li></ul>
+                           <ul class="dropdown-menu pull-right" id="theMenu" role="menu" style="width:200px;"><li ng-repeat="menu in menus" role="presentation" ng-class="(menu.header||menu.divider||'')" ><a ng-show="menu.link" role="menuitem" tabindex="-1" ng-href="{{menu.href}}"><span ng-show="menu.icon" ng-class="'custIcon glyphicon '+(menu.icon||'')"></span>{{menu.text}}</a></li></ul>
                         </span>
                      </small>
                   </h2>
@@ -30,7 +30,7 @@
             </div>
             <article id="deviceready" class="slide-animate" ng-view></article>
             <form class="form-inline well well-sm bottom-search" role="form">
-               <div class="input-group col-xs-12 footNote"><span class="glyphicon glyphicon-search input-group-addon white"></span><input type="text" class="form-control" ng-model="inputSearch" id="inputSearch" placeholder="Search..."><span ng-click="exit()" class="glyphicon glyphicon-off input-group-addon white"></span></div>
+               <div class="input-group col-xs-12 footNote"><span class="glyphicon glyphicon-search input-group-addon white"></span><input type="text" class="form-control" ng-model="inputSearch" id="inputSearch" placeholder="Search..."><span ng-click="refresh()" class="glyphicon glyphicon-refresh link input-group-addon white"></span><span ng-click="exit()" class="glyphicon glyphicon-off input-group-addon white"></span></div>
             </form>
             <aside class="leftPanel" ng-show="showPanel=='left'" ><ul class="nothing list-group"><li class="list-first-item"></li><li ng-repeat="panel in panelLeft" ng-class="'list-group-item '+{true:panel.cls}[panel.header]"><a ng-href="{{panel.href}}"><span ng-show="panel.icon" ng-class="'glyphicon ' + panel.icon"></span>  {{panel.name}}</a></li></ul></aside>
             <aside class="rightPanel" ng-show="showPanel=='right'"><ul class="nothing list-group"><li class="list-first-item"></li><li ng-repeat="panel in panelRight" ng-class="'list-group-item '+{true:panel.cls}[panel.header]"><a href="">{{panel.name}}</a></li></ul></aside>

@@ -1,0 +1,125 @@
+<article >
+   <section id="detailView">
+      <section  class='-listContainer'>
+         <span id="messager" ng-class="'help-block '+{true:'text-danger',false:'text-info'}[err]" ng-show="msg" ng-bind="msg"></span>
+         <form id="srvForm" class="withLabel" name="dataForm" ng-submit="submit(dataForm)">
+            <input type="hidden" class="form-control" ng-model="data.jesua" />
+            <div class="row">
+               <div class="col-lg-6">
+                  <header>
+                     <h2>Client Details <small>Client detail are copied from the suppliers quote</small></h2>
+                  </header>
+                  <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.client]">
+                     <span class="input-group-addon glyphicon glyphicon-book"></span>
+                     <span class="input-group-addon form-label">Client</span>
+                     <input type="text" class="form-control" required placeholder="Client's name" autofocus name="client" ng-model="data.client" title="Client's name"
+                           typeahead="clients.display for clients in typeahead.clients | filter:{display:$viewValue} | limitTo:5" typeahead-min-length="1"  />
+                  </div>
+                  <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.quote_number]">
+                     <span class="input-group-addon glyphicon glyphicon-lock"></span>
+                     <span class="input-group-addon form-label">Quote number / Same as PO</span>
+                     <input type="text" class="form-control" placeholder="Quote number / Same as PO" name="quote_number" ng-model="data.quote_number" title="Quote Number" />
+                  </div>
+                  <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.quote_number]">
+                     <span class="input-group-addon glyphicon glyphicon-usd"></span>
+                     <span class="input-group-addon form-label">Quote Total <small>(exVat)</small></span>
+                     <input type="text" class="form-control" placeholder="Quote total excluding vat" name="quote_total" ng-model="data.quote_total" title="Quote Total" />
+                     <span class="input-group-addon addon">ZAR</span>
+                  </div>
+
+                  <h4>Reference <small>Select a reference between the below</small></h4>
+                  <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.PO_30]">
+                     <span class="input-group-addon glyphicon glyphicon-info-sign"></span>
+                     <span class="input-group-addon form-label">Purchase Order</span>
+                     <input type="text" class="form-control" placeholder="Purchase Order from 30 day client" name="PO_30" ng-model="data.PO_30" title="Purchase order from 30 day client" />
+                  </div>
+                  <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.proof]">
+                     <span class="input-group-addon glyphicon glyphicon-folder-close"></span>
+                     <span class="input-group-addon form-label">Proof of payment</span>
+                     <input type="text" class="form-control" placeholder="Proof of payment from COD client" name="proof" ng-model="data.proof" title="Proof of payment from COD client" />
+                  </div>
+                  <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.confirmation_amount]" >
+                     <span class="input-group-addon glyphicon glyphicon-envelope"></span>
+                     <span class="input-group-addon form-label">Confirmation on email</span>
+                     <input type="text" class="form-control" placeholder="Amount and Quote number confirmation on email" name="confirmation_amount" ng-model="data.confirmation_amount" title="Amount and Quote number confirmation on email" />
+                  </div>
+               </div>
+               <div class="col-lg-6">
+                  <header>
+                     <h2>Supplier's Details <small>type the name of the supplier and select from the drop down list</small></h2>
+                  </header>
+                  <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.supplier]">
+                     <span class="input-group-addon glyphicon glyphicon-book"></span>
+                     <span class="input-group-addon form-label">Supplier's code</span>
+                     <input type="text" class="form-control" required placeholder="Supplier's name" name="supplier" ng-model="data.supplier" title="Supplier's name"
+                            typeahead="value.alpha as value.display for value in typeahead.supplies | filter:{display:$viewValue} | limitTo:5" typeahead-min-length="1"/>
+                  </div>
+                  <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.delivery]">
+                     <span class="input-group-addon glyphicon glyphicon-home"></span>
+                     <span class="input-group-addon form-label">Delivery instruction</span>
+                     <input type="text" class="form-control" required placeholder="Delivery instruction" autofocus name="delivery" ng-model="data.delivery" title="Delivery instruction" />
+                  </div>
+                  <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.sales_total]">
+                     <span class="input-group-addon glyphicon glyphicon-usd"></span>
+                     <span class="input-group-addon form-label">Order's total</span>
+                     <input type="text" class="form-control" required placeholder="Order's total" autofocus name="sales_total" ng-model="data.sales_total" title="Order's total" />
+                     <span class="input-group-addon addon">ZAR</span>
+                  </div>
+
+                  <h4>Profile <small>Current order status</small></h4>
+                  <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.sales_person]">
+                     <span class="input-group-addon glyphicon glyphicon-user"></span>
+                     <span class="input-group-addon form-label">Sales Person</span>
+                     <output class="form-control" readonly placeholder="Sales Person" name="sales_person" ng-bind="data.sales_person" title="Sales person" ></output>
+                  </div>
+                  <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.management]">
+                     <span class="input-group-addon glyphicon glyphicon-user"></span>
+                     <span class="input-group-addon form-label">Approved by</span>
+                     <output class="form-control" readonly placeholder="Management" name="management" ng-bind="data.management" title="Management" ></output>
+                  </div>
+                  <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.status]">
+                     <span class="input-group-addon glyphicon glyphicon-eye-open"></span>
+                     <span class="input-group-addon form-label">Current order is</span>
+                     <output class="form-control" readonly placeholder="Status" name="status" ng-bind="data.status" title="Status" ></output>
+                  </div>
+               </div>
+            </div>
+            <div ng-if="licentia.deLta||true" id='srvModified'  class="input-group">
+               <button type="submit"  ng-class="btnClass" name="submit" >{{btn}}</button>
+            </div>
+         </form>
+            <header>
+               <h2>Sales Items<small>listed below add/delete/update sales articles</small></h2>
+            </header>
+            <div ng-repeat="(ref,lists) in opt.listsConf" class="table-responsive panel panel-primary">
+               <div class="panel-heading"><h3 class="panel-title">{{lists.title}}. <small class="white" ng-show="!opt.listsVal">Click on the add(+) icon to add new items</small> </h3></div>
+               <div class="panel-body">
+                  <table class="table table-hover table-condensed table-dynamic">
+                     <thead>
+                        <tr>
+                           <th>#</th><th style="width:5%">QTY</th><th style="width:14%">Code <small style="#333">The code is generated from the dropdown</small></th><th>Description</th><th style="width:10%">Unit Cost</th><th style="width:10%">Total Cost</th><th><span ng-click="addItem(ref)" class="glyphicon glyphicon-plus success" title="Add a new item"></span></th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr ng-repeat="(key,list) in opt.listsVal[ref]">
+                           <td>{{key+1}}</td>
+                           <td><input type="text" placeholder="Add the quantity" name="quantity[]" ng-model="list.quantity" /></td>
+                           <td><input type="text" placeholder="Article code" name="code[]" ng-model="list.code" typeahead="value.alpha as value.display for value in typeahead.traders | filter:{display:$viewValue} | limitTo:5" typeahead-min-length="1"/></td>
+                           <td>
+                              <textarea a class="form-control" style="font-size:90%;" rows="2" ng-blur="savItem(ref,list)" placeholder="Add a description here" name="description[]" ng-model="list.description" ></textarea>
+                           </td>
+                           <td><input ng-blur="savItem(ref,list)" type="text" placeholder="Amount" name="cost[]" ng-model="list.cost" /></td>
+                           <td><output placeholder="Amount" name="total[]" ng-bind="list.total" ></output></td>
+                           <td><span ng-click="remItem(key,ref,{'sales_order':list.sales_order,'article':list.article})" class="glyphicon glyphicon-remove danger" title="Remove this item"></span><input type="hidden" name="isNew[]" ng-model="list.isNew" /></td>
+                        </tr>
+                     </tbody>
+                     <tfoot ng-if="opt.listsVal">
+                     <td colspan="6">&nbsp;</td>
+                     <td><span ng-click="submit(dataForm)" class="glyphicon glyphicon-ok success" title="Save all items"></span></td>
+                     </tfoot>
+                  </table>
+               </div>
+            </div>
+      </section>
+   </section>
+</article>

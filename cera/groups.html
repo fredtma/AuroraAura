@@ -1,0 +1,102 @@
+<article  ng-controller="judges">
+   <section id="listView" ng-if="view=='list'">
+      <header class="menuHeader">
+         <ol class="breadcrumb">
+            <li><a href="#genesis">Home</a></li>
+            <li class="active">{{menu[0].text}}</li>
+            <li class="menu-icon"><a ng-if="consent('Create Groups')" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+         </ol>
+      </header>
+      <section id="mainContent" class='listContainer'>
+         <div id='scroller'>
+            <ul>
+               <li class="row numbers-items" ng-repeat="row in data | filter:inputSearch">
+                  <div class="col-xs-1 icon-column">
+                     <span ng-class="'item-icon glyphicon glyphicon-flag success'"></span>
+                  </div>
+                  <div class="col-xs-11">
+                     <a href="#judges/groups/view/{{row.name}}">
+                        <h4>
+                           {{row.name}}
+                        </h4>
+                        <small><span ng-if='row.description' ng-bind='row.description'></span> </small>
+                     </a>
+                  </div>
+               </li>
+            </ul>
+         </div>
+      </section>
+   </section>
+   <section id="detailView"  ng-if="view=='view'||view=='new'">
+      <header class="menuHeader">
+         <ol class="breadcrumb">
+            <li><a href="#genesis">Home</a></li>
+            <li><a ng-href="{{menu[0].link}}">{{menu[0].text}}</a></li>
+            <li class="active">{{jesua|ucfirst}} {{menu[1].text}}</li>
+            <li class="menu-icon"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon"><a ng-if="licentia.omegA"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
+         </ol>
+      </header>
+      <section  class='listContainer'><span id="messager" ng-class="'help-block '+{true:'text-danger',false:'text-info'}[err]" ng-show="msg">{{msg}}</span>
+         <form id="userForm" name="dataForm"  ng-submit="submit(dataForm)">
+            <input type="hidden" class="form-control" ng-model="data.jesua" />
+         <div class="input-group">
+            <span class="input-group-addon glyphicon glyphicon-calendar"></span>
+            <output class="form-control readonly" ng-model="data.modified"  >{{data.modified}}</output>
+         </div>
+         <div ng-class="'input-group '+{true:'has-error'}[errMsg.name]">
+            <span class="input-group-addon glyphicon glyphicon-qrcode"></span>
+            <input type="text" class="form-control" required placeholder="Group's name" title="Group's name" autofocus name="name" ng-model="data.name.alpha" />
+         </div>
+         <div ng-class="'input-group '+{true:'has-error'}[errMsg.description]">
+            <span class="input-group-addon glyphicon glyphicon-barcode"></span>
+            <textarea class="form-control" required placeholder="Group description" title="Group description" name="description" ng-model="data.description" ></textarea>
+         </div>
+         <div ng-if="opt.foreignVal" ng-repeat="(key,links) in opt.foreignVal" >
+            <h4 class="refSection">{{opt.foreignConf[key].title}}</h4>
+            <div class="input-group btn-group" data-toggle="buttons" ng-init="col1=opt.foreignConf[key].col1;col2=opt.foreignConf[key].col2;parent=data[opt.foreignConf[key].parent].alpha;type=opt.foreignConf[key].type;">
+               <span class="input-group-addon glyphicon glyphicon-book"></span>
+               <button ng-if="type=='radio'" ng-repeat="(k,link) in links.rows" type="button" class="btn btn-primary" ng-model="link[col1]"  btn-radio="'{{parent}}'" ng-click="DBenum(links,parent,col1,k,'radio');">{{link[col2]}}</button>
+               <button ng-if="type=='checkbox'" ng-repeat="(k,link) in links.rows" type="button" class="btn btn-primary" ng-model="link[col1]" btn-checkbox btn-checkbox-false="null" btn-checkbox-true="'{{parent}}'" >{{link[col2]}}</button>
+            </div>
+         </div>
+            <hr/>
+         <div ng-if="opt.listsVal[ref]" class="table-responsive panel panel-primary">
+            <div class="panel-heading" style="position:relative">
+               <h4 class="panel-title"><span  ng-bind="lists.title+' to '+selected"></span> <small>Select the group that will be associated with {{selected}}</small></h4>
+               <div class="btn-group pull-right" style="position: absolute;top: 0px;right: 5px;">
+                  <button type="button" class="btn btn-info"><span class="glyphicon glyphicon-user"></span> Link User</button>
+                  <button type="button" class="btn btn-info"><span class="glyphicon glyphicon-lock"></span> Link Permissions</button>
+               </div>
+            </div>
+            <div class="panel-body">
+               <table class="table table-hover table-condensed table-dynamic">
+                  <thead>
+                     <tr>
+                        <th>#</th><th style="width:14%">Given name</th><th>Username</th><th class="funcSmall">Functions</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr ng-repeat="(key,list) in opt.listsVal[ref]| filter:inputSearch">
+                        <td>{{key+1}}</td>
+                        <td ng-bind="list.frstname+' '+list.lastname"></td>
+                        <td ng-bind="list.username"></td>
+                        <td>
+                           <span  ng-click="linkItem(ref,[list.username,selected,list.group],key)" class="glyphicon funcSmall link" ng-class="{true:'glyphicon-ok-circle success',false:'glyphicon-remove-circle danger'}[list.user==list.username]" title="Link/Unlink item to group"></span>
+                           <input type="hidden" name="isNew[]" ng-model="list.isNew" />
+                        </td>
+                     </tr>
+                  </tbody>
+                  <tfoot ng-if="opt.listsVal">
+                     <td colspan="4">&nbsp;</td>
+                  </tfoot>
+               </table>
+            </div>
+         </div>
+         <div ng-if="licentia.deLta||data.jesua==prima" class="input-group">
+            <button ng-if="licentia.deLta" type="submit" ng-class="btnClass" name="submit" >{{btn}}</button>
+         </div>
+         </form>
+      </section>
+   </section>
+</article>

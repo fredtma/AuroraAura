@@ -6,15 +6,16 @@
       <form id="userForm" name="dataForm" ng-submit="login()" >
          <div id='srvModified' ng-class="'input-group '+{true:'has-error'}[errMsg.username]">
             <span class="input-group-addon glyphicon glyphicon-user"></span>
-            <input type="text" class="form-control" required placeholder="Username or Email" autofocus name="username" ng-model="data.username" />
+            <input type="text" class="form-control" required placeholder="Username or Email" autofocus="true" name="username" ng-model="data.username" />
          </div>
          <div id='srvModified' ng-class="'input-group '+{true:'has-error'}[errMsg.password]">
             <span class="input-group-addon glyphicon glyphicon-lock"></span>
             <input type="password" class="form-control" required placeholder="Enter server Password" name="password" ng-model="data.password" />
          </div>
          <div id='srvModified' class="input-group">
-            <button type="submit" class="form-control btn btn-primary width50" name="login" >Login</button>
-            <button type="button" class="form-control btn btn-default width50" ng-click="forgot()" name="submit" >Forgot</button>
+            <button type="submit" class="form-control btn btn-primary " id="login1" name="login" style="width:34%" >Login</button>
+            <button type="button" class="form-control btn " ng-click="login('ad')" name="activeDirectory" id="login2" style="width:33%;background:#000000;color:#ffffff;" >Active Directory</button>
+            <button type="button" class="form-control btn btn-default " ng-click="forgot()" name="submit" style="width:33%" >Forgot</button>
          </div>
       </form>
    </section>
