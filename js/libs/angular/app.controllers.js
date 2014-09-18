@@ -48,17 +48,15 @@ function exodus($scope,fetch,$rootScope,$location,$routeParams,crud,notitia) {
             USER_NAME   ={"operarius":row['username'],"nominis":row['name'],"jesua":row['jesua'],"procurator":procurator,"cons":row["sess"],"mail":row['email']};
             dynamis.set("USER_NAME",USER_NAME);dynamis.set("USER_NAME",USER_NAME,true);$rootScope['USER_NAME']=USER_NAME;
             setting.config();//when login in run setup of default setting
-            notitia.principio();//start and set local db
-            $rootScope.licentia = row['aditum'];
-
-            $rootScope.menus[1].href="#joshua/administrator/view/"+USER_NAME.operarius;
-            $rootScope.panelLeft[1].href="#joshua/administrator/view/"+USER_NAME.operarius;
+            notitia.principio();//start and set local db and if there is an upgrade it will run
+            rootMenu(row,$rootScope,USER_NAME);
             $location.path("/genesis");
          }else{$scope.attempt++;msg='Failed login.Fill in your email address & click on forgot password';
             iyona.msg(msg,false," danger bold");
          }
       });//fetch callback
    }//login
+
    //=========================================================================//FORGOT BUTTON
    $scope.forgot=function(){
       if("data" in $scope===false||"username" in $scope.data===false){iyona.msg("Your are required to fill in the email",false," danger bold"); return false;}
@@ -193,7 +191,7 @@ function chronicles1($scope,fetch,$location,$routeParams){
    $scope.menu={"list":[{"name":"Server Logs", "url":"#chronicles1/log-servers"}]}//set the menu
 //   if(address)$scope.menu.list[1]={"name":"View server: "+serverName, "url":"#leviticus/servers/"+serverName+"/details"};
    if(serverName)$scope.menu.list[2]={"name":serverName+" logs"};
-   fetch.post(dynamis.get('SITE_SERVICE')+',creo,server_logs',{"militia":"server_logs","servus":serverName},function(server){
+   fetch.post(dynamis.get('SITE_SERVICE')+',creo,server_logs',{"militia":"server_logs","servus":serverName,"uProfile":"server"},function(server){
       iyona.deb(server,'server');if(server&&"rows" in server===false) return false;/*set scroller*/setTimeout(SETiSCROLL,1000);
       angular.extend($scope.data,server.rows);iyona.deb($scope.data,'$scope.data');
    });
@@ -252,6 +250,10 @@ function joshua($scope,crud,$routeParams){
    $scope.delete=function(){$scope.data.username.delta=null;/*prevent the search field to be used instead use jesua*/crud.delete($scope,profile);}
    $scope.DBenum=function(links,parent,col1,key,type){crud.DBenum(links,parent,col1,key,type)}//enum
    $scope.DBset=function(field,val){return crud.DBset(field,val);}
+   $scope.viewLink=function(ref){iyona.deb($scope.data.username);
+      $scope.ref = ref; $scope.lists = defaultScope.listsConf[$scope.ref];$scope.selected = $scope.data.username.alpha;
+      setTimeout(function(){SETiSCROLL('#referencesLink')},1000);/*set scroller*/
+   }
    $scope.linkItem=function(mensa2,list,key){crud.linkItem(mensa2,list,key); }
    $scope.prima=impetroUser().jesua;
    $scope.$on("readyForm",function(e,server){
@@ -276,6 +278,10 @@ function judges($scope,crud,$routeParams){
    $scope.delete=function(){$scope.data.name.delta=null;/*prevent the search field to be used instead use jesua*/crud.delete($scope,profile);}
    $scope.DBenum=function(links,parent,col1,key,type){crud.DBenum(links,parent,col1,key,type)}//enum
    $scope.DBset=function(field,val){return crud.DBset(field,val);}
+   $scope.viewLink=function(ref){
+      $scope.ref = ref; $scope.lists = defaultScope.listsConf[$scope.ref];$scope.selected = $scope.data.name.alpha;
+      setTimeout(function(){SETiSCROLL('#referencesLink')},1000);/*set scroller*/
+   }
    $scope.linkItem=function(mensa2,list,key){crud.linkItem(mensa2,list,key); }
    $scope.prima=impetroUser().jesua;
    $scope.$on("readyForm",function(e,server){
@@ -350,13 +356,14 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
       });
    }
    $scope.downloadCSV=function(){
+      var filename = "monthly_report.xls";
       fetch.responseType = "application/octet-stream";
       fetch.post(dynamis.get("SITE_ALPHA")+',creo,relatione menstrua',{"messenger":{"period":sessionStorage.isaiah,"mail":impetroUser().mail} },function(server){
          if(typeof server === "undefined") return false;
          iyona.msg("Please check your inbox.");
          window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
          window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs){
-            fs.root.getFile("monthly_report.xls", {create: true},function(dataFile){
+            fs.root.getFile(filename, {create: true},function(dataFile){
                iyona.deb("FILE",dataFile,dataFile.isFile,dataFile.name,dataFile.fullPath);
                var url = dataFile.toURL();
                dataFile.createWriter(function(fileWriter) {
@@ -365,8 +372,8 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
                   fileWriter.onwriteend = function(e) {console.log('Write completed.');};
                   fileWriter.onerror = function(e) {console.log('Write failed: ' + e.toString());};
                   fileWriter.write(blob);
+                  downloadLINK(url,filename);
 //                  downloadURL(url);
-//                  var win = window.open(url, '_blank');win.focus();
                },function(){fileErrorHandler()});
             });
          },function(){fileErrorHandler()});
@@ -389,8 +396,8 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
    $scope.arrange=function(sort){$scope.sortable=sort;$scope.reverse=!$scope.reverse;}
    $scope.prima=impetroUser().jesua;
    $scope.$on("readyList",function(e,server){
-      var cust = server.consuetudinem.customVal;iyona.deb("server",server,cust);
-      if (typeof cust!=="undefined" && typeof cust['cost summary']!=="undefined" && typeof cust['cost summary'].rows!=="undefined" && typeof cust['cost summary'].rows[0]!=="undefined") {
+      var cust = server.consuetudinem.customVal;iyona.deb("readyList",cust);
+      if (isset(cust)&& isset(cust['cost summary'])&& isset(cust['cost summary'].rows)&& isset(cust['cost summary'].rows[0]) ) {
          $scope.opt.savings = cust['cost summary'].rows[0].savings}
    });
    $scope.$on("readyForm",function(e,server){
@@ -460,8 +467,7 @@ function psalm($scope,crud,$routeParams,fetch){
       if($scope.data.margin.alpha<10){proceed = false;msg="Please note that the profit is below 10%";}
       crud.modalMessage(msg,
          function(selected){
-            if(proceed){$scope.downloadCSV("pastelExport","pastelExport.csv",$scope.data.jesua);
-               $scope.closed=true;}
+            if(proceed){$scope.downloadCSV("pastelExport","pastelExport.csv",$scope.data.jesua,"Close Current Sales");}
             iyona.deb("Faith...",selected);
          },
          function(selected){iyona.deb("The button selected is::",selected);}
@@ -473,22 +479,24 @@ function psalm($scope,crud,$routeParams,fetch){
    $scope.$on("readyForm",function(e,s){iyona.deb("readyForm",s); if(s.iota[0].status==="Closed") $scope.closed=true;$scope.calMrgn(); });
    $scope.$on("readySubmit",function(e,s){iyona.deb("readySumit");});
    $scope.$on("readyList",function(e,s){iyona.deb("readyList");});
-   $scope.downloadCSV=function(caller,filename,sales){
+   $scope.downloadCSV=function(caller,filename,sales,licentia){
       window.URL = window.webkitURL || window.URL;
       window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
 
       fetch.responseType = "application/octet-stream";
       sales = sales||0;
 
-      if(0){window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs){
+      if(1){window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs){
          fs.root.getFile(filename, {create: false},function(dataFile){
             dataFile.remove(function(e){iyona.deb("Removed file",e)},fileErrorHandler);
          });
       });}
-      fetch.post(dynamis.get("SITE_ALPHA")+',creo,'+caller,{"messenger":{"filename":filename,"mail":impetroUser().mail,"operarius":impetroUser().operarius,"current":sales} },function(server){
+      fetch.post(dynamis.get("SITE_ALPHA")+',creo,'+caller,{"messenger":{"filename":filename,"mail":impetroUser().mail,"operarius":impetroUser().operarius,"current":sales},"licentia":licentia },function(server){
          if(typeof server === "undefined") return false;
+         if(typeof server ==="object" && (server.err||server.notitia.err) ) {iyona.msg(server.err||server.notitia.err,true,'danger'); return false;}
 
          iyona.msg("Please check your inbox.");
+         $scope.closed=true;
 
          window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs){
             fs.root.getFile(filename, {create: true},function(dataFile){
@@ -517,7 +525,7 @@ function psalm($scope,crud,$routeParams,fetch){
       });
    }
 }
-//============================================================================//
+//============================================================================//permissions
 function deuteronomy($scope,crud,$routeParams,fetch){
    var title="Permissions",profile='licentia',defaultScope=dynamis.get("defaultScope",true)[profile];
    defaultScope.details.name={"delta":"!@=!#","alpha":$routeParams.jesua||null};
@@ -525,6 +533,7 @@ function deuteronomy($scope,crud,$routeParams,fetch){
    crud.get($scope,title,profile,defaultScope);
 iyona.deb("SCOPE",$scope);
    $scope.alert01=function(){$scope.msg="";};
+   $scope.chkChng=function(list){list.changed=true;}
    $scope.addItem=function(ref,node){
       var name=$scope.data.name.alpha,custValue={"name":node+" "+name,"description":"This permission will allow users to "+node+" "+name,"created":new Date().format("isoDate") };
       var node = $scope.opt.listsVal[ref];
@@ -577,7 +586,7 @@ function rptServers($scope,$routeParams,crud,fetch){
    defaultScope.details.name={"delta":"!@=!#","alpha":$routeParams.jesua};
 
    crud.get($scope,title,profile,defaultScope);
-   fetch.post(sessionStorage.SITE_SERVICE+',creo,invoice-example',{},function(server){
+   fetch.post(sessionStorage.SITE_SERVICE+',creo,invoice-example',{"uProfile":profile},function(server){
       if(typeof server.rows!=="undefined"){
          $scope.data = server.rows;
          //SETiSCROLL('#repTable');

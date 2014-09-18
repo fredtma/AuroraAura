@@ -4,7 +4,7 @@
          <ol class="breadcrumb">
             <li><a href="#genesis">Home</a></li>
             <li class="active">{{menu[0].text}}</li>
-            <li class="menu-icon"><a ng-if="licentia.Alpha||true" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Create Licentia']" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
          </ol>
       </header>
       <section id="mainContent" class='listContainer'>
@@ -33,8 +33,8 @@
             <li><a href="#genesis">Home</a></li>
             <li><a ng-href="{{menu[0].link}}">{{menu[0].text}}</a></li>
             <li class="active">{{menu[1].text}}</li>
-            <li class="menu-icon"><a ng-if="licentia.Alpha||true" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
-            <li class="menu-icon"><a ng-if="licentia.omegA||true"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Create Licentia']" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Delete Licentia']"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
          </ol>
       </header>
       <section id="mainContent" class="listContainer" style="overflow:auto;">
@@ -67,15 +67,15 @@
                         <label class="btn btn-info" ng-model="data.enable" style='width:50%' btn-radio="0">Disable</label>
                      </div>
                   </div>
-                  <div ng-if="data.jesua" id='srvModified'  ng-class="'input-group '">
+                  <div ng-if="data.jesua && licentia['Create Licentia']" id='srvModified'  ng-class="'input-group '">
                      <span class="input-group-addon glyphicon glyphicon-edit"></span>
                      <span class="input-group-addon form-label">New permission</span>
                      <div class="btn-group">
-                        <button type="button" class="btn btn-info" ng-repeat="row in opt.extra.create.enum"ng-click="addItem('permissions',row)"  ng-bind="row"></button>
+                        <button type="button" class="btn btn-info" ng-repeat="row in opt.extra.create.enum" ng-click="addItem('permissions',row)"  ng-bind="row"></button>
                      </div>
                   </div>
                </div>
-               <div class="col-lg-6">
+               <div class="col-lg-6" ng-if="licentia['Create Licentia']">
                   <h4>Current Permissions <small>List of permissions from the parent</small></h4>
                   <table class="table table-striped table-hover, table-bordered table-custom" ng-if="data.jesua">
                      <thead>
@@ -90,8 +90,8 @@
                            <td><input ng-change="chkChng(list)" ng-blur="savItem('permissions',list)" type="text" name="subDescription[]" ng-model="list.description" class="form-control" /></td>
                            <td>
                               <input type="hidden" name="isNew[]" ng-model="list.isNew" />
-                              <span ng-click="remItem($index,'permissions',{'jesua':list.jesua})" class="glyphicon glyphicon-remove danger" title="Remove this item"></span>
-                              <span ng-click="listItems('link_permissions_groups',{'jesua':list.jesua,'search':list.name})" class="glyphicon glyphicon-paperclip success link" title="Link group"></span>
+                              <span ng-if="licentia['Delete Licentia']" ng-click="remItem($index,'permissions',{'jesua':list.jesua})" class="glyphicon glyphicon-remove danger" title="Remove this item"></span>
+                              <span ng-if="licentia['Link Licentia to Groups']" ng-click="listItems('link_permissions_groups',{'jesua':list.jesua,'search':list.name})" class="glyphicon glyphicon-paperclip success link" title="Link group"></span>
                            </td>
                         </tr>
                      </tbody>
@@ -127,7 +127,7 @@
                   </table>
                </div>
             </div>
-            <div ng-if="licentia.deLta||true" id='srvModified'  class="input-group">
+            <div ng-if="verifySubmit()" id='srvModified'  class="input-group">
                <button  type="submit" form="srvForm"  ng-class="btnClass" name="submit" >{{btn}}</button>
             </div>
          </form>

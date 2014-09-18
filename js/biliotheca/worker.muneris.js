@@ -231,7 +231,7 @@ objSearch = function(obj,value){
 }
 //============================================================================//
 callIdb = function(data,self,defaultScope,SITE_SERVICE) {
-   var ver = data.DB_VERSION||null,x,l;
+   var ver = data.DB_VERSION||null,x,l,tbl=[];
    var iRequest=self.indexedDB.open("app_xpandit",parseInt(ver)),idb,option=data.option,upgrading=false;
 
    iRequest.onsuccess=function(e){self.postMessage("Worker iDB Ready");
@@ -241,13 +241,20 @@ callIdb = function(data,self,defaultScope,SITE_SERVICE) {
          for(var profile in defaultScope){
             var table = defaultScope[profile].mensa;
             if(table==='creo') continue;
-            aSync(SITE_SERVICE,{"militia":"imple","mensa":table},function(e){
-               if(typeof e.notitia==='undefined' || typeof e.notitia.rows==='undefined' || e.notitia.found===false){iyona.log("could not auto update iDB on upgrade",e,table);return false;}
-               iyona.log("RESOURCE::"+e.notitia.mensa,e);
-               l=e.notitia.rows.length;
-               for(x=0;x<l;x++){iWrite(e.notitia.mensa,e.notitia.rows[x],false);}
-            });
-      }}upgrading=false;
+            tbl.push(table);
+      }}
+      aSync(SITE_SERVICE,{"militia":"imple","mensa":tbl,"licentia":"Creo Ratio"},function(e){
+         if(e && typeof e.notitia==='undefined'){iyona.log("could not auto update iDB on upgrade",e);return false;}
+
+         var whole = e.notitia,key,single;
+         for(key in whole){
+            single = whole[key];
+            if(single.found===false) continue;
+            l=single.rows.length;iyona.log("Mensa 4 "+key,single);
+            for(x=0;x<l;x++){iWrite(key,single.rows[x],false);}
+         }
+      });
+      upgrading=false;
    }
    iRequest.onerror=function(e){iyona.log("Database error code: "+e.target.error.message);}
 
@@ -290,7 +297,7 @@ callIdb = function(data,self,defaultScope,SITE_SERVICE) {
       }
    }
    this.iWrite=function(_store,_data,_update){var crud;
-      if(iRequest&&iRequest.readyState!="done"){iRequest.addEventListener("success",function(){iyona.log("Here it act"); iWrite(_store,_data,_update)},false); return false;}
+      if(iRequest&&iRequest.readyState!="done"){iRequest.addEventListener("success",function(){ iWrite(_store,_data,_update)},false); return false;}
       else if(iRequest) {idb=iRequest.result;}
       else {iyona.log("No iRequest");return false;}
       if(idb.objectStoreNames.contains(_store)!==true){iyona.log("No store iFound");return false;}

@@ -3,8 +3,7 @@
       <header class="menuHeader">
          <ol class="breadcrumb">
             <li><a href="#genesis">Home</a></li>
-            <li ng-repeat="m in menu" class="m.class" ><a href="{{m.link}}" ng-bind="m.text"></a></li>
-            <li class="menu-icon" ng-if="crud.alpha"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li ng-repeat="m in menu" class="m.class" ng-if="licentia[m.perm||m.text]" ><a href="{{m.link}}" ng-bind="m.text"></a></li>
          </ol>
       </header>
       <div class="headContainer adsl row">
@@ -78,79 +77,56 @@
       <section  class='listContainer adsl scrollerContainer'>
          <span id="messager" ng-class="'help-block '+{true:'text-danger',false:'text-info'}[err]" ng-show="msg">{{msg}}</span>
          <form id="srvForm" name="dataForm" ng-submit="submit(dataForm)">
-         <div id='client'  class="input-group"><span class="input-group-addon glyphicon glyphicon-user"></span><span class="input-group-addon form-label">Client</span><output class="form-control ">{{data.client.alpha}}</output></div>
-         <div id='account'  class="input-group"><span class="input-group-addon glyphicon glyphicon-envelope"></span><span class="input-group-addon form-label">Account</span><output class="form-control ">{{data.account.alpha}}</output></div>
-         <div id='savings' class="input-group"><span class="input-group-addon glyphicon glyphicon-calendar"></span><span class="input-group-addon form-label">Date</span><output class="form-control ">{{data.modified.alpha}}</output></div>
-         <div class="groupOfSimilar">
-            <div id='sent' class="input-group"><span class="input-group-addon glyphicon glyphicon-cloud-upload"></span><span class="input-group-addon form-label">Sent</span><output class="form-control ">{{data.sent.alpha}} </output><span class="input-group-addon addon">MB</span></div>
-            <div id='received' class="input-group"><span class="input-group-addon glyphicon glyphicon-cloud-download"></span><span class="input-group-addon form-label">Received</span><output class="form-control ">{{data.received.alpha}} </output><span class="input-group-addon addon">MB</span></div>
-            <div id='total' class="input-group"><span class="input-group-addon glyphicon glyphicon-cloud"></span><span class="input-group-addon form-label">Total</span><output class="form-control ">{{data.total.alpha}} </output><span class="input-group-addon addon">MB</span></div>
-            <div id='allowed' class="input-group"><span class="input-group-addon glyphicon glyphicon-hdd"></span><span class="input-group-addon form-label">Allowed</span><output class="form-control ">{{data.allowed}} </output><span class="input-group-addon addon">MB</span></div>
-         </div>
-         <div id='status' class="input-group"><span ng-class="'input-group-addon glyphicon '+{'safe':'success glyphicon-ok-sign','cautious':'info glyphicon-plus-sign','max':'warning glyphicon-minus-sign','danger':'warning glyphicon-minus-sign','critical':'danger glyphicon-remove-sign'}[data.status]"></span><span class="input-group-addon form-label">Status</span><output class="form-control ">{{data.status}}</output></div>
-         <h4>Packages <small>Displays the type of packages associated to the account</small></h4>
-         <div class="groupOfSimilar2">
-            <div id='init' class="input-group"><span class="input-group-addon glyphicon glyphicon-tag"></span><span class="input-group-addon form-label">Innitial Package</span><output class="form-control ">{{data.init.alpha}}</output></div>
-            <div id='init_cost' class="input-group"><span class="input-group-addon glyphicon glyphicon-euro"></span><span class="input-group-addon form-label">Initial Cost</span><output class="form-control ">{{data.init_cost.alpha}} </output><span class="input-group-addon addon">ZAR</span></div>
-         </div><div class="groupOfSimilar2">
-            <div id='current' class="input-group"><span class="input-group-addon glyphicon glyphicon-tag"></span><span class="input-group-addon form-label">Current Package</span><output class="form-control ">{{data.current.alpha}}</output></div>
-            <div id='current_cost' class="input-group"><span class="input-group-addon glyphicon glyphicon-euro"></span><span class="input-group-addon form-label">Current Cost</span><output class="form-control ">{{data.current_cost.alpha}} </output><span class="input-group-addon addon">ZAR</span></div>
-         </div><div class="groupOfSimilar2">
-            <div id='first' class="input-group"><span class="input-group-addon glyphicon glyphicon-tag"></span><span class="input-group-addon form-label">Original Package</span><output class="form-control ">{{data.first.alpha}}</output></div>
-            <div id='first_cost' class="input-group"><span class="input-group-addon glyphicon glyphicon-euro"></span><span class="input-group-addon form-label">Original Cost</span><output class="form-control ">{{data.first_cost.alpha}} </output><span class="input-group-addon addon">ZAR</span></div>
-         </div><div class="groupOfSimilar2">
-            <div id='top' class="input-group"><span class="input-group-addon glyphicon glyphicon-tag"></span><span class="input-group-addon form-label">Max Package</span><output class="form-control ">{{data.top.alpha}}</output></div>
-            <div id='top_cost' class="input-group"><span class="input-group-addon glyphicon glyphicon-euro"></span><span class="input-group-addon form-label">Max Cost</span><output class="form-control ">{{data.top_cost.alpha}} </output><span class="input-group-addon addon">ZAR</span></div>
-         </div><div class="groupOfSimilar2">
-            <div id='next' class="input-group"><span class="input-group-addon glyphicon glyphicon-tag"></span><span class="input-group-addon form-label">Next Package</span><output class="form-control ">{{data.next}}</output></div>
-            <div id='next_cost' class="input-group"><span class="input-group-addon glyphicon glyphicon-euro"></span><span class="input-group-addon form-label">Next Cost</span><output class="form-control ">{{data.next_cost}} </output><span class="input-group-addon addon">ZAR</span></div>
-         </div>
-         <h4>Summary <small>calculate gain/lost based upon current package and original package</small></h4>
-         <div id='savings' class="input-group"><span class="input-group-addon glyphicon glyphicon-euro"></span><span class="input-group-addon form-label">Savings</span><output class="form-control ">{{data.savings.alpha}} </output><span class="input-group-addon addon">ZAR</span></div>
-         <div id='different' ng-if="data.different.alpha"  class="input-group danger"><span class="input-group-addon glyphicon glyphicon-edit danger"></span><span class="input-group-addon form-label danger">On Update</span><output class="form-control danger">Account will be updated to {{data.init.alpha}} next month </output></div>
-         <hr/>
-         <div id='package' class="input-group">
-            <span class="input-group-addon glyphicon glyphicon-euro"></span>
-            <span class="input-group-addon form-label">Change account</span>
-            <select class='form-control adsl_select' ng-model="data.choice" ng-options="option as option.description for option in opt.customVal.package.rows">
-               <option value=""> --- Select Package to change to --- </option>
-            </select>
-         </div>
-         <div ng-if="opt.foreignVal" ng-repeat="(key,links) in opt.foreignVal" >
-            <h4 class="refSection">{{opt.foreignConf[key].title}}</h4>
-            <div id='srvModified' class="input-group btn-group" data-toggle="buttons" ng-init="col1=opt.foreignConf[key].col1;col2=opt.foreignConf[key].col2;parent=data[opt.foreignConf[key].parent].alpha;type=opt.foreignConf[key].type;">
-               <span class="input-group-addon glyphicon glyphicon-book"></span>
-               <button ng-if="type=='radio'" ng-repeat="(k,link) in links.rows" type="button" class="btn btn-primary" ng-model="link[col1]"  btn-radio="'{{parent}}'" ng-click="DBenum(links,parent,col1,k,'radio');">{{link[col2]}}</button>
-               <button ng-if="type=='checkbox'" ng-repeat="(k,link) in links.rows" type="button" class="btn btn-primary" ng-model="link[col1]" btn-checkbox btn-checkbox-false="null" btn-checkbox-true="'{{parent}}'" >{{link[col2]}}</button>
+            <div id='client'  class="input-group"><span class="input-group-addon glyphicon glyphicon-user"></span><span class="input-group-addon form-label">Client</span><output class="form-control ">{{data.client.alpha}}</output></div>
+            <div id='account'  class="input-group"><span class="input-group-addon glyphicon glyphicon-envelope"></span><span class="input-group-addon form-label">Account</span><output class="form-control ">{{data.account.alpha}}</output></div>
+            <div id='savings' class="input-group"><span class="input-group-addon glyphicon glyphicon-calendar"></span><span class="input-group-addon form-label">Date</span><output class="form-control ">{{data.modified.alpha}}</output></div>
+            <div class="groupOfSimilar">
+               <div id='sent' class="input-group"><span class="input-group-addon glyphicon glyphicon-cloud-upload"></span><span class="input-group-addon form-label">Sent</span><output class="form-control ">{{data.sent.alpha}} </output><span class="input-group-addon addon">MB</span></div>
+               <div id='received' class="input-group"><span class="input-group-addon glyphicon glyphicon-cloud-download"></span><span class="input-group-addon form-label">Received</span><output class="form-control ">{{data.received.alpha}} </output><span class="input-group-addon addon">MB</span></div>
+               <div id='total' class="input-group"><span class="input-group-addon glyphicon glyphicon-cloud"></span><span class="input-group-addon form-label">Total</span><output class="form-control ">{{data.total.alpha}} </output><span class="input-group-addon addon">MB</span></div>
+               <div id='allowed' class="input-group"><span class="input-group-addon glyphicon glyphicon-hdd"></span><span class="input-group-addon form-label">Allowed</span><output class="form-control ">{{data.allowed}} </output><span class="input-group-addon addon">MB</span></div>
             </div>
-         </div>
-         <div ng-if="licentia.deLta" id='srvModified'  class="input-group">
-            <button type="submit"  ng-class="btnClass" name="submit" >{{btn}}</button>
-         </div>
+            <div id='status' class="input-group"><span ng-class="'input-group-addon glyphicon '+{'safe':'success glyphicon-ok-sign','cautious':'info glyphicon-plus-sign','max':'warning glyphicon-minus-sign','danger':'warning glyphicon-minus-sign','critical':'danger glyphicon-remove-sign'}[data.status]"></span><span class="input-group-addon form-label">Status</span><output class="form-control ">{{data.status}}</output></div>
+            <h4>Packages <small>Displays the type of packages associated to the account</small></h4>
+            <div class="groupOfSimilar2">
+               <div id='init' class="input-group"><span class="input-group-addon glyphicon glyphicon-tag"></span><span class="input-group-addon form-label">Innitial Package</span><output class="form-control ">{{data.init.alpha}}</output></div>
+               <div id='init_cost' class="input-group"><span class="input-group-addon glyphicon glyphicon-euro"></span><span class="input-group-addon form-label">Initial Cost</span><output class="form-control ">{{data.init_cost.alpha}} </output><span class="input-group-addon addon">ZAR</span></div>
+            </div><div class="groupOfSimilar2">
+               <div id='current' class="input-group"><span class="input-group-addon glyphicon glyphicon-tag"></span><span class="input-group-addon form-label">Current Package</span><output class="form-control ">{{data.current.alpha}}</output></div>
+               <div id='current_cost' class="input-group"><span class="input-group-addon glyphicon glyphicon-euro"></span><span class="input-group-addon form-label">Current Cost</span><output class="form-control ">{{data.current_cost.alpha}} </output><span class="input-group-addon addon">ZAR</span></div>
+            </div><div class="groupOfSimilar2">
+               <div id='first' class="input-group"><span class="input-group-addon glyphicon glyphicon-tag"></span><span class="input-group-addon form-label">Original Package</span><output class="form-control ">{{data.first.alpha}}</output></div>
+               <div id='first_cost' class="input-group"><span class="input-group-addon glyphicon glyphicon-euro"></span><span class="input-group-addon form-label">Original Cost</span><output class="form-control ">{{data.first_cost.alpha}} </output><span class="input-group-addon addon">ZAR</span></div>
+            </div><div class="groupOfSimilar2">
+               <div id='top' class="input-group"><span class="input-group-addon glyphicon glyphicon-tag"></span><span class="input-group-addon form-label">Max Package</span><output class="form-control ">{{data.top.alpha}}</output></div>
+               <div id='top_cost' class="input-group"><span class="input-group-addon glyphicon glyphicon-euro"></span><span class="input-group-addon form-label">Max Cost</span><output class="form-control ">{{data.top_cost.alpha}} </output><span class="input-group-addon addon">ZAR</span></div>
+            </div><div class="groupOfSimilar2">
+               <div id='next' class="input-group"><span class="input-group-addon glyphicon glyphicon-tag"></span><span class="input-group-addon form-label">Next Package</span><output class="form-control ">{{data.next}}</output></div>
+               <div id='next_cost' class="input-group"><span class="input-group-addon glyphicon glyphicon-euro"></span><span class="input-group-addon form-label">Next Cost</span><output class="form-control ">{{data.next_cost}} </output><span class="input-group-addon addon">ZAR</span></div>
+            </div>
+            <h4>Summary <small>calculate gain/lost based upon current package and original package</small></h4>
+            <div id='savings' class="input-group"><span class="input-group-addon glyphicon glyphicon-euro"></span><span class="input-group-addon form-label">Savings</span><output class="form-control ">{{data.savings.alpha}} </output><span class="input-group-addon addon">ZAR</span></div>
+            <div id='different' ng-if="data.different.alpha"  class="input-group danger"><span class="input-group-addon glyphicon glyphicon-edit danger"></span><span class="input-group-addon form-label danger">On Update</span><output class="form-control danger">Account will be updated to {{data.init.alpha}} next month </output></div>
+            <hr/>
+            <div id='package' class="input-group">
+               <span class="input-group-addon glyphicon glyphicon-euro"></span>
+               <span class="input-group-addon form-label">Change account</span>
+               <select class='form-control adsl_select' ng-model="data.choice" ng-options="option as option.description for option in opt.customVal.package.rows">
+                  <option value=""> --- Select Package to change to --- </option>
+               </select>
+            </div>
+            <div ng-if="opt.foreignVal" ng-repeat="(key,links) in opt.foreignVal" >
+               <h4 class="refSection">{{opt.foreignConf[key].title}}</h4>
+               <div id='srvModified' class="input-group btn-group" data-toggle="buttons" ng-init="col1=opt.foreignConf[key].col1;col2=opt.foreignConf[key].col2;parent=data[opt.foreignConf[key].parent].alpha;type=opt.foreignConf[key].type;">
+                  <span class="input-group-addon glyphicon glyphicon-book"></span>
+                  <button ng-if="type=='radio'" ng-repeat="(k,link) in links.rows" type="button" class="btn btn-primary" ng-model="link[col1]"  btn-radio="'{{parent}}'" ng-click="DBenum(links,parent,col1,k,'radio');">{{link[col2]}}</button>
+                  <button ng-if="type=='checkbox'" ng-repeat="(k,link) in links.rows" type="button" class="btn btn-primary" ng-model="link[col1]" btn-checkbox btn-checkbox-false="null" btn-checkbox-true="'{{parent}}'" >{{link[col2]}}</button>
+               </div>
+            </div>
+            <div ng-if="verifySubmit()" id='srvModified'  class="input-group">
+               <button type="submit"  ng-class="btnClass" name="submit" >{{btn}}</button>
+            </div>
          </form>
-         <div ng-repeat="(ref,lists) in opt.listsConf" class="table-responsive panel panel-primary">
-            <div class="panel-heading"><h3 class="panel-title">{{lists.title}}. <small class="white" ng-show="!opt.listsVal">Click on the add(+) icon to add new items</small> </h3></div>
-            <div class="panel-body">
-               <table class="table table-hover table-condensed table-dynamic">
-                  <thead>
-                     <tr>
-                        <th>#</th><th>Name</th><th>Description</th><th><span ng-click="addItem(ref)" class="glyphicon glyphicon-plus info" title="Add a new item"></span></th>
-                     </tr>
-                  </thead>
-                  <tbody>
-                     <tr ng-repeat="(key,list) in opt.listsVal[ref]">
-                        <td>{{key+1}}</td><td><input type="text" placeholder="Add a name here" name="listName[]" ng-model="list.lists_name" /></td>
-                        <td><input ng-blur="savItem(ref,list)" type="text" placeholder="Add a description here" name="listDesc[]" ng-model="list.description" /></td>
-                        <td><span ng-click="remItem(key,ref,list)" class="glyphicon glyphicon-remove danger" title="Remove this item"></span><input type="hidden" name="isNew[]" ng-model="list.isNew" /></td>
-                     </tr>
-                  </tbody>
-                  <tfoot ng-if="opt.listsVal">
-                  <td colspan="3">&nbsp;</td>
-                  <td><span ng-click="submit(dataForm)" class="glyphicon glyphicon-ok success" title="Save all items"></span></td>
-                  </tfoot>
-               </table>
-            </div>
-         </div>
       </section>
    </section>
 

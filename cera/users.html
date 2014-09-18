@@ -4,7 +4,7 @@
          <ol class="breadcrumb">
             <li><a href="#genesis">Home</a></li>
             <li class="active">{{menu[0].text}}</li>
-            <li class="menu-icon"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Create Admin']" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
          </ol>
       </header>
       <section id="mainContent" class='listContainer'>
@@ -29,8 +29,8 @@
             <li><a href="#genesis">Home</a></li>
             <li><a ng-href="{{menu[0].link}}">{{menu[0].text}}</a></li>
             <li class="active">{{jesua|ucfirst}} {{menu[1].text}}</li>
-            <li class="menu-icon"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
-            <li class="menu-icon"><a ng-if="licentia.omegA"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Create Admin']" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Delete Admin']" ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
          </ol>
       </header>
       <section  class='listContainer'><span id="messager" ng-class="'help-block '+{true:'text-danger',false:'text-info'}[err]" ng-show="msg">{{msg}}</span>
@@ -80,37 +80,51 @@
                <button ng-if="type=='checkbox'" ng-repeat="(k,link) in links.rows" name="clients" type="button" class="btn btn-primary" ng-model="link[col1]" btn-checkbox btn-checkbox-false="null" btn-checkbox-true="'{{parent}}'" >{{link[col2]}}</button>
             </div>
          </div>
-            <hr/>
-         <div ng-if="opt.listsVal[ref]" class="table-responsive panel panel-primary">
-            <div class="panel-heading">
+         <hr/>
+         <div ng-if="verifySubmit()||data.jesua==prima" class="input-group">
+            <button  type="submit" ng-class="btnClass" name="submit" >{{btn}}</button>
+         </div>
+         <hr/>
+
+         <div ng-if="opt.listsVal[ref] && licentia['Link Admin to Groups']" class="table-responsive panel panel-primary">
+            <div class="panel-heading" style="position:relative">
                <h4 class="panel-title"><span  ng-bind="lists.title+' to '+selected"></span> <small>Select the group that will be associated with {{selected}}</small></h4>
+               <div class="btn-group pull-right" style="position: absolute;top: 0px;right: 5px;">
+                  <button type="button" class="btn btn-info" ng-click="viewLink('link_users_groups')" ><span class="glyphicon glyphicon-user"></span> Link Groups</button>
+                  <button type="button" class="btn btn-info" ng-click="viewLink('link_permissions_users')" ><span class="glyphicon glyphicon-lock"></span> Link Permissions</button>
+               </div>
             </div>
             <div class="panel-body">
-               <table class="table table-hover table-condensed table-dynamic">
-                  <thead>
-                     <tr>
-                        <th>#</th><th style="width:14%">Group name</th><th>Description</th><th class="funcSmall">Functions</th>
-                     </tr>
-                  </thead>
-                  <tbody>
-                     <tr ng-repeat="(key,list) in opt.listsVal[ref]| filter:inputSearch">
-                        <td>{{key+1}}</td>
-                        <td ng-bind="list.name"></td>
-                        <td ng-bind="list.description"></td>
-                        <td>
-                           <span  ng-click="linkItem(ref,[selected,list.name,list.group],key)" class="glyphicon funcSmall link" ng-class="{true:'glyphicon-ok-circle success',false:'glyphicon-remove-circle danger'}[list.group==list.name]" title="Link/Unlink item to group"></span>
-                           <input type="hidden" name="isNew[]" ng-model="list.isNew" />
-                        </td>
-                     </tr>
-                  </tbody>
-                  <tfoot ng-if="opt.listsVal">
-                     <td colspan="4">&nbsp;</td>
-                  </tfoot>
-               </table>
+               <div id="referencesLink" style="overflow: hidden;position: absolute;width: 100%;height: 350px;">
+                  <div  id="scroller">
+                     <table class="table table-hover table-condensed table-dynamic">
+                        <thead>
+                           <tr>
+                              <th>#</th><th style="width:14%">Group name</th><th>Description</th><th class="funcSmall">Functions</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           <tr ng-repeat="(key,list) in opt.listsVal[ref]| filter:inputSearch">
+                              <td>{{key+1}}</td>
+                              <td ng-bind="list.name"></td>
+                              <td ng-bind="list.description"></td>
+                              <td ng-if="ref==='link_users_groups'">
+                                 <span ng-if="licentia['Link Admin to Groups']" ng-click="linkItem(ref,[selected,list.name,list.group],key)" class="glyphicon funcSmall link" ng-class="{true:'glyphicon-ok-circle success',false:'glyphicon-remove-circle danger'}[list.group==list.name]" title="Link/Unlink item to group"></span>
+                                 <input type="hidden" name="isNew[]" ng-model="list.isNew" />
+                              </td>
+                              <td ng-if="ref==='link_permissions_users'">
+                                 <span ng-if="licentia['Link Admin to Permissions']"  ng-click="linkItem(ref,[selected,list.name,list.permission],list.name)" class="glyphicon funcSmall link" ng-class="{true:'glyphicon-ok-circle success',false:'glyphicon-remove-circle danger'}[list.permission==list.name]" title="Link/Unlink item to group"></span>
+                                 <input type="hidden" name="isNew[]" ng-model="list.isNew" />
+                              </td>
+                           </tr>
+                        </tbody>
+                        <tfoot ng-if="opt.listsVal">
+                           <td colspan="4">&nbsp;</td>
+                        </tfoot>
+                     </table>
+                  </div>
+               </div>
             </div>
-         </div>
-         <div ng-if="licentia.deLta||data.jesua==prima" class="input-group">
-            <button ng-if="licentia.deLta" type="submit" ng-class="btnClass" name="submit" >{{btn}}</button>
          </div>
          </form>
       </section>

@@ -4,8 +4,8 @@
          <ol class="breadcrumb">
             <li><a href="#genesis">Home</a></li>
             <li class="active">{{menu[0].text}}</li>
-            <li class="menu-icon"><a ng-if="licentia.Alpha||true" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
-            <li class="menu-icon"><a ng-if="licentia.Alpha||true" ng-click="downloadCSV('pastelExport','pastelExport.csv')" class="glyphicon glyphicon-download-alt primary link"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Create Sales']" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success" title='Add a new sale'></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Close all Sales']" ng-click="downloadCSV('pastelExport','pastelExport.csv',null,'Close all Sales')" class="glyphicon glyphicon-download-alt primary link" tittle='Close all open sales'></a></li>
             <li class="menu-icon">
                <div class="dropdown">
                  <a class="dropdown-toggle glyphicon glyphicon-sort-by-attributes link"> Sort</a>
@@ -44,8 +44,8 @@
             <li><a href="#genesis">Home</a></li>
             <li><a ng-href="{{menu[0].link}}">{{menu[0].text}}</a></li>
             <li class="active">{{menu[1].text}}</li>
-            <li class="menu-icon"><a ng-if="licentia.Alpha||true" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
-            <li class="menu-icon"><a ng-if="licentia.omegA||true"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Create Sales']" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Delete Sales']"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
          </ol>
       </header>
       <section id="mainContent" class="listContainer" style="overflow:auto;">
@@ -138,7 +138,7 @@
                         </ul>
                      </span>-->
                      <!--<output class="form-control" readonly placeholder="Status" name="status" ng-bind="data.status" title="Status" ></output>-->
-                     <div class="btn-group" data-toggle="buttons" style="width:100%;">
+                     <div class="btn-group" data-toggle="buttons" style="width:100%;" ng-if="licentia['Close Current Sales']">
                         <label style="width:50%;" class="btn btn-info" ng-model="data.status" btn-radio="'Open'"  disabled="{{closed}}">Open</label>
                         <label style="width:50%;" class="btn btn-info" ng-model="data.status" btn-radio="'Closed'" disabled="{{closed}}" ng-click="finalize($event)">Closed</label>
                      </div>
@@ -184,7 +184,7 @@
                   </table>
                </div>
             </div>
-            <div ng-if="licentia.deLta||true" id='srvModified'  class="input-group">
+            <div ng-if="verifySubmit()" id='srvModified'  class="input-group">
                <button ng-if="!closed" type="submit" form="srvForm"  ng-class="btnClass" name="submit" >{{btn}}</button>
             </div>
          </form>

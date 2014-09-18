@@ -42,6 +42,7 @@ iyona={
 
       xhr.open(settings.method,settings.url,true);
       xhr.responseType=settings.format;
+      xhr.withCredentials=true;
       xhr.onreadystatechange=function(e){
          if(this.readyState==4 && this.status==200){
             var response=this.response||"{}";//@fix:empty object so as to not cause an error
@@ -76,8 +77,8 @@ dynamis={
       var value,isChrome=(typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined");
       if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local===true){chrome.storage.local.get(_key,function(obj){return obj[_key];});value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!==-1)?JSON.parse(value):value;}
       else if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&!_local){chrome.storage.sync.get(_key,function(obj){return obj[_key];});value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!==-1)?JSON.parse(value):value;}
-      else if(_local===true&&!isChrome){value=localStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}
-      else{value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1)?JSON.parse(value):value;}//endif
+      else if(_local===true&&!isChrome){value=localStorage.getItem(_key);return (value&&value.indexOf("{")!=-1 || value&&value.indexOf("[")!=-1)?JSON.parse(value):value;}
+      else{value=sessionStorage.getItem(_key);return (value&&value.indexOf("{")!=-1 || value&&value.indexOf("[")!=-1)?JSON.parse(value):value;}//endif
    },
    del:function(_key,_local){var isChrome=(typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined");
       if(typeof chrome!=="undefined"&&chrome.hasOwnProperty("storage")&&_local==true){chrome.storage.local.remove(_key);sessionStorage.removeItem(_key);}
@@ -115,7 +116,7 @@ configuration.prototype.config=function(){
    sessionStorage.SITE_UPLOADS=sessionStorage.SITE_URL+'uploads/';
    sessionStorage.MAIL_SUPPORT='support@xpandit.co.za';
    sessionStorage.DB_NAME='app_xpandit';
-   sessionStorage.DB_VERSION=57;//always integer 4 iDB
+   sessionStorage.DB_VERSION=85;//always integer 4 iDB
    sessionStorage.DB_DESC='The local application Database';
    sessionStorage.DB_SIZE=15;
    sessionStorage.DB_LIMIT=20;
@@ -310,8 +311,8 @@ function hasValue(val){
 //check element structure to find value in current form and alpha form
 function pray(obj){
    if(hasValue(obj)) return obj;
-   else if(hasValue(obj.alpha)) return obj.alpha;
-   return 0;
+   else if(isset(obj)&&hasValue(obj.alpha)) return obj.alpha;
+   return false;
 }
 function modalist(ele){
    ele = ele || 'dialog';
@@ -635,8 +636,8 @@ function callWorker(option,callback){
          "defaultScope":dynamis.get("defaultScope",true),
          "SITE_SERVICE":sessionStorage.SITE_SERVICE,
          "SITE_MILITIA":sessionStorage.SITE_MILITIA
-      },option);
-   if(window.Worker&&impetroUser()){
+      },option);//ce si vas limiter l'access a ceux qui sont enregistrer seulment.
+   if(window.Worker&&impetroUser()||false){
       var notitiaWorker=new Worker("js/biliotheca/worker.notitia.js");
       notitiaWorker.postMessage(opt);
       readWorker(notitiaWorker,callback);
@@ -784,7 +785,7 @@ function timeDifference(t) {
  * @version 0.5
  * @category asthetic
  */
-function SETiSCROLL (id) {id=id||"#mainContent";
+function SETiSCROLL (id) {id=id||"#mainContent";iyona.deb("RUNNING iSCROLL ON ID",id);
 	return new IScroll(id, {scrollbars: true,mouseWheel: true,interactiveScrollbars: true,shrinkScrollbars: 'scale',fadeScrollbars: true, tab:true, click:true});
 }
 //============================================================================//

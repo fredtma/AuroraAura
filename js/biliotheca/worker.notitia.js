@@ -47,10 +47,10 @@ self.addEventListener('message',function(e){
       var iDB = callIdb(data,self,defaultScope,SITE_SERVICE),l,x;
       iyona.log("WORKING ENKELE", typeof data.militia);
       if(data.militia==="imple"){
-         aSync(SITE_SERVICE,{"militia":"imple","mensa":data.mensa},function(e){
-            if("notitia" in e===false){iyona.log("could not auto update iDB");return false;}
-            l=e.notitia.rows.length;
-            for(x=0;x<l;x++){iDB.iWrite(data.mensa,e.notitia.rows[x],true);}
+         aSync(SITE_SERVICE,{"militia":"imple","mensa":data.mensa,"uProfile":data.uProfile},function(e){
+            if(typeof e.notitia==="undefined" || typeof e.notitia[data.mensa].rows==="undefined"){iyona.log("could not auto update iDB",e);WORK.postMessage("could not auto update iDB on "+data.mensa);return false;}
+            l=e.notitia[data.mensa].rows.length;iyona.log("DATA added",data.mensa,e);
+            for(x=0;x<l;x++){iDB.iWrite(data.mensa,e.notitia[data.mensa].rows[x],true);}
             WORK.postMessage("Worker Typeahead addition for "+data.mensa);
          });
       }

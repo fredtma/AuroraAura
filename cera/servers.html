@@ -4,7 +4,7 @@
          <ol class="breadcrumb">
             <li><a href="#genesis">Home</a></li>
             <li class="active">{{menu[0].text}}</li>
-            <li class="menu-icon"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Create Server']" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
             <li class="menu-icon">
                <div class="dropdown">
                  <a class="dropdown-toggle glyphicon glyphicon-sort-by-attributes success link"> Sort</a>
@@ -41,8 +41,8 @@
             <li><a href="#genesis">Home</a></li>
             <li><a ng-href="{{menu[0].link}}">{{menu[0].text}}</a></li>
             <li class="active">{{jesua|ucfirst}} {{menu[1].text}}</li>
-            <li class="menu-icon"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
-            <li class="menu-icon"><a ng-if="licentia.omegA"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Create Server']" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Delete Server']"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
          </ol>
       </header>
       <section  class='listContainer'>
@@ -82,11 +82,11 @@
             <span class="input-group-addon glyphicon glyphicon-link"></span>
             <a ng-href="{{'#deuteronomy/log-servers/'+data.name+'/'+data.address}}">Click here to view server's log. <small>(This will take you to a different page)</small></a>
          </div>
-         <div ng-if="licentia.deLta" id='srvModified'  class="input-group">
+         <div ng-if="verifySubmit()" id='srvModified'  class="input-group">
             <button type="submit"  ng-class="btnClass" name="submit" >{{btn}}</button>
          </div>
-         </form><hr/>{{ {selected_server:selected} }}
-         <input type="text" ng-model="selected" typeahead="server as server.display for server in typeahead.mailbox | filter:{display:$viewValue} | limitTo:5" class="form-control" typeahead-min-length="1" />
+         </form><hr/>
+
          <div ng-repeat="(ref,lists) in opt.listsConf" class="table-responsive panel panel-primary">
             <div class="panel-heading"><h3 class="panel-title">{{lists.title}}. <small class="white" ng-show="!opt.listsVal">Click on the add(+) icon to add new items</small> </h3></div>
             <div class="panel-body">
@@ -109,7 +109,7 @@
                   </tfoot>
                </table>
             </div>
-         </div><small ng-if="debug">{{licentia|json}}<hr/>{{data|json}}<br/>{{opt.reference|json}}</small>
+         </div>
       </section>
    </section>
 </article>
