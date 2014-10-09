@@ -14,6 +14,7 @@ angular.module('KingsControllers',[])
    .controller('tmplClient',['$scope','crud','$routeParams',tmplClient])
    .controller('psalm',['$scope','crud','$routeParams','fetch',psalm])
    .controller('deuteronomy',['$scope','crud','$routeParams','fetch',deuteronomy])
+   .controller('kingsI',['$scope','crud','$routeParams','fetch',kingsI])
    .controller('proverbs',['$scope','crud',proverbs])
    .controller('rptServers',['$scope','$routeParams','crud','fetch',rptServers]);
 //============================================================================//
@@ -321,7 +322,7 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
    defaultScope.list.period={"delta":"!@=!#","alpha":month};
    defaultScope.messenger = {"period":month,"run_consue":"cost summary"};
    $scope.sortable=null;$scope.reverse=false;
-   $scope.months = [{"name":"May","id":"5"},{"name":"June","id":"6"},{"name":"July","id":"7"},{"name":"August","id":"8"},{"name":"September","id":"9"},{"name":"Email Report","id":0}];$scope.month=objSearch($scope.months,month)[0][0];
+   $scope.months = [{"name":"May","id":"5"},{"name":"June","id":"6"},{"name":"July","id":"7"},{"name":"August","id":"8"},{"name":"September","id":"9"},{"name":"October","id":"10"},{"name":"Email Report","id":0}];$scope.month=objSearch($scope.months,month)[0][0];
 
    if(view=='reports'){
       if(!jesua){$routeParams.jesua='data'; jesua='data';}
@@ -531,7 +532,7 @@ function deuteronomy($scope,crud,$routeParams,fetch){
    defaultScope.details.name={"delta":"!@=!#","alpha":$routeParams.jesua||null};
 
    crud.get($scope,title,profile,defaultScope);
-iyona.deb("SCOPE",$scope);
+
    $scope.alert01=function(){$scope.msg="";};
    $scope.chkChng=function(list){list.changed=true;}
    $scope.addItem=function(ref,node){
@@ -555,6 +556,42 @@ iyona.deb("SCOPE",$scope);
 
    $scope.submit=function(dataForm){$scope.dataForm=dataForm;crud.submit($scope,profile);};
    $scope.delete=function(){crud.delete($scope,profile);};
+   $scope.$on("readyForm",function(e,s){iyona.deb("readyForm",s); });
+   $scope.$on("readySubmit",function(e,s){iyona.deb("readySumit");});
+   $scope.$on("readyList",function(e,s){iyona.deb("readyList");});
+   $scope.$on("readyListItem",function(e,s){iyona.deb("readyListItem",$scope);$scope.ref="link_permissions_groups";$scope.lists=$scope.opt.listsConf.link_permissions_groups;});
+
+}
+//============================================================================//
+function kingsI($scope,crud,$routeParams,fetch){
+   var title="Main Servers",profile='machine',defaultScope=dynamis.get("defaultScope",true)[profile];
+   defaultScope.details.name={"delta":"!@=!#","alpha":$routeParams.jesua||null};
+   $scope.sorts=[{"name":"By Name","key":"name"},{"name":"By Date","key":"modified"},{"name":"By Profile","key":"profile"}];$scope.sortable=null;$scope.reverse=false;
+
+   crud.get($scope,title,profile,defaultScope);
+
+   $scope.addItem=function(ref,node){
+      var name=$scope.data.name.alpha,custValue={"name":node+" "+name,"description":"This permission will allow users to "+node+" "+name,"created":new Date().format("isoDate") };
+      var node = $scope.opt.listsVal[ref];
+      crud.addItem(ref,custValue);
+      var l=node.length,list=node[l-1];
+      list.changed=true;
+      $scope.savItem(ref,list);
+      iyona.deb("Adding",list,l,node);
+   };
+   $scope.remItem=function(no,ref,list){
+      crud.remItem(no,ref,list);
+      $scope.$on("remItem",function(e,s){iyona.deb("removing",s);});
+   };
+   $scope.listItems=function(mensa2,list){$scope.selected=list.search; crud.listItem(mensa2,list); iyona.deb("THE SCOPE",$scope);}
+   $scope.linkItem=function(mensa2,list,key){crud.linkItem(mensa2,list,key); }
+   $scope.savItem=function(ref,list){
+      if(list.changed &&list.name &&list.description){crud.savItem(ref,list); list.changed=false;}
+   };
+
+   $scope.submit=function(dataForm){$scope.dataForm=dataForm;crud.submit($scope,profile);};
+   $scope.delete=function(){crud.delete($scope,profile);};
+   $scope.arrange=function(sort){$scope.sortable=sort;$scope.reverse=!$scope.reverse;}
    $scope.$on("readyForm",function(e,s){iyona.deb("readyForm",s); });
    $scope.$on("readySubmit",function(e,s){iyona.deb("readySumit");});
    $scope.$on("readyList",function(e,s){iyona.deb("readyList");});

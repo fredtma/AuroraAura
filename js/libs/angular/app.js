@@ -17,6 +17,7 @@ angular.module('KingOFkings',['ngRoute','angular-gestures','ngSanitize','ngAnima
       .when('/isaiah/:page/:view?/:jesua?',{templateUrl:'cera/adsl.html'})
       .when('/psalm/:page/:view?/:jesua?',{templateUrl:'cera/sales.html'})
       .when('/deuteronomy/:page/:view?/:jesua?',{templateUrl:'cera/permissions.html'})
+      .when('/kingsI/:page/:view?/:jesua?',{templateUrl:'cera/servers_main.html'})
       .when('/report/:report?',{templateUrl:'cera/reports/servers-rpt.html'})
       .when('/reportAll/:report?',{templateUrl:'cera/reports/reports.html'})
       .otherwise({redirectTo:'/genesis'});

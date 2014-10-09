@@ -660,7 +660,7 @@ function crud($rootScope,notitia,$routeParams,$modal,$log,fetch,$timeout){
       else dynamis.del("typeAheadArr");
 
       that.scope.verifySubmit = function(){
-         var call = defaultScope.licentia;//iyona.log("Grace",call);
+         var call = defaultScope.licentia;iyona.log("Grace",call,that.scope.licentia,pray(that.scope.data.jesua),that.scope.data.jesua,that.scope.licentia['Create '+call],'Create '+call);
          if(!isset(that.scope.licentia)) {iyona.log("Grace licentia");return false;}
          return ( (pray(that.scope.data.jesua)===false &&that.scope.licentia['Create '+call]) || (pray(that.scope.data.jesua)&&that.scope.licentia['Edit '+call]) );
       };
