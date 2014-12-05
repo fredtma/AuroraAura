@@ -113,17 +113,17 @@ function notitia($resource,$rootScope,$location){iyona.log("BEGIN NOTITIA...");
       if(!_val&&_properties.field.required=="new"&&_actum==2){}//seulment avec une nouvelle donner
       else if(!_val&&"required" in _properties.field) {msg='Missing `'+_field+'`';omega=false;}
       else if (!sessionStorage.formValidation){
-         if(_properties.pattern&&_val.search(this.patterns[_properties.pattern][0])==-1){msg=title+', '+this.patterns[_properties.pattern][1];omega=false;}
-         else if(_properties.field.pattern&&_val.search(_properties.field.pattern)==-1){msg=title+', missing a requirment';omega=false;}
-         else if(type=="email"&&_val.search(this.patterns["email"][0])==-1){msg=title+', '+this.patterns["email"][1];omega=false;}
-         else if(type=="number"&&_val.search(this.patterns["number"][0])==-1){msg=title+', '+this.patterns["number"][1];omega=false;}
-         else if(type=="color"&&_val.search(this.patterns["color"][0])==-1){msg=title+', '+this.patterns["color"][1];omega=false;}
-         else if(type=="url"&&_val.search(this.patterns["url"][0])==-1){msg=title+', '+this.patterns["url"][1];omega=false;}
-         else if(type=="date"&&_val.search(this.patterns["fullDate"][0])==-1){msg=title+', '+this.patterns["fullDate"][1];omega=false;}
+         if(_properties.pattern&&_val.search(this.patterns[_properties.pattern][0])===-1){msg=title+', '+this.patterns[_properties.pattern][1];omega=false;}
+         else if(_properties.field.pattern&&_val.search(_properties.field.pattern)===-1){msg=title+', missing a requirment';omega=false;}
+         else if(type=="email"&&_val.search(this.patterns["email"][0])===-1){msg=title+', '+this.patterns["email"][1];omega=false;}
+         else if(type=="number"&&_val.search(this.patterns["number"][0])===-1){msg=title+', '+this.patterns["number"][1];omega=false;}
+         else if(type=="color"&&_val.search(this.patterns["color"][0])===-1){msg=title+', '+this.patterns["color"][1];omega=false;}
+         else if(type=="url"&&_val.search(this.patterns["url"][0])===-1){msg=title+', '+this.patterns["url"][1];omega=false;}
+         else if(type=="date"&&_val.search(this.patterns["fullDate"][0])===-1){msg=title+', '+this.patterns["fullDate"][1];omega=false;}
       }
       else if(type=="password"&&_val.search(this.patterns["password"][0])==-1){msg=title+', '+this.patterns["password"][1];omega=false;}
       if(type=="password"&&_$('#signum').length&&_val&&_val!==_$('#signum').val()){msg=title+' passwords do not match';omega=false;}
-      if(omega===false){ele.parentNode.insertBefore(err, ele.nextSibling);err.innerHTML=msg;_$('#notification').html('<div class="text-error">'+msg+'</div>');_$('.control-group.'+this.frmName+'_'+_field).addClass('error');}
+      if(omega===false && ele){ele.parentNode.insertBefore(err, ele.nextSibling);err.innerHTML=msg;_$('#notification').html('<div class="text-error">'+msg+'</div>');_$('.control-group.'+this.frmName+'_'+_field).addClass('error');}
       return omega;
    }
    //=========================================================================//
@@ -660,7 +660,7 @@ function crud($rootScope,notitia,$routeParams,$modal,$log,fetch,$timeout){
       else dynamis.del("typeAheadArr");
 
       that.scope.verifySubmit = function(){
-         var call = defaultScope.licentia;iyona.log("Grace",call,that.scope.licentia,pray(that.scope.data.jesua),that.scope.data.jesua,that.scope.licentia['Create '+call],'Create '+call);
+         var call = defaultScope.licentia;//iyona.log("Grace",call,that.scope.licentia,pray(that.scope.data.jesua),that.scope.data.jesua,that.scope.licentia['Create '+call],'Create '+call);
          if(!isset(that.scope.licentia)) {iyona.log("Grace licentia");return false;}
          return ( (pray(that.scope.data.jesua)===false &&that.scope.licentia['Create '+call]) || (pray(that.scope.data.jesua)&&that.scope.licentia['Edit '+call]) );
       };
@@ -811,6 +811,12 @@ function crud($rootScope,notitia,$routeParams,$modal,$log,fetch,$timeout){
          iyona.msg(notitia.msg,true,clss);
       },$scope.opt);
    }
+   /**
+    * make use_mother=false in the list if the parent is not going to be added/updated
+    * @param {string} mensa
+    * @param {object} list
+    * @returns {void}
+    */
    this.savItem=function(mensa,list){iyona.deb("BEFORE SAVE",list,mensa);
 
       fetch.post(dynamis.get("SITE_SERVICE")+',creo,novum album',{"mensa":mensa,"list":list,"uProfile":defaultProfile},function(results){
@@ -856,21 +862,29 @@ function crud($rootScope,notitia,$routeParams,$modal,$log,fetch,$timeout){
          else if(isset(results)&&isset(results.err)) {iyona.msg(results.err,false,"danger");}
       });
    }
-   this.linkItem=function(ref,arr,index){
+   this.linkItem=function(ref,arr,index,field,func){
       var list={"use_mother":false},to,cnt=0,l=arr.length-1,key;
       for (key in that.scope.opt.listsConf[ref].child){list[key]=arr[cnt];cnt++;}//creates a new list, combining the config fields to the array
 
+      //@NOTE:always place the last linking item last, it's the one that has a value and null when linked
+      //@FUTURE: pass the link field
       var to = arr[l]?",creo,tollere album":",creo,novum album";//if the last value of arr has a value delete or else add.
+      //to = ",creo,novum album";
+      var tmp = index;
       if(typeof index ==="string") index = objSearch(that.scope.opt.listsVal[ref],index)[1];
-      iyona.deb("LINKING",list,l,arr,index,arr[l],that.scope.opt.listsVal[ref][index]);
+      iyona.deb("LINKING",list,l,arr,"INDEX="+tmp+" AND "+index,arr[l],"FOUND",that.scope.opt.listsVal[ref][index]);
+      var messenger = (isset(func))?{"run_consue":func,"json":true}:{"json":true};
 
-      fetch.post(dynamis.get("SITE_SERVICE")+to,{"list":list,"mensa":ref,"messenger":{"json":true},"uProfile":defaultProfile},function(results){
-         iyona.deb("iTEM LINK resulTs",results);
+      fetch.post(dynamis.get("SITE_SERVICE")+to,{"list":list,"mensa":ref,"messenger":messenger,"uProfile":defaultProfile},function(results){
+         iyona.deb("iTEM LINK resulTs",results,that.scope.opt.listsVal[ref][index],list);
          if(isset(results)&&isset(results.msg)){//make the changes on success for the link value
 
-            if(results.msg==="Successfully deleted list") for(key in list)list[key]=null;
+            if(results.msg==="Successfully deleted list"){
+               if(!isset(field))for(key in list)list[key]=null;
+               else list[field]=null;
+            }
             angular.extend(that.scope.opt.listsVal[ref][index],list);
-             that.scope.$broadcast("readyLinkItem",results);
+            that.scope.$broadcast("readyLinkItem",results);
          }
          else if(isset(results)&&isset(results.err)) {iyona.msg(results.err,false,"danger");}
       });
@@ -901,7 +915,8 @@ function crud($rootScope,notitia,$routeParams,$modal,$log,fetch,$timeout){
       message={"email":"is not a valid email","required":"is required","number":"is not numerical","min":"is less then minimum","max":"is greater then maximum","date":"is not valid date","url":"is not a valid url","pattern":"is not correctly formated"};
       iyona.deb("CHECKING.............",invalid,frm.$error,frm);
 
-      if(invalid){$scope.err=true;$scope.errMsg={};
+      if(invalid){
+         $scope.err=true;$scope.errMsg={};
          for(var type in frm.$error){l=frm.$error[type].length;iyona.deb(type,frm.$error[type]);
             for(x=0;x<l;x++){
                row=frm.$error[type][x];title=ucfirst(row.$name);//gets the name field
@@ -912,7 +927,8 @@ function crud($rootScope,notitia,$routeParams,$modal,$log,fetch,$timeout){
                msg.push(" "+title+" "+message[type]);//push the messages
             }}
          if(frm){}iyona.deb("SCOPE",$scope);
-         $scope.msg=msg.join();iyona.msg(msg);return false;}
+         $scope.msg=msg.join();iyona.msg(msg);return false;
+      }
       $scope.errMsg=null;$scope.err=false;$scope.msg=null;return true;
    }
    this.checkboxValue=function($scope,defaultField,field){
@@ -935,7 +951,7 @@ function crud($rootScope,notitia,$routeParams,$modal,$log,fetch,$timeout){
       mensa=mensa||defaultMensa;
       for(x=0;x<l;x++)notitia.iWrite(mensa,results[x],true);
    }
-   this.typeahead=function(){iyona.deb("Typing ahead...");
+   this.typeahead=function(){//iyona.deb("Typing ahead...");
       var runOnce=false;
       function callBack(e,field){var set=defaultScope.typeahead[field];
          that.scope.typeahead[field]=that.scope.typeahead[field]||[];

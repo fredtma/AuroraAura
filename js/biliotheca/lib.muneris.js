@@ -136,7 +136,7 @@ configuration.prototype.config=function(){
       "projectID":"17238315752",
       "app":(typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined")
    });
-   iyona.sync({"url":sessionStorage.SITE_URL+'json/scope.json',"method":"get","format":"json","callback":function(data){iyona.deb("defaultScope-",data);
+   iyona.sync({"url":sessionStorage.SITE_URL+'json/scope.json',"method":"get","format":"json","callback":function(data){//iyona.deb("defaultScope-",data);
       dynamis.set("defaultScope",data,true);
    }});
    dynamis.set("EXEMPLAR",{"username":["^[A-Za-z0-9_]{6,15}$","requires at least six alpha-numerique character"],
@@ -751,7 +751,8 @@ objSearch = function(ele,value){
     for(key in ele ) {obj=ele[key];
         if(typeof obj==='object' )found=objSearch(obj,value);
         if(found!==false) return [found,key];
-        if(typeof obj==="string"&&obj.indexOf(value)!==-1 ) return [ele,key];
+//        if(typeof obj==="string"&&obj.indexOf(value)!==-1 ) return [ele,key];
+        if(typeof obj==="string"&&obj===value ) return [ele,key];
     }
     return false;
 }
