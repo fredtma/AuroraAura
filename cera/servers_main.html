@@ -46,8 +46,10 @@
             <li><a href="#genesis">Home</a></li>
             <li><a ng-href="{{menu[0].link}}">{{menu[0].text}}</a></li>
             <li class="active">{{jesua|ucfirst}} {{menu[1].text}}</li>
+            <li class="menu-icon"><a ng-if="licentia['View Server']" ng-href="{{navigation.next.link}}" class="glyphicon glyphicon-chevron-right "></a></li>
             <li class="menu-icon"><a ng-if="licentia['Create Server']" ng-href="{{crud.alpha}}" ng-click="new()" class="glyphicon glyphicon-plus success"></a></li>
             <li class="menu-icon"><a ng-if="licentia['Delete Server']"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['View Server']"  ng-href="{{navigation.prev.link}}" class="glyphicon glyphicon-chevron-left "></a></li>
          </ol>
       </header>
       <section  class='listContainer'>
@@ -55,61 +57,73 @@
          <form id="srvForm" class="container-fluid" name="dataForm" ng-submit="submit(dataForm)">
             <input type="hidden" class="form-control" ng-model="data.jesua" />
             <div class="col-md-6">
-               <div id='srvModified1'  class="input-group">
+               <div class="input-group">
                   <span class="input-group-addon glyphicon glyphicon-calendar"></span>
                   <span class="input-group-addon form-label">Modified</span>
                   <output class="form-control readonly" ng-model="modified"  >{{data.modified}}</output>
                </div>
-               <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.name]">
+               <div  ng-class="'input-group '+{true:'has-error'}[errMsg.name]">
                   <span class="input-group-addon glyphicon glyphicon-book"></span>
                   <span class="input-group-addon form-label">Server</span>
-                  <input type="text" class="form-control" required placeholder="Server's name" autofocus name="name" ng-model="data.name.alpha" title="Server's name" />
+                  <input tabindex="1" type="text" class="form-control" required placeholder="Server's name" autofocus name="name" ng-model="data.name.alpha" title="Server's name" />
                </div>
             </div>
             <div class="col-md-6">
-               <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.ip]">
-                  <span class="input-group-addon glyphicon glyphicon-cloud"></span>
-                  <span class="input-group-addon form-label">IP</span>
-                  <input type="text" class="form-control" required placeholder="Server IP" name="address" ng-model="data.ip" title="Server IP" />
+               <div class="input-group">
+                  <span ng-class="'input-group-addon glyphicon glyphicon-exclamation-sign '+{true:'danger'}[data.failed>0]"></span>
+                  <span ng-class="'input-group-addon form-label '+{true:'danger'}[data.failed>0]" ng-bind="data.failed>0?'Error ('+data.failed+')':'Error'"></span>
+                  <output tabindex="0" class="form-control readonly" ng-bind="data.server_message||'None'"  ></output>
                </div>
-               <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.parent]">
-                  <span class="input-group-addon glyphicon glyphicon-envelope"></span>
-                  <span class="input-group-addon form-label">Parent</span>
-                  <input type="text" class="form-control" placeholder="parent Name / Parent" name="parent" ng-model="data.parent" title="parent Name / Parent" />
-               </div>
-            </div>
-            <div class="col-md-6">
-               <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.message]">
-                  <span class="input-group-addon glyphicon glyphicon-pencil"></span>
-                  <span class="input-group-addon form-label">Message</span>
-                  <input type="text" class="form-control" placeholder="Message/Error" name="message" ng-model="data.message" title="Message" />
-               </div>
-               <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.company]">
+               <div  ng-class="'input-group '+{true:'has-error'}[errMsg.company]">
                   <span class="input-group-addon glyphicon glyphicon-briefcase"></span>
                   <span class="input-group-addon form-label">Company</span>
-                  <input type="text" class="form-control" placeholder="Company" name="company" ng-model="data.company" title="Company" />
+                  <input tabindex="5" type="text" class="form-control" placeholder="Company" name="company" ng-model="data.company" title="Company" />
                </div>
             </div>
             <div class="col-md-6">
-               <div id='srvModified' ng-class="'input-group '+{true:'has-error'}[errMsg.login]">
+               <div  ng-class="'input-group '+{true:'has-error'}[errMsg.ip]">
+                  <span class="input-group-addon glyphicon glyphicon-cloud"></span>
+                  <span class="input-group-addon form-label">IP</span>
+                  <input tabindex="2" type="text" class="form-control" required placeholder="Server IP" name="address" ng-model="data.ip" title="Server IP" />
+               </div>
+               <div  ng-class="'input-group '+{true:'has-error'}[errMsg.parent]">
+                  <span class="input-group-addon glyphicon glyphicon-envelope"></span>
+                  <span class="input-group-addon form-label">Parent</span>
+                  <input tabindex="3" type="text" class="form-control" placeholder="parent Name / Parent" name="parent" ng-model="data.parent" title="parent Name / Parent" />
+               </div>
+            </div>
+            <div class="col-md-6">
+               <div ng-class="'input-group '+{true:'has-error'}[errMsg.login]">
                   <span class="input-group-addon glyphicon glyphicon-lock"></span>
                   <span class="input-group-addon form-label">RDC Login</span>
-                  <input type="text" class="form-control" placeholder="Login" name="login" ng-model="data.login" title="Login" />
+                  <input tabindex="6" type="text" class="form-control" placeholder="Login" name="login" ng-model="data.login" title="Login" />
                </div>
                <div class="input-group btn-group" data-toggle="buttons">
                   <span class="input-group-addon glyphicon glyphicon-book"></span>
-                  <button ng-repeat="key in opt.extra.status.enum" name="status[]" type="button" class="btn btn-primary" ng-model="data.status"  btn-radio="'{{key}}'" >{{key}}</button>
+                  <button tabindex="7" ng-repeat="key in opt.extra.status.enum" name="status[]" type="button" class="btn btn-primary" ng-model="data.status"  btn-radio="'{{key}}'" >{{key}}</button>
                </div>
             </div>
-            <div id='srvModified'  ng-class="'input-group '+{true:'has-error'}[errMsg.description]" >
-               <span class="input-group-addon glyphicon glyphicon-lock"></span>
-               <textarea class="form-control" rows="7" required placeholder="Enter server description" title="Enter server description" name="description" ng-model="data.description" ></textarea>
+            <div class="col-md-12">
+               <div ng-class="'input-group '+{true:'has-error'}[errMsg.message]" >
+                  <span class="input-group-addon glyphicon glyphicon-pencil"></span>
+                  <span class="input-group-addon form-label">Message</span>
+                  <input tabindex="8" type="text" class="form-control" placeholder="Message/Error" name="message" ng-model="data.message" title="Message" />
+               </div>
+               <div class="panel panel-primary">
+                  <div  ng-class="'panel-heading '+{true:'has-error'}[errMsg.description]" style='padding:0;'>
+                     <button type="button" class="btn-block btn btn-primary" style='border:none;text-align:left;' ng-click="customScript=!customScript">Custom Script <small>(click)</small></button>
+                  </div>
+                  <div class="panel-body animate-if" ng-if="customScript">
+                     <textarea tabindex="8" class="form-control" rows="7" required placeholder="Enter custom script" title="Enter server script" name="description" ng-model="data.description" ></textarea>
+                  </div>
+               </div>
+               <div class="input-group btn-group" data-toggle="buttons">
+                  <span class="input-group-addon glyphicon glyphicon-book"></span>
+                  <button ng-repeat="key in opt.extra.type.enum" name="type[]" type="button" class="btn btn-primary" ng-model="data.type"  btn-radio="'{{key}}'" >{{key}}</button>
+               </div>
             </div>
-            <div class="input-group btn-group" data-toggle="buttons">
-               <span class="input-group-addon glyphicon glyphicon-book"></span>
-               <button ng-repeat="key in opt.extra.type.enum" name="type[]" type="button" class="btn btn-primary" ng-model="data.type"  btn-radio="'{{key}}'" >{{key}}</button>
-            </div>
-            <div ng-if="verifySubmit()" id='srvModified'  class="input-group">
+
+            <div ng-if="verifySubmit()"  class="input-group">
                <button type="submit"  ng-class="btnClass" name="submit" >{{btn}}</button>
             </div>
          </form><hr/>

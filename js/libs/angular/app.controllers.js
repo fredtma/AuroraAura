@@ -197,7 +197,7 @@ function chronicles1($scope,fetch,$location,$routeParams){
    $scope.menu={"list":[{"name":"Server Logs", "url":"#chronicles1/log-servers"}]}//set the menu
 //   if(address)$scope.menu.list[1]={"name":"View server: "+serverName, "url":"#leviticus/servers/"+serverName+"/details"};
    if(serverName)$scope.menu.list[2]={"name":serverName+" logs"};
-   fetch.post(dynamis.get('SITE_SERVICE')+',creo,server_logs',{"militia":"server_logs","servus":serverName,"uProfile":"server"},function(server){
+   fetch.post(dynamis.get('SITE_SERVICE')+',creo,server_logs',{"militia":"server_logs","servus":serverName,"uProfile":"servers"},function(server){
       iyona.deb(server,'server');if(server&&"rows" in server===false) return false;/*set scroller*/setTimeout(SETiSCROLL,1000);
       angular.extend($scope.data,server.rows);iyona.deb($scope.data,'$scope.data');
    });
@@ -232,10 +232,14 @@ function leviticus($scope,crud,$routeParams){
    $scope.arrange=function(sort){$scope.sortable=sort;$scope.reverse=!$scope.reverse;}
    $scope.$on("readyList",function(e,server){
       for(var row in $scope.data){
-         row=$scope.data[row];row.modified=row.modified.replace('-','/'); row.modified=new Date(row.modified).format("dd mmmm, yyyy HH:MM:ss");row.count=timeDifference(row.modified)+' ago';
-         if(row.status=="down") { row.icon="glyphicon-warning-sign";row.clss="danger red";row.tags=[{"name":"Server Down","cls":row.clss}];
-         } else if(server.status=="slow") { row.icon="glyphicon-refresh";row.clss="warning";row.tags=[{"name":"Server Slow","cls":row.clss}];
-         } else { row.icon="glyphicon-envelope";row.clss="success";row.tags=[{"name":"Server Up","cls":row.clss}];}
+         row=$scope.data[row];
+         row.modified=row.modified.replace('-','/');
+         row.modified=new Date(row.modified).format("dd mmmm, yyyy HH:MM:ss");
+         row.count=timeDifference(row.modified)+' ago';
+         //iyona.deb("COUNTING",row.modified,row);
+         if(row.status==="down")       { row.icon="glyphicon-warning-sign";row.clss="danger red";row.tags=[{"name":"Server Down","cls":row.clss}];}
+         else if(row.status==="slow")  { row.icon="glyphicon-refresh";row.clss="warning";row.tags=[{"name":"Server Slow","cls":row.clss}];}
+         else                          { row.icon="glyphicon-envelope";row.clss="success";row.tags=[{"name":"Server Up","cls":row.clss}];}
       }
    });$scope.typeahead=[];
 }
@@ -276,7 +280,7 @@ function joshua($scope,crud,$routeParams){
  * @returns {void}
  */
 function judges($scope,crud,$routeParams){
-   var title="System Groups",profile='judges',defaultScope=dynamis.get("defaultScope",true)[profile];iyona.deb("FASR",profile,$routeParams,defaultScope);
+   var title="System Groups",profile='judges',defaultScope=dynamis.get("defaultScope",true)[profile];
    defaultScope.details.name={"delta":"!@=!#","alpha":$routeParams.jesua};
 
    crud.get($scope,title,profile,defaultScope);
@@ -327,7 +331,9 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
    defaultScope.list.period={"delta":"!@=!#","alpha":month};
    defaultScope.messenger = {"period":month,"run_consue":"cost summary"};
    $scope.sortable=null;$scope.reverse=false;
-   $scope.months = [{"name":"May","id":"5"},{"name":"June","id":"6"},{"name":"July","id":"7"},{"name":"August","id":"8"},{"name":"September","id":"9"},{"name":"October","id":"10"},{"name":"November","id":"11"},{"name":"December","id":"12"},{"name":"Email Report","id":0}];$scope.month=objSearch($scope.months,month)[0][0];
+   $scope.months = [{"name":"May","id":"5"},{"name":"June","id":"6"},{"name":"July","id":"7"},{"name":"August","id":"8"},{"name":"September","id":"9"},{"name":"October","id":"10"},{"name":"November","id":"11"},{"name":"December","id":"12"},{"name":"Email Report","id":0}];
+   $scope.month=objSearch($scope.months,month);iyona.deb("MONTHS",$scope.month,$scope.months,month);
+   $scope.month= isset($scope.month[0]) && isset($scope.month[0][0])?$scope.month[0][0]:{};
 
    if(view=='reports'){
       if(!jesua){$routeParams.jesua='data'; jesua='data';}
@@ -571,11 +577,12 @@ function deuteronomy($scope,crud,$routeParams,fetch){
 }
 //============================================================================//
 function kingsI($scope,crud,$routeParams,fetch){
-   var title="Main Servers",profile='machine',defaultScope=dynamis.get("defaultScope",true)[profile];
+   var title="Main Servers",profile='machine',defaultScope=dynamis.get("defaultScope",true)[profile];iyona.deb("FASR",profile,$routeParams,defaultScope);
    defaultScope.details.name={"delta":"!@=!#","alpha":$routeParams.jesua||null};
    $scope.sorts=[{"name":"By Company","key":"company"},{"name":"By Name","key":"name"},{"name":"By Type","key":"type"},{"name":"By Status","key":"status"}];$scope.sortable=null;$scope.reverse=false;
 
    crud.get($scope,title,profile,defaultScope);
+
 
    $scope.addItem=function(ref,node){
       var name=$scope.data.name.alpha,custValue={"name":node+" "+name,"description":"This permission will allow users to "+node+" "+name,"created":new Date().format("isoDate") };
@@ -589,10 +596,10 @@ function kingsI($scope,crud,$routeParams,fetch){
    $scope.remItem=function(no,ref,list){
       crud.remItem(no,ref,list);
       $scope.$on("remItem",function(e,s){iyona.deb("removing",s);});
-   };
+   };iyona.deb("00000",$scope.$parent);
    $scope.new=function(){$scope.data = {};};
    $scope.listItems=function(mensa2,list){$scope.selected=list.search; crud.listItem(mensa2,list); iyona.deb("THE SCOPE",$scope);}
-   $scope.linkItem=function(mensa2,list,key,field){crud.linkItem(mensa2,list,key,field); }
+   $scope.linkItem=function(mensa2,list,key,field){crud.linkItem(mensa2,list,key,field); _$('#inputSearch')[0].focus();  }
    $scope.savItem=function(ref,list){
       if(list.changed &&list.host &&list.command){list.use_mother=false; crud.savItem(ref,list); list.changed=false;}
    };
@@ -602,9 +609,10 @@ function kingsI($scope,crud,$routeParams,fetch){
    $scope.arrange=function(sort){$scope.sortable=sort;$scope.reverse=!$scope.reverse;}
    $scope.$on("readyForm",onUpdate);
    $scope.$on("readySubmit",onUpdate);
-   $scope.$on("readyList",function(e,s){iyona.deb("readyList");});
+   $scope.$on("readyList",function(e,s){iyona.log("readyList",e,s,$scope.data); });
    $scope.$on("readyListItem",function(e,s){iyona.deb("readyListItem",$scope);$scope.ref="link_permissions_groups";$scope.lists=$scope.opt.listsConf.link_permissions_groups;});
    function onUpdate(e,s){iyona.deb("readyFormUpdate",s,$scope);
+      crud.navigateNext("ndxServCompanyMain",$routeParams.jesua||null,'name');
 
       if(isset(s.consuetudinem)){
          var copy = s.consuetudinem.listsVal,x,l,node1,node2;
@@ -614,7 +622,7 @@ function kingsI($scope,crud,$routeParams,fetch){
                node1 = $scope.opt.listsVal.nagios_services[x];
                node2 = copy.nagios_services[x];
                //we need to keep the original in order to validate linked items
-               node1.live   = (isset(node1.string))?"set":"unset";
+               node1.live   = (isset(node1.string))?"set":"down";
                node1.string = (isset(node1.string))?node1.string :(isset(node2.default))?node2.name+node2.default:node2.name;
                //iyona.deb("ON",node1,node2,node1.command,node2.name,node2.default);
             }

@@ -27,10 +27,11 @@
                            <span ng-if="row.tags" ng-repeat="tag in row.tags" ng-class="'pull-right label label-'+(tag.cls||'default')">{{tag.name}}</span>
                            {{row.name}}
                         </h4>
-                        <small><span ng-if='row.address'>{{row.address}}.</span> <span ng-if='row.modified'>{{row.modified}}</span></small>
+                        <small><span ng-bind-html="row.system_comment" class="{{row.clss}}"></span>. <span ng-if='row.address'>{{row.address}}.</span> <span ng-if='row.modified'>{{row.modified}}</span></small>
                      </a>
                   </div>
                </li>
+               <li class="row numbers-items" style="height:115px;background:#eeffee;">&nbsp;</li>
             </ul>
          </div>
       </section>
@@ -80,14 +81,14 @@
          </div>
          <div id='srvModified'  class="input-group" ng-if="data.jesua">
             <span class="input-group-addon glyphicon glyphicon-link"></span>
-            <a ng-href="{{'#deuteronomy/log-servers/'+data.name+'/'+data.address}}">Click here to view server's log. <small>(This will take you to a different page)</small></a>
+            <a ng-href="{{'#chronicles1/log-servers/'+data.name.alpha+'/'+data.address}}">Click here to view server's log. <small>(This will take you to a different page)</small></a>
          </div>
          <div ng-if="verifySubmit()" id='srvModified'  class="input-group">
             <button type="submit"  ng-class="btnClass" name="submit" >{{btn}}</button>
          </div>
          </form><hr/>
 
-         <div ng-repeat="(ref,lists) in opt.listsConf" class="table-responsive panel panel-primary">
+         <div ng-if="false" ng-repeat="(ref,lists) in opt.listsConf" class="table-responsive panel panel-primary">
             <div class="panel-heading"><h3 class="panel-title">{{lists.title}}. <small class="white" ng-show="!opt.listsVal">Click on the add(+) icon to add new items</small> </h3></div>
             <div class="panel-body">
                <table class="table table-hover table-condensed table-dynamic">

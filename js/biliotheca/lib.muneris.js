@@ -116,7 +116,7 @@ configuration.prototype.config=function(){
    sessionStorage.SITE_UPLOADS=sessionStorage.SITE_URL+'uploads/';
    sessionStorage.MAIL_SUPPORT='support@xpandit.co.za';
    sessionStorage.DB_NAME='app_xpandit';
-   sessionStorage.DB_VERSION=86;//always integer 4 iDB
+   sessionStorage.DB_VERSION=88;//always integer 4 iDB
    sessionStorage.DB_DESC='The local application Database';
    sessionStorage.DB_SIZE=15;
    sessionStorage.DB_LIMIT=20;
@@ -752,7 +752,7 @@ objSearch = function(ele,value){
         if(typeof obj==='object' )found=objSearch(obj,value);
         if(found!==false) return [found,key];
 //        if(typeof obj==="string"&&obj.indexOf(value)!==-1 ) return [ele,key];
-        if(typeof obj==="string"&&obj===value ) return [ele,key];
+        if(typeof obj==="string"&&obj==value ) return [ele,key];
     }
     return false;
 }
