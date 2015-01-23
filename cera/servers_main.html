@@ -28,8 +28,8 @@
                            {{row.name}} <small ng-if='row.ip'>{{row.ip}}</small>
                         </h4>
                         <small>
-                           <span ng-if='row.status!=="down"'>{{row.description | limitTo:110}}.</span>
-                           <span ng-if='row.message' ng-class="{true:'text-danger',false:''}[row.status==='down']">{{row.message}}.</span>
+                           <span ng-if='row.status!="down"'>{{row.message | limitTo:110}}</span>
+                           <span ng-if='row.status=="down"' ng-class="{true:'text-danger',false:''}[row.status==='down']">{{row.server_message}}</span>
                            <span ng-if='row.modified' class="text-primary">{{row.modified}}.</span>
 
                         </small>
