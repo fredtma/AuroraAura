@@ -60,31 +60,46 @@ self.addEventListener('message',function(e){
       var serverEvent;
       serverEvent=new EventSource("https://demo.xpandit.co.za/aura/home-event");
       serverEvent.addEventListener('init',function(ev){
-         cnt++;if(cnt>=50){iyona.log("Closing worker"); serverEvent.close();self.close();}
-         var results=JSON.parse(ev.data);iyona.log("WK + SERVER EVENT INIT-"+cnt);
-         if(!results||"servers" in results===false) {iyona.log("There was an error in bethel's results");return false;}
-         var back = {"results":results,"scope":{"servers":null,"online":null,"serverLine":null}};
+         cnt++;
+         if(cnt>=50 && false){iyona.log("Closing worker"); serverEvent.close();self.close();}//DISABLE::after a certain number
+         var results=JSON.parse(ev.data);
+         console.log("#==============================================================================#");
+         console.log("WK + SERVER EVENT INIT-"+cnt,results,"servers" in results===false, !results);
+         if(!results||"servers" in results===false) {console.log("There was an error in bethel's results");return false;}
+         var back = {"results":results,"scope":{"servers":null,"online":null,"serverLine":null,"nagios":null}};
          var scope=results;
-         try{ results=null;
-            var row1 = (typeof scope.online.rows[0] !=="undefined")?scope.online.rows[0].count:0,row2 = (typeof scope.online.rows[1] !=="undefined")?scope.online.rows[1].count:0;
-            scope.total=parseInt(row1)+parseInt(row2);//total number of server
-            scope.down=( (scope.online.length>1)||(scope.online.length==1&&scope.online.rows[0].status=="down") )?true:false;//if there is two row or one with a down status
-            scope.msg=(scope.down)?"You have one or more server down<br/>":"There are no Inactive server";
-            var n = (scope.online.rows[1])?scope.online.rows[1].count:(scope.online.rows[0])?scope.online.rows[0].count:1;
-            scope.downTotal=n;
-            if(scope.down){
-               scope.msgStatus="You have "+n+" server down";
-            }else{scope.msgStatus="All servers are operational.";}
-            scope.last=scope.online.rows[0].modified;
-            back.scope=scope; self.postMessage(back);
-         }catch(e){iyona.log("There was an error in bethel",e.message);}
+         try{
+            results=null;
+            var serverStatus={'down':0,'active':0,'slow':0,'nagios':0},xx,ll,nn,row=[];
+            scope.total = 0;
+            if(typeof scope.online!=="undefined" && typeof scope.online.rows !== "undefined"){
+               ll = scope.online.rows.length;
+               for(var xx=0;xx<ll;xx++){
+                  nn = scope.online.rows[xx];
+                  row.push(nn);
+                  serverStatus[nn.status] = parseInt(nn.count);
+                  scope.total += parseInt(nn.count);
+               }
+            }
+            serverStatus.nagios  = parseInt(scope.nagios.length);
+            scope.down           = serverStatus.down>0?true:false;//if there is two row or one with a down status
+
+            scope.msgStatus="All mail servers are operational.<br/>";/*set scroller*/
+            if(serverStatus.down)   {scope.msgStatus ="You have "+serverStatus.down+" mail server down<br/>";}
+            if(serverStatus.slow)   {scope.msgStatus+="You have "+serverStatus.slow+" slow mail servers<br/>";}/*set scroller*/
+            if(serverStatus.nagios) {scope.msgStatus+="You have "+scope.nagios.length+" Nagios server/s down <br/>";}/*set scroller*/
+
+            scope.last=row[0].modified;
+            back.scope=scope;
+            self.postMessage(back);
+         }catch(e){console.log("There was an error in bethel",e.message);}
       });
-      serverEvent.onerror=function(ev){iyona.deb("Server event error.",ev);}
+      serverEvent.onerror=function(ev){iyona.deb("Server event error.",ev);console.log(ev);}
       self.onclose=function(){serverEvent.close();iyona.log("Closing worker && SSE :: OnClose");}
 
       if(data.factum==="close"){
          serverEvent.close();
-         serverEvent=new EventSource("http://demo.xpandit.co.za/aura/home-event,close");
+         serverEvent=new EventSource("https://demo.xpandit.co.za/aura/home-event,close");
          iyona.log("Living God, Closing worker && SSE");
          self.close();
       }

@@ -16,6 +16,7 @@ angular.module('KingOFkings',['ngRoute','angular-gestures','ngSanitize','ngAnima
       .when('/numbers/:page/:view?/:jesua?',{templateUrl:'cera/clients.html'})
       .when('/isaiah/:page/:view?/:jesua?',{templateUrl:'cera/adsl.html'})
       .when('/psalm/:page/:view?/:jesua?',{templateUrl:'cera/sales.html'})
+      .when('/job/:page/:view?/:jesua?',{templateUrl:'cera/checklist.html'})
       .when('/deuteronomy/:page/:view?/:jesua?',{templateUrl:'cera/permissions.html'})
       .when('/kingsI/:page/:view?/:jesua?',{templateUrl:'cera/servers_main.html'})
       .when('/report/:report?',{templateUrl:'cera/reports/servers-rpt.html'})
@@ -91,8 +92,35 @@ if (window.PASCO) {load_script(["cordova.js","js/PushNotification.js","js/index.
          {"link":true,"icon":"glyphicon glyphicon-cog","text":"Configuration"},
          {"link":true,"icon":"glyphicon glyphicon-off","href":"#exodus/logoff","text":"Log Off"},
          {"link":true,"icon":"glyphicon glyphicon-home","href":"#genesis","text":"Dashboard"}];
-      $rootScope.panelLeft=[{"name":"Functions","id":"panelFunctions","header":true,"cls":"list-header"},{"name":"User Profile","id":"panelProfile","header":false,"icon":"glyphicon-user","href":href},{"name":"Profile List","id":"panelProfileList","header":false,"icon":"glyphicon-flag","href":"#joshua/administrator/list"},{"name":"Clients","id":"panelClients","header":false,"icon":"glyphicon-briefcase","href":"#numbers/clients/list"},{"name":"Servers","id":"panelServers","header":false,"icon":"glyphicon-hdd","href":"#leviticus/servers/list"},{"header":false,"id":"panelADSL","name":"ADSL List","icon":"glyphicon glyphicon-road","text":"ADSL List","href":"#isaiah/adsl/list"},{"header":false,"id":"systemList","name":"System List","icon":"glyphicon glyphicon-list","text":"System List","href":"#proverbs/list"},{"name":"System","id":"panelCommunicate","header":true,"cls":"list-header"},{"name":"Share","id":"panelShare","header":false,"icon":"glyphicon-retweet"},{"name":"Feed Back","id":"panelFeed","header":false,"icon":"glyphicon-comment"},{"name":"Configuration","id":"panelConfig","header":false,"icon":"glyphicon-cog"},{"name":"Help","id":"panelHelp","header":false,"icon":"glyphicon-question-sign"},{"name":"Log Off","id":"panelLogOff","header":false,"icon":"glyphicon-off danger","href":"#exodus/logoff"}];
-      $rootScope.panelRight=[{"name":"Knowledge Graph","id":"panelKnowledge","header":true,"cls":"list-header"},{"name":"Email","id":"panelEmail","header":false},{"name":"Network","id":"panelNetword","header":false},{"name":"Setup","id":"panelSetup","header":false},{"name":"Server","id":"panelServer","header":false},{"name":"Software","id":"panelSoftware","header":false}];
+      $rootScope.panelLeft=[
+         {"name":"Functions","   id":"panelFunctions","header":true,"cls":"list-header"},
+         {"name":"My Profile",   "id":"panelProfile","header":false,"icon":"glyphicon-user","href":href},
+         {"name":"ADSL List",    "id":"panelADSL","header":false,"icon":"glyphicon glyphicon-road","text":"ADSL List","href":"#isaiah/adsl/list"},
+         {"name":"Clients",      "id":"panelClients","header":false,"icon":"glyphicon-briefcase","href":"#numbers/clients/list"},
+         {"name":"Groups",       "id":"panelGroups","header":false,"icon":"glyphicon-flag","href":"#judges/groups/list"},
+         {"name":"Mail Servers", "id":"panelServers","header":false,"icon":"glyphicon-envelope","href":"#leviticus/servers/list"},
+         {"name":"MonitorScreen","id":"panelMonitor","header":false,"icon":"glyphicon-hdd","href":"#gospel"},
+         {"name":"Nagios Server","id":"panelnNagios","header":false,"icon":"glyphicon-folder-close","href":"#kingsI/machine/list"},
+         {"name":"Permission",   "id":"panelPermissions","header":false,"icon":"glyphicon-lock","href":"#deuteronomy/permissions/list"},
+         {"name":"Profile List", "id":"panelProfileList","header":false,"icon":"glyphicon-flag","href":"#joshua/administrator/list"},
+         {"name":"Sales Order",  "id":"panelSalesOrder","header":false,"icon":"glyphicon-th-list","href":"#psalm/sales/list"},
+         {"name":"System List",  "id":"systemList","header":false,"icon":"glyphicon glyphicon-list","text":"System List","href":"#proverbs/list"}
+      ];
+      $rootScope.panelRight=[
+         {"name":"Knowledge Graph","id":"panelKnowledge","header":true,"cls":"list-header"},
+         {"name":"Email",     "id":"panelEmail","header":false},
+         {"name":"Network",   "id":"panelNetword","header":false},
+         {"name":"Setup",     "id":"panelSetup","header":false},
+         {"name":"Server",    "id":"panelServer","header":false},
+         {"name":"Software",  "id":"panelSoftware","header":false},
+
+         {"name":"System",       "id":"panelCommunicate","header":true,"cls":"list-header"},
+         {"name":"Configuration","id":"panelConfig","header":false,"icon":"glyphicon-cog"},
+         {"name":"Feed Back",    "id":"panelFeed","header":false,"icon":"glyphicon-comment"},
+         {"name":"Help",         "id":"panelHelp","header":false,"icon":"glyphicon-question-sign"},
+         {"name":"Log Off",      "id":"panelLogOff","header":false,"icon":"glyphicon-off danger","href":"#exodus/logoff"},
+         {"name":"Share",        "id":"panelShare","header":false,"icon":"glyphicon-retweet"}
+      ];
       $rootScope.menus[1].href="#joshua/administrator/view/"+USER_NAME.operarius;
       $rootScope.panelLeft[1].href="#joshua/administrator/view/"+USER_NAME.operarius;
    }

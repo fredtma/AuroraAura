@@ -1,0 +1,135 @@
+<article  ng-controller="job">
+   <section id="listView" ng-if="view=='list'">
+      <header class="menuHeader">
+         <ol class="breadcrumb">
+            <li><a href="#genesis">Home</a></li>
+            <li class="active">{{menu[0].text}}</li>
+            <li class="menu-icon"><a ng-if="licentia['Create Checklist']" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+         </ol>
+      </header>
+      <section id="mainContent" class='listContainer'>
+         <div id='scroller'>
+            <ul>
+               <li class="row numbers-items" ng-repeat="row in data | filter:inputSearch">
+                  <div class="col-xs-1">
+                     <span ng-class="'item-icon glyphicon glyphicon-briefcase success'"></span>
+                  </div>
+                  <div class="col-xs-11">
+                     <a href="#job/checklist/view/{{row.jesua}}">
+                        <h4>
+                           {{row.company}}
+                        </h4>
+                        <small><span style="width:400px;display:inline-block;"><strong style="color:#000" ng-bind="row.client_name"></strong>, <span ng-bind="row.setup_type"></span></span> <span style='width:9em;' ng-class="'badge '+{'client request':'badge-warning','finished':'badge-info','closed':'badge-success','escalate':'badge-danger'}[row.status]" ng-bind="row.status"></span></small>
+                     </a>
+                  </div>
+               </li>
+            </ul>
+         </div>
+      </section>
+   </section>
+   <section id="detailView"  ng-if="view=='view'||view=='new'">
+      <header class="menuHeader">
+         <ol class="breadcrumb">
+            <li><a href="#genesis">Home</a></li>
+            <li><a ng-href="{{menu[0].link}}">{{menu[0].text}}</a></li>
+            <li class="active"> {{menu[1].text}}</li>
+            <li class="menu-icon"><a ng-if="licentia['Create Checklist']" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
+            <li class="menu-icon"><a ng-if="licentia['Delete Checklist']"  ng-click="delete()" class="glyphicon glyphicon-remove danger"></a></li>
+         </ol>
+      </header>
+      <section  class='listContainer scrollerContainer'><span id="messager" ng-class="'help-block '+{true:'text-danger',false:'text-info'}[err]" ng-show="msg" ng-bind="msg"></span>
+         <form id="clientForm" name="dataForm" ng-submit="submit(dataForm)" >
+            <input type="hidden" class="form-control" ng-model="data.jesua" />
+            <input type="hidden" class="form-control" ng-model="data.jesua" />
+         <div id='srvModified1' class="input-group">
+            <span class="input-group-addon glyphicon glyphicon-calendar"></span>
+            <span class="readonly form-control" ng-model="data.modified"  >{{data.givenTime}} </span>
+         </div>
+         <div  ng-class="'input-group '">
+            <span class="input-group-addon glyphicon glyphicon-qrcode"></span>
+            <input type="text" class="form-control" title="Company name, client name" name="company_client" readonly ng-value="data.setup_type+' for '+data.client_name+' @'+data.client_email+' ('+data.company+')  '" />
+         </div>
+         <div  ng-class="'input-group '+{true:'has-error'}[errMsg.tag_number]">
+            <span class="input-group-addon glyphicon glyphicon-barcode"></span>
+            <input type="text" class="form-control" required placeholder="Tag number" title="Tag Number" autofocus name="tag_number" ng-model="data.tag_number" />
+         </div>
+         <div  ng-class="'input-group '+{true:'has-error'}[errMsg.folder_synced]">
+            <span class="input-group-addon glyphicon glyphicon-repeat"></span>
+            <input style='margin-left:15px;' type="radio" class=""  title="Folder Synced" name="folder_synced" ng-model="data.folder_synced" ng-value='true' /> Folders have synced
+            <input style='margin-left:15px;' type="radio" class=""  title="Folder Synced" name="folder_synced" ng-model="data.folder_synced" ng-value='false' selected='true' /> Folders not have synced
+         </div>
+         <div  ng-class="'input-group '+{true:'has-error'}[errMsg.synchronisation_date]">
+            <span class="input-group-addon glyphicon glyphicon-calendar"></span>
+            <input type="date" class="form-control" datepicker-popup='yyyy-MM-dd' show-button-bar='false' show-weeks='false' title="Synchronisation Sate" name="synchronisation_date" ng-model="data.synchronisation_date" />
+         </div>
+         <div ng-if='false'  ng-class="'input-group '">
+            <span class="input-group-addon glyphicon glyphicon-cloud"></span>
+            <label class="radio-inline ">
+               <input type="radio" style="margin-left:0px;" name="setup_type" value="Setting up a new PC" ng-model="data.setup_type"> Setting up a new PC</label><label class="radio-inline ">
+               <input type="radio" name="setup_type" value="Moving a user to another PC" ng-model="data.setup_type"> Moving a user to another PC</label><label class="radio-inline ">
+               <input type="radio" name="setup_type" value="Moving a PC to another physical location" ng-model="data.setup_type"> Moving a PC to another physical location
+            </label>
+         </div>
+         <span ng-if="data.setup_type==='Setting up a new PC'" class="animate-if2">
+            <h4 class="refSection">New Setup <small style="color:#fff;">(When a user does not have an existing PC)</small></h4>
+            <label class='checklabel input-group btn-group' ng-repeat="(k,label) in data.new_setup" for="installed{{k}}" >
+               <span class='input-group-addon'>
+                  <input name="install" type="checkbox" class="" ng-model="data.install[label]" ng-false-value="null" ng-true-value="true" id="installed{{k}}" >
+               </span>
+               {{label}}
+            </label>
+         </span>
+         <span ng-if="data.setup_type==='Moving a user to another PC'" class="animate-if2">
+            <h4 class="refSection">Replacement Setup <small style="color:#fff;">(When a user is moving from one PC to an other)</small></h4>
+            <label class='checklabel input-group btn-group' ng-repeat="(k,label) in data.replacement_setup" for="uninstalled{{k}}" >
+               <span class='input-group-addon'>
+                  <input name="uninstall" type="checkbox" class="" ng-model="data.uninstall[label]" ng-false-value="null" ng-true-value="true" id="uninstalled{{k}}" >
+               </span>
+               {{label}}
+            </label>
+         </span>
+         <table class="chkTxt table table-hover table-condensed">
+            <tr ng-if="data.other_uninstall"><th>Other software to un-install</th><td ng-bind="data.other_uninstall" ></td><td><button name="done"type="button" ng-class="'btn '+{true:'btn-success',false:'btn-danger'}[data.done['other_uninstall']===true]" ng-model="data.done['other_uninstall']"  btn-checkbox btn-checkbox-false="false" btn-checkbox-true="true" >{{data.done['other_uninstall']===true?'Done':'Todo'}}</button></td></tr>
+            <tr ng-if="data.files_to_backup"><th>Files to backup</th><td ng-bind="data.files_to_backup" ></td><td><button name="done"type="button" ng-class="'btn '+{true:'btn-success',false:'btn-danger'}[data.done['files_to_backup']===true]" ng-model="data.done['files_to_backup']"  btn-checkbox btn-checkbox-false="false" btn-checkbox-true="true" >{{data.done['files_to_backup']===true?'Done':'Todo'}}</button></td></tr>
+            <tr ng-if="data.other_files_to_backup"><th>Other Files</th><td ng-bind-html="data.other_files_to_backup" ></td><td><button name="done"type="button" ng-class="'btn '+{true:'btn-success',false:'btn-danger'}[data.done['other_files_to_backup']===true]" ng-model="data.done['other_files_to_backup']"  btn-checkbox btn-checkbox-false="false" btn-checkbox-true="true" >{{data.done['other_files_to_backup']===true?'Done':'Todo'}}</button></td></tr>
+            <tr ng-if="data.application_to_install"><th>Application to install</th><td ng-bind="data.application_to_install" > </td><td><button name="done"type="button" ng-class="'btn '+{true:'btn-success',false:'btn-danger'}[data.done['application_to_install']===true]" ng-model="data.done['application_to_install']"  btn-checkbox btn-checkbox-false="false" btn-checkbox-true="true" >{{data.done['application_to_install']===true?'Done':'Todo'}}</button></td></tr>
+            <tr ng-if="data.other_application_to_install"><th>Other application</th><td ng-bind="data.other_application_to_install" ></td><td><button name="done"type="button" ng-class="'btn '+{true:'btn-success',false:'btn-danger'}[data.done['other_application_to_install']===true]" ng-model="data.done['other_application_to_install']"  btn-checkbox btn-checkbox-false="false" btn-checkbox-true="true" >{{data.done['other_application_to_install']===true?'Done':'Todo'}}</button></td></tr>
+            <tr ng-if="data.printer_scanner_devices_to_install"><th>Printer, Scanner devices to install</th><td ng-bind="data.printer_scanner_devices_to_install"/></td><td><button name="done"type="button" ng-class="'btn '+{true:'btn-success',false:'btn-danger'}[data.done['printer_scanner_devices_to_install']===true]" ng-model="data.done['printer_scanner_devices_to_install']"  btn-checkbox btn-checkbox-false="false" btn-checkbox-true="true" >{{data.done['printer_scanner_devices_to_install']===true?'Done':'Todo'}}</button></td></tr>
+            <tr ng-if="data.network_drivers_to_map"><th>Network drivers to map</th><td ng-bind="data.network_drivers_to_map"></td><td><button name="done"type="button" ng-class="'btn '+{true:'btn-success',false:'btn-danger'}[data.done['network_drivers_to_map']===true]" ng-model="data.done['network_drivers_to_map']"  btn-checkbox btn-checkbox-false="false" btn-checkbox-true="true" >{{data.done['network_drivers_to_map']===true?'Done':'Todo'}}</button></td></tr>
+            <tr ng-if="data.folder_synced"><th>Synchronisation Date</th><td ng-bind="data.synchronisation_date"></td><td><button name="done"type="button" ng-class="'btn '+{true:'btn-success',false:'btn-danger'}[data.done['synchronisation_date']===true]" ng-model="data.done['synchronisation_date']"  btn-checkbox btn-checkbox-false="false" btn-checkbox-true="true" >{{data.done['synchronisation_date']===true?'Done':'Todo'}}</button></td></tr>
+            <tr ng-if="data.accessories"><th>Accessories</th><td ng-bind="data.accessories" > </td><td><button name="done"type="button" ng-class="'btn '+{true:'btn-success',false:'btn-danger'}[data.done['accessories']===true]" ng-model="data.done['accessories']"  btn-checkbox btn-checkbox-false="false" btn-checkbox-true="true" >{{data.done['accessories']===true?'Done':'Todo'}}</button></td></tr>
+            <tr ng-if="data.other_accessories"><th>Other accessories</th><td ng-bind="data.other_accessories"></td><td><button name="done"type="button" ng-class="'btn '+{true:'btn-success',false:'btn-danger'}[data.done['other_accessories']===true]" ng-model="data.done['other_accessories']"  btn-checkbox btn-checkbox-false="false" btn-checkbox-true="true" >{{data.done['other_accessories']===true?'Done':'Todo'}}</button></td></tr>
+            <tr ng-if="data.signedDate"><th>Signed Date</th><td ng-bind="data.signedDate"></td><td><button name="done"type="button" ng-class="'btn '+{true:'btn-success',false:'btn-danger'}[data.done['signedDate']===true]" ng-model="data.done['signedDate']"  btn-checkbox btn-checkbox-false="false" btn-checkbox-true="true" >{{data.done['signedDate']===true?'Done':'Todo'}}</button></td></tr>
+         </table>
+         <div  ng-class="'input-group '+{true:'has-error'}[errMsg.engineer_comment]">
+            <span class="input-group-addon glyphicon glyphicon-align-justify"></span>
+            <input type="text" class="form-control" placeholder="Your comment?" title="Engineer comment" name="engineer_comment" ng-model="data.engineer_comment" />
+         </div>
+         <div ng-if='data.client_comment'  ng-class="'input-group '+{true:'has-error'}[errMsg.client_comment]">
+            <span class="input-group-addon glyphicon glyphicon-align-justify"></span>
+            <input type="text" class="form-control" placeholder="Client comment?" title="Client comment" name="client_comment" ng-model="data.client_comment" />
+         </div>
+         <div ng-if="data.adm_comment"  ng-class="'input-group '+{true:'has-error'}[errMsg.adm_comment]">
+            <span class="input-group-addon glyphicon glyphicon-align-justify"></span>
+            <input type="text" class="form-control" placeholder="Management comment?" title="Management comment" name="adm_comment" ng-model="data.adm_comment" />
+         </div>
+         <div class="input-group">
+            <span class="input-group-addon">
+               <input type="checkbox" id="finished" aria-label="..." ng-model="data.status" ng-false-value="client request" ng-true-value="finished">
+            </span>
+            <label class="checklabel" for="finished">I {{data.user}} comply that all has been checked</label>
+         </div><!-- /input-group -->
+         <div ng-if="licentia['Open Checklist']" class="input-group">
+            <span class="input-group-addon">
+               <input type="checkbox" aria-label="..." ng-model="data.status" id="escalte" ng-false-value="client request" ng-true-value="escalate">
+            </span>
+            <label class="checklabel" for="escalte">Would you like to escalate this call?</label>
+         </div><!-- /input-group -->
+         <div class="input-group" ng-if="!readonly || licentia['Open Checklist']">
+            <button ng-if="verifySubmit()" type="submit" ng-class="btnClass" name="submit" >{{btn}}</button>
+         </div>
+         </form>
+      </section>
+
+   </section>
+</article>

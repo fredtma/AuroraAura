@@ -1,4 +1,5 @@
 <article ng-controller="isaiah">
+
    <section id="listView" ng-if="view=='list'">
       <header class="menuHeader">
          <ol class="breadcrumb">
@@ -6,61 +7,55 @@
             <li ng-repeat="m in menu" class="m.class" ng-if="licentia[m.perm||m.text]" ><a href="{{m.link}}" ng-bind="m.text"></a></li>
          </ol>
       </header>
-      <div class="headContainer adsl row">
-         <div class="col-xs-1 txt">
-            <span class="dropdown btn-group" on-toggle="toggled(open)">
-               <a href class="dropdown-toggle link-dropdown" >{{month.name}} <span class="caret"></span></a>
-               <ul class="dropdown-menu list-dropdown">
-                  <li ng-repeat="m in months"><a href ng-bind="m.name" ng-click="change_month(m)" ></a></li>
-               </ul>
-            </span>
-         </div>
-         <div class="col-xs-11">
-            <ol>
-               <li class="link" style="width:15%" ng-click="arrange('client')">Account Name <span style="color:#5cb85c;margin-left:1em;">[ {{opt.savings}} ZAR ]</span></li>
-               <li class="menu-icon adsl-menu-title link size1" ng-click="arrange('percent')">Status</li>
-               <li class="menu-icon adsl-menu-title link" ng-click="arrange('sent')">Sent</li>
-               <li class="menu-icon adsl-menu-title link" ng-click="arrange('received')">Received</li>
-               <li class="menu-icon adsl-menu-title link" ng-click="arrange('total')">Total</li>
-               <li class="menu-icon adsl-menu-title link " ng-click="arrange('current_cost')">Current Cost</li>
-               <li class="menu-icon adsl-menu-title link size2" ng-click="arrange('current')">Current Package</li>
-               <li class="menu-icon adsl-menu-title link " ng-click="arrange('first_cost')">Original Cost</li>
-               <li class="menu-icon adsl-menu-title link size2" ng-click="arrange('first')">Original Package</li>
-               <li class="menu-icon adsl-menu-title link " ng-click="arrange('savings')" >Savings</li>
-               <li class="menu-icon" ng-if="crud.alpha"><a ng-if="licentia.Alpha" ng-href="{{crud.alpha}}" class="glyphicon glyphicon-plus success"></a></li>
-            </ol>
-         </div>
+      <div class="none headContainer adsl ">
+         <table class="table adsl_table" border="0">
+            <thead>
+               <tr>
+                  <th>
+                  <span class="dropdown btn-group" on-toggle="toggled(open)">
+                     <a href class="dropdown-toggle link-dropdown" >{{month.name}} <span class="caret"></span></a>
+                     <ul class="dropdown-menu list-dropdown">
+                        <li ng-repeat="m in months"><a href ng-bind="m.name" ng-click="change_month(m)" ></a></li>
+                     </ul>
+                  </span>
+                  </th>
+                  <th ng-click="arrange('client')">Account Name <span style="color:#5cb85c;margin-left:1em;">[ {{opt.savings}} ZAR ]</span></th>
+                  <th ng-click="arrange('current')">Current Package</th>
+                  <th ng-click="arrange('current_cost')">Current Cost</th>
+                  <th ng-click="arrange('init_cost')">Initial Cost</th>
+                  <th ng-click="arrange('savings')">Savings</th>
+                  <th ng-click="arrange('total')">Used / Sent / Received</th>
+                  <th ng-click="arrange('status')">Status</th>
+               </tr>
+            </thead>
+         </table>
       </div>
       <section id="mainContent" class='listContainer rowContainer' >
-         <div id='scroller'>
-            <ul>
-               <li ng-class="'adsl row numbers-items '+{1:''}[row.different]" style="background:#fafafa" ng-repeat="row in data | filter:inputSearch | orderBy:sortable:reverse">
-                  <div class="col-xs-1">
-                     <span ng-class="'item-icon glyphicon glyphicon-plus-sign '+{'safe':'success','cautious':'info','max':'warning','danger':'warning','critical':'danger'}[row.status] "></span>
-                  </div>
-                  <div class="col-xs-11">
+         <table class="table table-bordered table-hover table-condensed adsl_table" border="0">
+            <tbody>
+               <tr ng-class="'adsl numbers-items '+{1:''}[row.different]" style="background:#fafafa" ng-repeat="row in data | filter:inputSearch | orderBy:sortable:reverse">
+                  <td><span ng-class="'item-icon glyphicon glyphicon-plus-sign '+{'safe':'success','cautious':'info','max':'warning','danger':'warning','critical':'danger'}[row.status] "></span></td>
+                  <td>
                      <a href="#isaiah/adsl/view/{{row.account}}">
-                        <h4>
-                           <span ng-class="'adsl-label pull-right badge size1 bordered '+{'safe':'success','cautious':'info','max':'warning','danger':'warning','critical':'danger'}[row.status]" ng-bind="row.status" ></span>
-                           <span ng-class="'adsl-label pull-right label bg-black'">{{row.sent}} MB</span>
-                           <span ng-class="'adsl-label pull-right label bg-black'">{{row.received}} MB</span>
-                           <span ng-class="'adsl-label pull-right label bg-black'">{{row.total}} MB</span>
-                           <span ng-class="'adsl-label pull-right label label-info bordered black'">{{row.current_cost}} ZAR</span>
-                           <span ng-class="'adsl-label pull-right label label-info size2'">{{row.current}}</span>
-                           <span ng-class="'adsl-label pull-right label label-info bordered black'">{{row.first_cost}} ZAR</span>
-                           <span ng-class="'adsl-label pull-right label label-info size2'">{{row.first}}</span>
-                           <span ng-class="'adsl-label pull-right label label-info bordered black '">{{row.savings}} ZAR</span>
-                           <span class='header' ng-if="row.client">{{row.client}}</span>
-                           <span class='header' ng-if="!row.client">{{row.account}}</span>
-                        </h4>
-                        <small>
-                           <span ng-if="row.client">{{row.account}}, </span>has used <span class="black bold">{{row.percent}}%.</span> <span ng-if='row.different' class='danger'>Account will be updated to {{row.init}} next month</span>
-                        </small>
+                        <span class='header' ng-if="!row.client">{{row.account}} <span class="black bold">{{row.percent}}%.</span></span>
+                        <span class='header' ng-if="row.client">{{row.client}} <span class="black bold">{{row.percent}}%.</span></span>
                      </a>
-                  </div>
-               </li>
-            </ul>
-         </div>
+                     <small ng-if='row.different' class='danger text-danger'><br/>Account will be updated to {{row.init}} next month</small>
+
+                  </td>
+                  <td><a href="#isaiah/adsl/view/{{row.account}}"><span ng-class="'adsl-label label label-info '">{{row.current}}</span></a></td>
+                  <td><a href="#isaiah/adsl/view/{{row.account}}"><span ng-class="'adsl-label label label-info bordered black'">{{row.current_cost}} ZAR</span></a></td>
+                  <td><a href="#isaiah/adsl/view/{{row.account}}"><span ng-class="'adsl-label label label-info bordered black'">{{row.first_cost}} ZAR</span></a></td>
+                  <td><a href="#isaiah/adsl/view/{{row.account}}"><span ng-class="'adsl-label label label-info bordered black '">{{row.savings}} ZAR</span></a></td>
+                  <td>
+                     <a href="#isaiah/adsl/view/{{row.account}}" >
+                        <span ng-class="'adsl-label label bg-black'">{{row.total}} MB</span><span ng-class="'adsl-label label bg-black'">{{row.sent}} MB</span><span ng-class="'adsl-label label bg-black'">{{row.received}} MB</span>
+                     </a>
+                  </td>
+                  <td><a href="#isaiah/adsl/view/{{row.account}}"><span ng-class="'adsl-label badge bordered '+{'safe':'success','cautious':'info','max':'warning','danger':'warning','critical':'danger'}[row.status]" ng-bind="row.status" ></span></a></td>
+               </tr>
+            </tbody>
+         </table>
       </section>
    </section>
 

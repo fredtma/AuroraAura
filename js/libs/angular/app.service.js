@@ -1066,6 +1066,18 @@ function crud($rootScope,notitia,$routeParams,$modal,$log,fetch,$timeout){
       });
       modalInstance.result.then(callOK,callCancel);
    }
+   this.setString2Array=function(value,key){
+      var match = {};
+      if(typeof value==='string') {
+         var tmp = value.split(','),l=tmp.length,prop;
+         value = {};
+         for(var x=0;x<l;x++){
+            prop = tmp[x];
+            match[prop] = key?tmp[x]:true;
+         }
+      }
+      return match;
+   }
 
 }
 //############################################################################//

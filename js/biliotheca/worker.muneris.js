@@ -3,8 +3,8 @@
  * @todo:version_db
  */
 var set_version,db;
-var SITE_MILITIA='http://demo.xpandit.co.za/aura/notitia';
-var SITE_SERVICE='http://demo.xpandit.co.za/aura/services';
+var SITE_MILITIA='https://demo.xpandit.co.za/aura/notitia';
+var SITE_SERVICE='https://demo.xpandit.co.za/aura/services';
 var DB_VERSION=10;//@also:DB_VERSION in lib.muneris.js
 var iyona= new iyonaLog();
 function $DB(_quaerere,params,_msg,callback,reading,_eternal){

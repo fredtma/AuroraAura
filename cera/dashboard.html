@@ -44,7 +44,7 @@
          </a>
       </div>
       <div class="row">
-         <a href="#psalm/sales/list" class=" col-md-6" ng-if="licentia['View Sales']">
+         <a href="#psalm/sales/list" class=" col-md-3" ng-if="licentia['View Sales']">
             <div class="panel panel-info">
                <div class="panel-heading"><i class="glyphicon glyphicon-th-list"></i> Sales Order</div>
                <div class="panel-body">
@@ -53,33 +53,53 @@
                </div>
             </div>
          </a>
-         <a href="#kingsI/machine/list" class=" col-md-2" ng-if="licentia['View Server']">
+         <a href="#kingsI/machine/list" class=" col-md-3" ng-if="licentia['View Server']">
             <div class="panel panel-info">
-               <div class="panel-heading"><i class="glyphicon glyphicon-envelope"></i> Main Servers</div>
+               <div class="panel-heading"><i class="glyphicon glyphicon-folder-close"></i> Nagios Monitoring</div>
                <div class="panel-body">
+                  View the status of servers that are monitored by nagios
                   <span class="label label-info">View details</span>
                </div>
             </div>
-         <a href="#leviticus/servers/list" class=" col-md-4" ng-if="licentia['View ServerMail']">
+         <a href="#leviticus/servers/list" class=" col-md-3" ng-if="licentia['View ServerMail']">
             <div class="panel panel-info">
-               <div class="panel-heading"><i class="glyphicon glyphicon-envelope"></i> Mail Servers</div>
+               <div class="panel-heading"><i class="glyphicon glyphicon-envelope"></i> Mail Monitoring</div>
                <div class="panel-body">
+                  Check the exchange POP setting of servers
+                  <span class="label label-info">View details</span>
+               </div>
+            </div>
+         </a>
+         <a href="#gospel" class=" col-md-3" ng-if="licentia['View Server']">
+            <div class="panel panel-info">
+               <div class="panel-heading"><i class="glyphicon glyphicon-hdd"></i> Monitoring Screen</div>
+               <div class="panel-body">
+                  live update on mail and nagios server monitoring.
                   <span class="label label-info">View details</span>
                </div>
             </div>
          </a>
       </div>
       <div class="row">
-         <a href="#proverbs/list" class=" col-md-3" ng-if="licentia['View Lists']">
+         <a href="#job/checklist/list" class=" col-md-4" ng-if="licentia['View Checklist']">
             <div class="panel panel-info">
-               <div class="panel-heading"><i class="glyphicon glyphicon-align-justify"></i> List</div>
+               <div class="panel-heading"><i class="glyphicon glyphicon-check"></i> Checklist</div>
+               <div class="panel-body">
+                  List of system setup checklist
+                  <span class="label label-info">View details <i class="glyphicon glyphicon-arrow-right"></i></span>
+               </div>
+            </div>
+         </a>
+         <a href="#proverbs/list" class=" col-md-2" ng-if="licentia['View Lists']">
+            <div class="panel panel-info">
+               <div class="panel-heading"><i class="glyphicon glyphicon-align-justify"></i> List.</div>
                <div class="panel-body">
                   List of categories
                   <span class="label label-info">View details <i class="glyphicon glyphicon-arrow-right"></i></span>
                </div>
             </div>
          </a>
-         <a href="#numbers/clients/list" class=" col-md-3" ng-if="licentia['View Clients']">
+         <a href="#numbers/clients/list" class=" col-md-2" ng-if="licentia['View Clients']">
             <div class="panel panel-info">
                <div class="panel-heading"><i class="glyphicon glyphicon-briefcase"></i> Clients</div>
                <div class="panel-body">
@@ -88,13 +108,13 @@
                </div>
             </div>
          </a>
-         <a href="#" class=" col-md-3" ng-if="licentia['View Suppliers']">
+         <a href="#" class=" col-md-2" ng-if="licentia['View Suppliers']">
             <div class="panel panel-warning">
                <div class="panel-heading"><i class="glyphicon glyphicon-shopping-cart"></i> Suppliers</div>
                <div class="panel-body"><span class="label label-warning">Under construction</span></div>
             </div>
          </a>
-         <a href="#" class=" col-md-3" ng-if="licentia['View SABJ']">
+         <a href="#" class=" col-md-2" ng-if="licentia['View SABJ']">
             <div class="panel panel-warning">
                <div class="panel-heading"><i class="glyphicon glyphicon-stats"></i> SABJ Reports</div>
                <div class="panel-body"><span class="label label-warning">Under construction</span></div>

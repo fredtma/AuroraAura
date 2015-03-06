@@ -13,6 +13,7 @@ angular.module('KingsControllers',[])
    .controller('tmplUser',['$scope','crud','$routeParams',tmplUser])
    .controller('tmplClient',['$scope','crud','$routeParams',tmplClient])
    .controller('psalm',['$scope','crud','$routeParams','fetch',psalm])
+   .controller('job',['$scope','crud','$routeParams',job])
    .controller('deuteronomy',['$scope','crud','$routeParams','fetch',deuteronomy])
    .controller('kingsI',['$scope','crud','$routeParams','fetch',kingsI])
    .controller('proverbs',['$scope','crud',proverbs])
@@ -32,7 +33,7 @@ function gospel($scope,$rootScope){iyona.deb("Check",$scope.licentia,$rootScope.
  * $routerParams /section/:page/:opt[name,view,new]/:view[all,details]
  */
 function exodus($scope,fetch,$rootScope,$location,$routeParams,crud,notitia) {$scope.test=1;
-   var service=dynamis.get("SITE_ALIQUIS")||"http://demo.xpandit.co.za/aura/aliquis",
+   var service=dynamis.get("SITE_ALIQUIS")||"https://demo.xpandit.co.za/aura/aliquis",
    gPlus={"user_info":{"id":0,"type":0,"emails":[{"value":0}]}};
    $scope.attempt=0;
    //=========================================================================//LOGIN BUTTON
@@ -109,80 +110,112 @@ function modalShow($scope,$modalInstance,passing,$log){
  * @returns null
  */
 function bethel($scope,fetch,$rootScope,$location,$routeParams){
-   var cons=impetroUser().cons;$rootScope.init=dynamis.get("init",true)||{};var view=$routeParams.view|'all',cnt=0;
-   if(typeof $rootScope.init=="object" && "servers" in $rootScope.init){ angular.extend($scope,$rootScope.init);
-      var row1 = (typeof $scope.online.rows[0] !=="undefined")?$scope.online.rows[0].count:0,row2 = (typeof $scope.online.rows[1] !=="undefined")?$scope.online.rows[1].count:0;
-      $scope.total=parseInt(row1)+parseInt(row2);
-      $scope.down=( ($scope.online.length>1)||($scope.online.length==1&&$scope.online.rows[0].status=="down") )?true:false;
-      $scope.msg=($scope.down)?"You have one or more server down<br/>":"There are no Inactive server";
-      var n = ($scope.online.rows[1])?$scope.online.rows[1].count:($scope.online.rows[0])?$scope.online.rows[0].count:1;$scope.downTotal=n;
-      if($scope.down){
-         $scope.msgStatus="You have "+n+" server down";
-      }else{$scope.msgStatus="All servers are operational.";}/*set scroller*/
-      $scope.last=$scope.online.rows[0].modified;
+
+   $rootScope.init=dynamis.get("init",true)||{};
+   $scope.iframe = "none";
+   var view=$routeParams.view|'all',cnt=0;
+
+   if(typeof $rootScope.init==="object" && "servers" in $rootScope.init){
+      angular.extend($scope,$rootScope.init);
+      resultWorkout();
    }
+
    if(window.hasOwnProperty("EventSource")){//if the browser support SSE
-      if(window.hasOwnProperty("chrome")){
-         callWorker({"factum":true},function(data,worker){if(!data) {iyona.log("There was a problem with the server."); return false;}
-            var results = typeof data.results=="string"?JSON.parse(data.results):data.results;cnt++;
-            $rootScope.init=results;dynamis.set("init",results,true);iyona.deb("WK RESULTS-"+cnt,results);
-            angular.extend($scope,data.scope);
-            $scope.$apply();
+
+      if(window.hasOwnProperty("chrome")){//chrome will do it in the background
+         callWorker({"factum":true},function(data,worker){
+            if(!data) {iyona.log("There was a problem with the server."); return false;}
+            var results = typeof data.results==="string"? JSON.parse(data.results): data.results;cnt++;
+            if(typeof results!=="object"||typeof results.servers==="undefined") {console.log("There was an error in bethel's results");return false;}
+
+            $rootScope.init=results;
+            dynamis.set("init",results,true);
+            iyona.deb("WK RESULTS:"+cnt,results, data);
+
+            $scope.$apply(function(){
+               $scope.down       = results.down;
+               $scope.last       = results.last;
+               $scope.msgStatus  = results.msgStatus;
+               $scope.msg        = results.last;
+               $scope.online     = results.online;
+               $scope.nagios     = results.nagios;
+               $scope.servers    = results.servers;
+               $scope.serverLine = results.serverLine;
+               $scope.total      = results.total;
+               $scope.iframe     = (cnt%2)?"none":"block";
+            });
             if(PASCO){navigator.splashscreen.hide();worker.terminate()}//for mobile platform close the SSE & splash
             if(cnt<=1){
                $scope.$on("$routeChangeStart",function(ev,newLoc,oldLoc){
-                  worker.postMessage({"factum":"close"});
-//                  worker.terminate();
+                  worker.postMessage({"factum":"close"});//close when changing to an other state
+                  worker.terminate();
                   iyona.log("server event closed.")});
             }//use an if <1 so that the event is not recorded multiple times
          });
+
       }else{//for FF and other eventSource support
-         var serverEvent=new EventSource("http://demo.xpandit.co.za/aura/home-event,"+view);
-         serverEvent.onmessage=function(ev){iyona.log("SERVER EVENT MESSAGE",results,ev);}
+         var serverEvent=new EventSource("https://demo.xpandit.co.za/aura/home-event");
+         serverEvent.onmessage=function(ev){iyona.log("SERVER EVENT MESSAGE",ev);}
          serverEvent.addEventListener('init',function(ev){
-            var results=JSON.parse(ev.data);iyona.log("SSE INIT...",results,ev);
-            if(!results||"servers" in results===false) {iyona.log("There was an error in bethel's results");return false;}
-            $rootScope.init=results;dynamis.set("init",results,true);$scope.servers={},$scope.online={};$scope.serverLine={};
-            try{ angular.extend($scope,results);results=null;
-               var row1 = (typeof $scope.online.rows[0] !=="undefined")?$scope.online.rows[0].count:0,row2 = (typeof $scope.online.rows[1] !=="undefined")?$scope.online.rows[1].count:0;
-               $scope.total=parseInt(row1)+parseInt(row2);
-               $scope.down=( ($scope.online.length>1)||($scope.online.length==1&&$scope.online.rows[0].status=="down") )?true:false;
-               $scope.msg=($scope.down)?"You have one or more server down<br/>":"There are no Inactive server";
-               var n = ($scope.online.rows[1])?$scope.online.rows[1].count:($scope.online.rows[0])?$scope.online.rows[0].count:1;$scope.downTotal=n;
-               if($scope.down){
-                  $scope.msgStatus="You have "+n+" server down";
-               }else{$scope.msgStatus="All servers are operational.";}
-               $scope.last=$scope.online.rows[0].modified;
-               $scope.$apply();
-               if(PASCO){navigator.splashscreen.hide();serverEvent.close();}//for mobile platform close the SSE & splash.
-               else if(!$scope.once) {setTimeout(function(){SETiSCROLL(".dashboard")},1500); $scope.once=true;}
-            }catch(e){iyona.log(e.message,false,"there was an error in bethel");}
+            cnt++;
+            if(cnt>=50 && false){iyona.log("Closing worker"); serverEvent.close();self.close();}//DISABLE::after a certain number
+            var results=JSON.parse(ev.data);
+            $scope.iframe = (cnt%2)?"none":"block";
+            resultApplication(results);
          });
          serverEvent.onerror=function(ev){iyona.deb("Server event error.",ev);}
          $scope.$on("$routeChangeStart",function(ev,newLoc,oldLoc){serverEvent.close();iyona.log("server event closed.")});
       }
+
    }else{//when the browser does not support SSE
-      fetch.post(dynamis.get('SITE_SERVICE')+',creo,server_events',{},function(results){
-         if(!results||"servers" in results===false) {iyona.log("There was an error in bethel's results");return false;}
-         $rootScope.init=results;dynamis.set("init",results,true);$scope.servers={},$scope.online={};$scope.serverLine={};
-         try{ angular.extend($scope,results);results=null;
-            var row1 = (typeof $scope.online.rows[0] !=="undefined")?$scope.online.rows[0].count:0,row2 = (typeof $scope.online.rows[1] !=="undefined")?$scope.online.rows[1].count:0;
-            $scope.total=parseInt(row1)+parseInt(row2);
-            $scope.down=( ($scope.online.length>1)||($scope.online.length==1&&$scope.online.rows[0].status=="down") )?true:false;
-            $scope.msg=($scope.down)?"You have one or more server down<br/>":"There are no Inactive server";
-            var n = ($scope.online.rows[1])?$scope.online.rows[1].count:($scope.online.rows[0])?$scope.online.rows[0].count:1;$scope.downTotal=n;
-            if($scope.down){
-               $scope.msgStatus="You have "+n+" server down";
-            }else{$scope.msgStatus="All servers are operational.";}
-            $scope.last=$scope.online.rows[0].modified;
-            if(PASCO){navigator.splashscreen.hide();serverEvent.close();}//for mobile platform close the SSE & splash.
-         }catch(e){iyona.log(e.message,false,"there was an error in bethel");}
+      var repeat=true;
+      fetch.post('https://demo.xpandit.co.za/aura/home-event,ie',{},function(results){
+         cnt++;
+         if(cnt>=50 && false){iyona.log("Closing iteration"); repeat=false;}//DISABLE::after a certain number
+         resultApplication(results,'ie');
       });
    }
    setTimeout(function(){SETiSCROLL(".dashboard")},1000);
    $scope.moveTo=function(server,direct){
-      if(!direct)$location.path("/leviticus/servers/"+server+"/details");
+      if(!direct)$location.path("/leviticus/servers/view/"+server);
       else $location.path(server);
+   }
+   function resultApplication(results,from){
+
+      iyona.log("RESULTS INIT...",results);
+      if(!results||typeof results.servers==="undefined") {iyona.log("There was an error in bethel's results");return false;}
+
+      $scope.servers={},$scope.online={};$scope.serverLine={};
+      $rootScope.init=results;
+      dynamis.set("init",results,true);
+      try{
+         angular.extend($scope,results);
+         results=null;
+         resultWorkout();
+         //$scope.$apply();
+         if(PASCO){navigator.splashscreen.hide();if(from==='ie')serverEvent.close();}//for mobile platform close the SSE & splash.
+      }catch(e){iyona.log(e.message,false,"there was an error in bethel");}
+   }
+   function resultWorkout(){
+      var serverStatus={'down':0,'active':0,'slow':0,'nagios':0},xx,ll,nn,row=[];
+      $scope.total=0;
+      if(typeof $scope.online!=="undefined" && typeof $scope.online.rows !== "undefined"){
+         ll = $scope.online.rows.length;
+         for(var xx=0;xx<ll;xx++){
+            nn = $scope.online.rows[xx];
+            row.push(nn);
+            serverStatus[nn.status] = parseInt(nn.count);
+            $scope.total += parseInt(nn.count);
+         }
+      }
+      serverStatus.nagios  = parseInt($scope.nagios.length);
+      $scope.down          = serverStatus.down>0?true:false;//if there is two row or one with a down status
+
+      $scope.msgStatus="All servers are operational.<br/>";
+      if(serverStatus.down)         {$scope.msgStatus="You have "+serverStatus.down+" server down.<br/>";}
+      else if (serverStatus.slow)   {$scope.msgStatus+="You have "+serverStatus.slow+" slow servers.<br/>";}
+      else if (serverStatus.nagios) {$scope.msgStatus+="You have "+$scope.nagios.length+" Nagios server/s down <br/>";}
+      $scope.last=row[0].modified;
    }
 }
 //============================================================================//
@@ -331,7 +364,7 @@ function isaiah($scope,crud,$routeParams,fetch,$timeout) {
    defaultScope.list.period={"delta":"!@=!#","alpha":month};
    defaultScope.messenger = {"period":month,"run_consue":"cost summary"};
    $scope.sortable=null;$scope.reverse=false;
-   $scope.months = [{"name":"January","id":"1"},{"name":"May","id":"5"},{"name":"June","id":"6"},{"name":"July","id":"7"},{"name":"August","id":"8"},{"name":"September","id":"9"},{"name":"October","id":"10"},{"name":"November","id":"11"},{"name":"December","id":"12"},{"name":"Email Report","id":0}];
+   $scope.months = [{"name":"January","id":"1"},{"name":"February","id":"2"},{"name":"March","id":"3"},{"name":"April","id":"4"},{"name":"May","id":"5"},{"name":"June","id":"6"},{"name":"July","id":"7"},{"name":"August","id":"8"},{"name":"September","id":"9"},{"name":"October","id":"10"},{"name":"November","id":"11"},{"name":"December","id":"12"},{"name":"Email Report","id":0}];
    $scope.month=objSearch($scope.months,month);iyona.deb("MONTHS",$scope.month,$scope.months,month);
    $scope.month= isset($scope.month[0]) && isset($scope.month[0][0])?$scope.month[0][0]:{};
 
@@ -539,6 +572,55 @@ function psalm($scope,crud,$routeParams,fetch){
       });
    }
 }
+//============================================================================//
+/*
+ * the controler for clients
+ * $routerParams /section/:page/:opt[name,view,new]/:view[all,details]
+ */
+function job($scope,crud,$routeParams) {
+   var title="Checklist",profile='checklist',defaultScope=dynamis.get("defaultScope",true)[profile];
+   defaultScope.details.jesua={"delta":"!@=!#","alpha":$routeParams.jesua};
+   var tmp1,tmp2,tmp3;
+
+   crud.get($scope,title,profile,defaultScope);
+   $scope.data.new_setup         = ['Kaseya Installed','Antivirus Installed','Mimecast (MSO) Installed','Startup Applications Removed'];
+	$scope.data.replacement_setup = ['Kaseya Uninstalled','Antivirus Uninstalled'];
+
+//   $scope.consent=function(perm){ iyona.log("Permission");return crud.consent(perm);};
+   $scope.submit=function(dataForm){
+      if($scope.data.status==='finished') $scope.data.engineer_finished = new Date().format('isoDate');
+
+      tmp1 = $scope.data.done;
+      tmp2 = $scope.data.install;
+      tmp3 = $scope.data.uninstall;
+      $scope.data.done     = Object.keys($scope.data.done).join();
+      $scope.data.install  = Object.keys($scope.data.install).join();
+      $scope.data.uninstall= Object.keys($scope.data.uninstall).join();
+      console.log("THE DATA",$scope.data,tmp1,tmp2,tmp3);
+      $scope.dataForm=dataForm;
+      crud.submit($scope,profile);
+   }
+   $scope.delete=function(){crud.delete($scope,profile);}
+//   $scope.DBenum=function(links,parent,col1,key,type){crud.DBenum(links,parent,col1,key,type)}//enum
+//   $scope.DBset=function(field,val){return crud.DBset(field,val);}
+
+   $scope.prima=impetroUser().operarius;
+   $scope.$on("readyList",function(e,server){console.log('server',server);});
+   $scope.$on("readySubmit",function(e,server){
+      $scope.data.done     = tmp1;
+      $scope.data.install  = tmp2;
+      $scope.data.uninstall= tmp3;
+   });
+   $scope.$on("readyForm",function(e,server){
+      $scope.data.user = $scope.prima;
+      $scope.data.done = crud.setString2Array($scope.data.done);
+      $scope.data.install = crud.setString2Array($scope.data.install);
+      $scope.data.uninstall = crud.setString2Array($scope.data.uninstall);
+      $scope.data.givenTime = "Last modified @ "+$scope.data.modified+($scope.data.engineer_finished?" and Engineer finished @ "+$scope.data.engineer_finished:"");
+      $scope.readonly = ($scope.data.status==='client request'||$scope.data.status==='escalate')?false:true;
+
+   });
+}//function
 //============================================================================//permissions
 function deuteronomy($scope,crud,$routeParams,fetch){
    var title="Permissions",profile='licentia',defaultScope=dynamis.get("defaultScope",true)[profile];

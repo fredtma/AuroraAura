@@ -3,39 +3,73 @@
       <ol class="breadcrumb">
          <li><a href="#genesis">Home</a></li>
          <li class="active">Device Details</li>
-         <li class="menu-icon"><a title="View operating server" href="#genesis/live" class="glyphicon glyphicon-thumbs-up white"></a></li>
-         <li class="menu-icon"><a  href="#genesis/down" title="View down server" class="glyphicon glyphicon-thumbs-down white"></a></li>
-         <li class="menu-icon"><a title="View all server" href="#genesis/all" class="glyphicon glyphicon-hand-up white"></a></li>
+<!--         <li class="menu-icon"><a title="View operating server" href="#genesis/live" class="glyphicon glyphicon-ok white"></a></li>
+         <li class="menu-icon"><a  href="#genesis/down" title="View down server" class="glyphicon glyphicon-remove white"></a></li>
+         <li class="menu-icon"><a title="View all server" href="#genesis/all" class="glyphicon glyphicon-hand-up white"></a></li>-->
       </ol>
    </header>
    <section class="dashboard listContainer" >
-      <ul>
+      <iframe ng-style="{display:iframe}" frameborder="0" width="100%" height="100%" src="http://xpandit.web.onecontact.1stream.co.za/onesupervisor13/"></iframe>
+      <ul class="">
          <li class="dashRow">
             <div class="panel panel-primary dashCell cell ">
-               <div class="panel-body whiteShadow"  ng-click="moveTo('leviticus/servers/list',true)">
-                  <span class="glyphicon glyphicon-hdd panelIcon"></span>
-                  <p>Currently {{total}} monitored server<br/>
+               <div class="panel-heading whiteShadow"  ng-click="moveTo('leviticus/servers/list',true)">
+                  <p>Currently monitoring {{total}} mail servers<br/>
                      The last system check ran on {{last}}
                   </p>
                </div>
-               <h3 class="panel-footer">Exchange Mail Server</h3>
+               <h3 class="panel-footer text-primary">
+                  <span class="glyphicon glyphicon-hdd panelIcon"></span>
+                  Exchange Mail Server
+               </h3>
             </div>
             <div ng-class="'panel '+{true:'panel-danger dashCell cell backRed',false:'panel-primary dashCell cell backBlue'}[down]">
                <div class="panel-body whiteShadow">
-                  <span ng-class="'glyphicon glyphicon-'+{true:'thumbs-down danger',false:'thumbs-up'}[down]+' panelIcon'"></span>
-                  <p ng-class="">{{msgStatus}}</p>
+                  <p ng-class="" ng-bind-html="msgStatus" ></p>
                </div>
-               <h3 ng-class="'panel-footer '+{true:'danger',false:'passed'}[down]">Inactive Mail Server</h3>
+               <h3 ng-class="'panel-footer '+{true:'danger',false:'text-primary'}[down]">
+                  <span ng-class="'glyphicon glyphicon-'+{true:'remove danger',false:'ok text-success'}[down]+' panelIcon'"></span>
+                  Mail Server
+               </h3>
             </div>
          </li>
-         <li class="dashRow" ng-repeat="(LineKey,line) in serverLine | filter:inputSearch">
-            <div ng-repeat="server in line" ng-class="'panel dashCell '+{true:' panel-danger backRed',false:' panel-primary backBlue'}[server.status=='down']+{true:' cellBlock',false:' cell'}[serverLine[LineKey].length==1]">
-               <div class="panel-body whiteShadow" ng-init="cnt=cnt+1;" ng-click="moveTo(server.name)">
-                  <span ng-class="'panelIcon glyphicon glyphicon-'+{true:'thumbs-down danger',false:'thumbs-up'}[server.status=='down']"></span>
-                  <p ng-class=""><strong>{{server.name}}</strong> {{server.status=='down'?"down since":"checked"}} {{server.modified|lastTime}} ago</p>
+         <li class="dashRow dashPanList" >
+            <span class="label label-success" ng-bind="!servers.rows?'All Mail servers are operational':'Mail Servers'" ></span>
+         </li>
+         <li class="dashRow dashPanList" ng-if="servers.rows" >
+            <div ng-repeat="(LineKey,server) in servers.rows | filter:inputSearch" ng-class="'panel dashCell dashPan '+{'down':' panel-danger ','active':' panel-primary ','slow':' panel-warning '}[server.status]">
+               <div class="panel-heading" ng-bind="server.name"></div>
+               <div class="panel-body " ng-init="cnt=cnt+1;" ng-click="moveTo(server.name)">
+                  <p ng-class=""><strong>{{server.system_comment}}</strong> {{server.status=='down'?"down since":"checked"}} {{server.modified|lastTime}} ago</p>
                </div>
-               <h3 ng-class="'panel-footer '+{true:'danger',false:'passed'}[server.status=='down']">{{server.address}}</h3>
+               <h3 ng-class="'panel-footer '+{'down':'danger','active':'text-primary','slow':'warning'}[server.status]">
+                  <span ng-class="'panelIcon glyphicon glyphicon-'+{'slow':'eye-open warning', 'down':'remove danger','active':'ok text-success'}[server.status]"></span>
+                  {{server.address}}
+               </h3>
             </div>
+         </li>
+         <li class="dashRow dashPanList" >
+            <span class="label label-success" ng-bind="!nagios.rows?'All Nagios servers are operational':'Nagios Servers'" ></span>
+         </li>
+         <li class="dashRow dashPanList" >
+            <div ng-repeat="(LineKey,server) in nagios.rows | filter:inputSearch" ng-class="'panel dashCell dashPan '+{'down':' panel-danger ','set':' panel-primary ','slow':' panel-warning '}[server.status]">
+               <div class="panel-heading" ><h5><span ng-bind="server.name"></span> <small ng-bind="server.type"></small></h5> </div>
+               <div class="panel-body "  ng-click="moveTo('/kingsI/machine/view/'+server.name,true)">
+                  <p ng-class="">
+                     <strong>{{server.company}}</strong><br/>
+                     <strong>{{server.server_message}}</strong>
+                     {{server.status=='down'?"down since":"checked"}}<br/>
+                     {{server.modified|lastTime}} ago. Number of tries {{server.failed}}.
+                  </p>
+               </div>
+               <h3 ng-class="'panel-footer '+{'down':'danger','set':'text-primary','slow':'warning'}[server.status]">
+                  <span ng-class="'panelIcon glyphicon glyphicon-'+{'slow':'eye-open warning', 'down':'remove danger','set':'ok text-success'}[server.status]"></span>
+                  {{server.ip}}
+               </h3>
+            </div>
+         </li>
+         <li class="dashRow">
+            <div class="panel dashCell cellBlock" style="height:7em;background:transparent;">&nbsp;</div>
          </li>
       </ul>
    </section>
